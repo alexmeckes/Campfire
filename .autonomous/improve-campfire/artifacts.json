@@ -1,0 +1,37 @@
+{
+  "task_slug": "improve-campfire",
+  "last_updated": "2026-03-14",
+  "artifacts": [
+    {
+      "path": "AGENTS.md",
+      "type": "workflow_rules",
+      "milestone_id": "milestone-001",
+      "reason": "Makes the Campfire repo self-hosting under its own long-horizon workflow."
+    },
+    {
+      "path": "scripts/new_task.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-001",
+      "reason": "Creates self-hosted Campfire tasks inside this repo."
+    },
+    {
+      "path": "scripts/resume_task.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-001",
+      "reason": "Resumes self-hosted Campfire tasks inside this repo."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_blocked_retry.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-001",
+      "reason": "Covers the blocked and retry escalation path."
+    },
+    {
+      "path": "scripts/verify_repo.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-001",
+      "reason": "Runs the Campfire repo verification suite including the blocked retry verifier."
+    }
+  ],
+  "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."
+}

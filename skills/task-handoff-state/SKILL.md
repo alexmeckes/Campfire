@@ -53,6 +53,12 @@ Verify the task-state lifecycle:
 ~/.codex/skills/task-handoff-state/scripts/verify_task_lifecycle.sh
 ```
 
+Verify blocked and retry handling:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_blocked_retry.sh
+```
+
 ## File Contract
 
 ### `plan.md`

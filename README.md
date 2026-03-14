@@ -146,11 +146,18 @@ This checks:
 - shell scripts parse
 - the example workspace exists
 - the generic lifecycle verifier passes
+- the blocked/retry verifier passes
 
 You can also run the lifecycle verifier directly:
 
 ```bash
 ./skills/task-handoff-state/scripts/verify_task_lifecycle.sh
+```
+
+And the blocked/retry verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_blocked_retry.sh
 ```
 
 ## Example Workspace
@@ -182,10 +189,11 @@ Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses two kinds of checks:
+The prototype currently uses three kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
+- blocked and retry tests that simulate escalation after repeated failures
 
 The goal is for every Campfire implementation to prove:
 
@@ -193,6 +201,7 @@ The goal is for every Campfire implementation to prove:
 - task state upgrades cleanly
 - resume output matches on-disk state
 - milestone validation can be recorded and surfaced correctly
+- blocked and retry state can be surfaced without silent thrashing
 
 ## Principles
 
@@ -216,7 +225,6 @@ Campfire is early, but it is now concrete enough to install and test:
 
 - publish the generic skill files
 - add reusable task-state verifiers
-- add blocked-run and retry-path verification
 - add optional worktree-aware bootstrapping for git repos
 - document automation patterns for recurring Codex App runs
 

@@ -18,6 +18,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/resume_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/scripts/install_skills.sh"
 
 echo "== Skill presence =="
@@ -45,6 +46,9 @@ expect_file "$TEMP_CODEX_HOME/skills/task-handoff-state"
 
 echo "== Lifecycle verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh"
+
+echo "== Blocked retry verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh"
 
 rm -f /tmp/campfire_install.out
 

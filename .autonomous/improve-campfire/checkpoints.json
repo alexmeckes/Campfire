@@ -1,0 +1,49 @@
+{
+  "task_slug": "improve-campfire",
+  "objective": "dogfood Campfire on itself and add the blocked-run lifecycle verifier",
+  "status": "validated",
+  "phase": "verification",
+  "current": {
+    "milestone_id": "milestone-001",
+    "milestone_title": "Self-hosting and blocked verifier",
+    "slice_id": "slice-003",
+    "slice_title": "Validate Campfire after adding blocked retry coverage",
+    "acceptance_criteria": [
+      "Campfire repo can initialize its own tasks",
+      "Blocked and retry verifier exists and passes",
+      "verify_repo.sh passes with the new coverage"
+    ],
+    "dependencies": [
+      "AGENTS.md",
+      "scripts/new_task.sh",
+      "scripts/resume_task.sh",
+      "skills/task-handoff-state/scripts/verify_blocked_retry.sh",
+      "scripts/verify_repo.sh"
+    ]
+  },
+  "blocker": {
+    "status": "none",
+    "type": "",
+    "summary": "",
+    "attempts": 0,
+    "next_action": ""
+  },
+  "last_run": {
+    "started_at": "2026-03-14T17:00:07Z",
+    "ended_at": "2026-03-14T17:07:00Z",
+    "stop_reason": "milestone_validated",
+    "summary": "Dogfooded Campfire on itself, added the blocked and retry verifier, and validated the repo.",
+    "next_step": "Choose the next Campfire improvement milestone."
+  },
+  "runbook": "runbook.md",
+  "artifacts_manifest": "artifacts.json",
+  "validation": [
+    {
+      "type": "repo_verification",
+      "result": "pass",
+      "command": "./scripts/verify_repo.sh",
+      "summary": "Repo verification passed after adding self-hosting files and blocked retry coverage."
+    }
+  ],
+  "last_updated": "2026-03-14"
+}
