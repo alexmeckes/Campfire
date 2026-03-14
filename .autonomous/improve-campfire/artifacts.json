@@ -31,6 +31,18 @@
       "type": "verifier_script",
       "milestone_id": "milestone-001",
       "reason": "Runs the Campfire repo verification suite including the blocked retry verifier."
+    },
+    {
+      "path": "skills/task-framer/SKILL.md",
+      "type": "skill_definition",
+      "milestone_id": "milestone-002",
+      "reason": "Turns vague objectives into concrete Campfire task plans."
+    },
+    {
+      "path": "skills/course-corrector/SKILL.md",
+      "type": "skill_definition",
+      "milestone_id": "milestone-002",
+      "reason": "Adjusts Campfire task plans when new facts change the best path."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

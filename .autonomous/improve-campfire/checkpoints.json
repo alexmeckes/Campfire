@@ -4,20 +4,19 @@
   "status": "validated",
   "phase": "verification",
   "current": {
-    "milestone_id": "milestone-001",
-    "milestone_title": "Self-hosting and blocked verifier",
-    "slice_id": "slice-003",
-    "slice_title": "Validate Campfire after adding blocked retry coverage",
+    "milestone_id": "milestone-002",
+    "milestone_title": "Framing and course correction",
+    "slice_id": "slice-005",
+    "slice_title": "Validate Campfire after adding framing and re-planning skills",
     "acceptance_criteria": [
-      "Campfire repo can initialize its own tasks",
-      "Blocked and retry verifier exists and passes",
-      "verify_repo.sh passes with the new coverage"
+      "Campfire includes a generic task framing skill",
+      "Campfire includes a generic course correction skill",
+      "Installer and repo verifier include the new skills"
     ],
     "dependencies": [
-      "AGENTS.md",
-      "scripts/new_task.sh",
-      "scripts/resume_task.sh",
-      "skills/task-handoff-state/scripts/verify_blocked_retry.sh",
+      "skills/task-framer/SKILL.md",
+      "skills/course-corrector/SKILL.md",
+      "scripts/install_skills.sh",
       "scripts/verify_repo.sh"
     ]
   },
@@ -29,10 +28,10 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-14T17:00:07Z",
-    "ended_at": "2026-03-14T17:07:00Z",
+    "started_at": "2026-03-14T17:07:00Z",
+    "ended_at": "2026-03-14T17:17:00Z",
     "stop_reason": "milestone_validated",
-    "summary": "Dogfooded Campfire on itself, added the blocked and retry verifier, and validated the repo.",
+    "summary": "Added generic task-framing and course-correction skills and validated the repo.",
     "next_step": "Choose the next Campfire improvement milestone."
   },
   "runbook": "runbook.md",
@@ -42,7 +41,7 @@
       "type": "repo_verification",
       "result": "pass",
       "command": "./scripts/verify_repo.sh",
-      "summary": "Repo verification passed after adding self-hosting files and blocked retry coverage."
+      "summary": "Repo verification passed after adding task framing and course-correction coverage."
     }
   ],
   "last_updated": "2026-03-14"

@@ -13,3 +13,11 @@
 - Validation: ran ./scripts/verify_repo.sh successfully after adding the blocked and retry verifier.
 - Blockers: none.
 - Next slice: choose the next Campfire improvement milestone.
+
+## 2026-03-14 milestone-002
+
+- Changed: added the generic task-framing and course-correction skills so Campfire now covers task formation, execution, state, and re-planning.
+- Changed: wired the new skills into install_skills.sh, verify_repo.sh, README.md, and AGENTS.md.
+- Validation: ran ./scripts/verify_repo.sh successfully after adding the new skills and installer wiring.
+- Blockers: none.
+- Next slice: choose the next Campfire improvement milestone.

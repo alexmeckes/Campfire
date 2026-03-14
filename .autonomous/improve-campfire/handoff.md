@@ -3,7 +3,7 @@
 ## Current Status
 
 - Status: validated
-- Current milestone: milestone-001 - self-hosting and blocked verifier
+- Current milestone: milestone-002 - framing and course correction
 - Next slice: choose the next Campfire improvement milestone
 - Stop reason: milestone_validated
 

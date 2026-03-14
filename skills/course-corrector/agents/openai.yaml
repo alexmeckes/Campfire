@@ -1,0 +1,7 @@
+interface:
+  display_name: "Course Corrector"
+  short_description: "Re-plan Campfire tasks without losing history"
+  default_prompt: "Use $course-corrector and $task-handoff-state to update this Campfire task after new information changed the best path."
+
+policy:
+  allow_implicit_invocation: false

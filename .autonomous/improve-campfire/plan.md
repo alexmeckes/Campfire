@@ -17,6 +17,7 @@ dogfood Campfire on itself and add the blocked-run lifecycle verifier
 - [x] Make the Campfire repo self-hosting with AGENTS.md and local task wrappers
 - [x] Add the blocked and retry lifecycle verifier
 - [x] Validate the repo with verify_repo.sh
+- [x] Add task framing and course-correction skills
 - [ ] Choose the next Campfire improvement milestone
 
 ## Notes

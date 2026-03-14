@@ -11,6 +11,8 @@ The core idea is:
 
 Instead of one giant project-specific skill, Campfire uses a small stack:
 
+- `task-framer`
+- `course-corrector`
 - `long-horizon-worker`
 - `task-handoff-state`
 - `AGENTS.md` in each repo
@@ -52,7 +54,15 @@ Campfire treats a long-running task as a small harness, not a giant prompt.
 
 `task-handoff-state` owns the durable file contract under `.autonomous/<task>/`.
 
-### 3. Project rules
+### 3. Generic framing skill
+
+`task-framer` turns vague objectives into real Campfire tasks with milestones, acceptance criteria, runbook commands, and the first safe slice.
+
+### 4. Generic course-correction skill
+
+`course-corrector` adjusts the plan when new facts, blockers, or better sequencing emerge during execution.
+
+### 5. Project rules
 
 Project-specific guidance belongs in:
 
@@ -91,6 +101,7 @@ Each task lives under:
 Campfire is designed for Codex App usage:
 
 - the two generic skills can be installed globally from this repo
+- framing and course-correction can stay generic while project rules stay local
 - each repo keeps its own `AGENTS.md`
 - each long task gets a durable `.autonomous/<task>/` directory
 - Codex App prompts stay short because the state is on disk
@@ -101,11 +112,25 @@ Typical prompt:
 Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and keep working until the current milestone is validated.
 ```
 
+Typical framing prompt:
+
+```text
+Use $task-framer and $task-handoff-state to turn this objective into a concrete Campfire task.
+```
+
+Typical course-correction prompt:
+
+```text
+Use $course-corrector and $task-handoff-state to update this Campfire task after new information changed the best path.
+```
+
 ## Repo Layout
 
 ```text
 Campfire/
   skills/
+    task-framer/
+    course-corrector/
     long-horizon-worker/
     task-handoff-state/
   scripts/
@@ -125,6 +150,8 @@ Install the Campfire skills into `~/.codex/skills`:
 
 That script symlinks:
 
+- `skills/task-framer`
+- `skills/course-corrector`
 - `skills/long-horizon-worker`
 - `skills/task-handoff-state`
 
@@ -173,16 +200,28 @@ Use it as a reference, not as a template you must copy verbatim.
 
 1. Install the Campfire skills from this repo.
 2. Add an `AGENTS.md` file to your project.
-3. Create a task:
+3. Create or scaffold a task:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/init_task.sh --root /path/to/project "your objective"
 ```
 
-4. Open the project in Codex App and prompt:
+4. If the task is still vague, prompt:
+
+```text
+Use $task-framer and $task-handoff-state to turn this objective into a concrete Campfire task.
+```
+
+5. Open the project in Codex App and prompt:
 
 ```text
 Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and keep working until the current milestone is validated.
+```
+
+6. If the plan changes mid-run, prompt:
+
+```text
+Use $course-corrector and $task-handoff-state to update this task after new facts changed the best path.
 ```
 
 ## Verification
@@ -217,6 +256,7 @@ The goal is for every Campfire implementation to prove:
 Campfire is early, but it is now concrete enough to install and test:
 
 - portable generic Codex skills
+- task framing and course correction as first-class skills
 - durable task-state scaffolding
 - repo-local install and verification scripts
 - a minimal example workspace

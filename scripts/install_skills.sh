@@ -34,7 +34,9 @@ install_skill() {
 }
 
 install_skill "long-horizon-worker"
+install_skill "task-framer"
 install_skill "task-handoff-state"
+install_skill "course-corrector"
 
 echo
 echo "Restart Codex App so the skill list refreshes."

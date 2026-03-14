@@ -1,0 +1,7 @@
+interface:
+  display_name: "Task Framer"
+  short_description: "Turn vague goals into real Campfire tasks"
+  default_prompt: "Use $task-framer and $task-handoff-state to turn this objective into a concrete Campfire task."
+
+policy:
+  allow_implicit_invocation: false
