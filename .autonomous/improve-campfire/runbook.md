@@ -10,6 +10,7 @@
 - Optional install into ~/.codex/skills: ./scripts/install_skills.sh
 - Rolling-mode helper: ./scripts/enable_rolling_mode.sh <task-slug> --queue "milestone-id:Milestone title"
 - Manual-stop rolling helper: ./scripts/enable_rolling_mode.sh --until-stopped <task-slug> --queue "milestone-id:Milestone title"
+- Automation prompt helper: ./skills/task-handoff-state/scripts/automation_prompt_helper.sh --root /Users/alexmeckes/Downloads/Campfire <task-slug>
 - Repo verification: ./scripts/verify_repo.sh
 - Lifecycle verification: ./skills/task-handoff-state/scripts/verify_task_lifecycle.sh
 - Blocked/retry verification: ./skills/task-handoff-state/scripts/verify_blocked_retry.sh
@@ -23,6 +24,8 @@
 - Rolling budget-limit verification: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Rolling waiting-on-decision verification: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
 - Automation-pattern verification: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
+- Automation prompt helper verification: ./skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh
+- Resume automation-guidance verification: ./skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh
 - Review framing skill: ./skills/task-framer/SKILL.md
 - Review correction skill: ./skills/course-corrector/SKILL.md
 - Review evaluator skill: ./skills/task-evaluator/SKILL.md
@@ -34,6 +37,8 @@
 - Review autonomy-floor correction note: .autonomous/improve-campfire/findings/milestone-021-autonomy-floor-course-correction.md
 - Review autonomy-floor evaluation: .autonomous/improve-campfire/findings/milestone-023-evaluation.md
 - Review automation-helper backlog brief: .autonomous/improve-campfire/findings/milestone-024-automation-helper-backlog.md
+- Review automation-helper evaluation: .autonomous/improve-campfire/findings/milestone-028-evaluation.md
+- Review automation proposal backlog brief: .autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md
 - Review automation patterns reference: skills/task-handoff-state/references/automation-patterns.md
 
 ## Validation
@@ -51,6 +56,8 @@
 - Secondary: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh
 - Secondary: inspect the task-evaluator skill, reference docs, installer wiring, and repo verifier wiring
 - Record new verifier scripts in artifacts.json when they become part of the harness
 

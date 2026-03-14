@@ -11,6 +11,7 @@ This skill standardizes a task directory at `.autonomous/<task>/` inside the act
 
 Read [references/task-state-contract.md](references/task-state-contract.md) when you need the full file contract and schema conventions.
 Read [references/automation-patterns.md](references/automation-patterns.md) when the task should drive a recurring Codex App automation instead of a one-off run.
+Use [scripts/automation_prompt_helper.sh](scripts/automation_prompt_helper.sh) when you want task-only automation prompt variants emitted from existing Campfire state.
 
 ## What It Creates
 
@@ -64,6 +65,12 @@ Switch an existing task into manual-stop rolling mode:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --until-stopped build-the-next-milestone --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
+```
+
+Print task-only automation prompt variants for an existing task:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/automation_prompt_helper.sh build-the-next-milestone
 ```
 
 Verify the task-state lifecycle:
@@ -132,6 +139,12 @@ Verify recurring automation-pattern coverage:
 ~/.codex/skills/task-handoff-state/scripts/verify_automation_patterns.sh
 ```
 
+Verify automation prompt helper coverage:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh
+```
+
 Verify the autonomous rolling floor defaults:
 
 ```bash
@@ -142,6 +155,12 @@ Verify the until-stopped rolling style:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
+```
+
+Verify that `resume_task.sh` surfaces automation prompt guidance for rolling tasks:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh
 ```
 
 ## File Contract
@@ -212,6 +231,7 @@ Verify the until-stopped rolling style:
 - Record review-relevant outputs in `artifacts.json`.
 - Keep logs and generated evidence inside the task folder when practical.
 - For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
+- Use `automation_prompt_helper.sh` when you want task-only automation prompts generated from existing Campfire state instead of copying examples by hand.
 - Dynamic rolling runs should usually enable queue replenishment so a run can keep going until budget, blocker, or decision boundary instead of stopping on an empty queue.
 - In rolling mode, record `auto_advanced` and `auto_reframed` in `last_run.events` and keep `last_run.stop_reason` for the real terminal pause reason.
 - In `run_style: until_stopped`, remove internal budget/cap stop conditions and keep `manual_pause` external-only.

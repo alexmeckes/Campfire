@@ -343,6 +343,42 @@
       "type": "documentation",
       "milestone_id": "milestone-024",
       "reason": "Documents how to enable and prompt Campfire's until-stopped rolling style."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/automation_prompt_helper.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-024",
+      "reason": "Generates task-only recurring automation prompt variants from existing Campfire state."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-025",
+      "reason": "Verifies bounded and until-stopped automation prompt helper output stays task-only and state-driven."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-028",
+      "reason": "Verifies rolling resume output surfaces automation prompt helper guidance correctly."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-028-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-028",
+      "reason": "Records the independent evaluation of the completed automation-helper backlog."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-029",
+      "reason": "Defines the next queue around automation proposal metadata for recurring Codex App runs."
+    },
+    {
+      "path": "examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md",
+      "type": "documentation",
+      "milestone_id": "milestone-026",
+      "reason": "Shows how the automation prompt helper replaces copied example prompt bodies in example guidance."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

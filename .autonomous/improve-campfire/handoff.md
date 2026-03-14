@@ -3,8 +3,8 @@
 ## Current Status
 
 - Status: ready
-- Current milestone: milestone-024 - add an automation prompt helper that emits task-only recurring prompt variants from Campfire state
-- Next slice: add a helper under `skills/task-handoff-state/scripts/` that prints `rolling_resume`, `verifier_sweep`, and `backlog_refresh` prompt variants for an existing task slug without mixing schedule or workspace into the prompt body
+- Current milestone: milestone-029 - add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state
+- Next slice: add a helper under `skills/task-handoff-state/scripts/` that prints a suggested automation name plus task-only prompt proposal fields for an existing task slug without embedding schedule or workspace settings
 - Stop reason: manual_pause
 
 ## Resume Prompt

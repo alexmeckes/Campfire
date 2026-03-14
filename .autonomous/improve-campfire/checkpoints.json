@@ -4,21 +4,22 @@
   "status": "ready",
   "phase": "execution",
   "current": {
-    "milestone_id": "milestone-024",
-    "milestone_title": "Add an automation prompt helper that emits task-only recurring prompt variants from Campfire state",
-    "slice_id": "slice-028",
-    "slice_title": "Add a helper under skills/task-handoff-state/scripts that prints recurring automation prompt variants for an existing task slug without mixing schedule or workspace into the prompt body",
+    "milestone_id": "milestone-029",
+    "milestone_title": "Add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state",
+    "slice_id": "slice-029",
+    "slice_title": "Add a helper under skills/task-handoff-state/scripts that prints a suggested automation name plus task-only prompt proposal fields for an existing task slug without embedding schedule or workspace settings",
     "acceptance_criteria": [
-      "Campfire provides a reusable helper that prints at least rolling_resume, verifier_sweep, and backlog_refresh prompt variants from existing task state",
-      "The helper keeps schedule and workspace out of the prompt body while targeting a concrete .autonomous/<task>/ directory",
-      "The generic task-state skill and repo docs can point to the helper once it exists"
+      "Campfire provides a reusable helper that emits a short suggested automation name and task-only prompt proposal fields from existing task state",
+      "The helper keeps schedule and workspace selection outside the generated proposal content while targeting a concrete .autonomous/<task>/ directory",
+      "The generic task-state skill, resume guidance, and repo docs can point to the proposal helper once it exists"
     ],
     "dependencies": [
       "skills/task-handoff-state/references/automation-patterns.md",
       "skills/task-handoff-state/SKILL.md",
+      "skills/task-handoff-state/scripts/automation_prompt_helper.sh",
       "README.md",
       "scripts/verify_repo.sh",
-      ".autonomous/improve-campfire/findings/milestone-024-automation-helper-backlog.md"
+      ".autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md"
     ]
   },
   "execution": {
@@ -39,23 +40,23 @@
     ],
     "queued_milestones": [
       {
-        "milestone_id": "milestone-025",
-        "milestone_title": "Add deterministic verification for automation prompt helper variants and task-state selection"
+        "milestone_id": "milestone-030",
+        "milestone_title": "Add deterministic verification for automation proposal helper output and task-state selection"
       },
       {
-        "milestone_id": "milestone-026",
-        "milestone_title": "Document automation prompt helper usage in README and example guidance"
+        "milestone_id": "milestone-031",
+        "milestone_title": "Document automation proposal helper usage in README and example guidance"
       },
       {
-        "milestone_id": "milestone-027",
-        "milestone_title": "Expose automation prompt helper guidance from resume_task.sh for rolling tasks"
+        "milestone_id": "milestone-032",
+        "milestone_title": "Expose automation proposal helper guidance from resume_task.sh for rolling tasks"
       },
       {
-        "milestone_id": "milestone-028",
-        "milestone_title": "Add deterministic verification that resume_task.sh surfaces automation-helper guidance correctly"
+        "milestone_id": "milestone-033",
+        "milestone_title": "Add deterministic verification that resume_task.sh surfaces automation proposal guidance correctly"
       }
     ],
-    "notes": "The self-hosted task is now configured for manual-stop autonomous runs with no internal budget or milestone cap.",
+    "notes": "The self-hosted task is configured for manual-stop autonomous runs with no internal budget or milestone cap. The completed automation-helper backlog now hands off to automation proposal metadata for recurring Codex App runs.",
     "run_style": "until_stopped"
   },
   "blocker": {
@@ -66,13 +67,14 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-15T00:05:00Z",
-    "ended_at": "2026-03-15T00:20:00Z",
+    "started_at": "2026-03-15T01:05:00Z",
+    "ended_at": "2026-03-15T01:35:00Z",
     "stop_reason": "manual_pause",
-    "summary": "Course-corrected the rolling policy toward explicit until-stopped runs, added verifier coverage for the new style, and re-queued the self-hosted task in manual-stop mode with the automation-helper backlog still intact.",
-    "next_step": "Add the automation prompt helper, then verify it, document it, and expose it through resume guidance.",
+    "summary": "Completed the automation-helper backlog, added deterministic helper and resume-guidance verification, and then reframed the next queue around automation proposal metadata for recurring Codex App runs.",
+    "next_step": "Add the automation proposal helper, then verify it, document it, and expose it through resume guidance.",
     "events": [
-      "course_corrected"
+      "auto_advanced",
+      "auto_reframed"
     ]
   },
   "runbook": "runbook.md",
@@ -102,6 +104,13 @@
     {
       "type": "plan_review",
       "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md",
+      "summary": "Reframed the next queue around automation proposal metadata once the automation-helper backlog validated."
+    },
+    {
+      "type": "plan_review",
+      "result": "pass",
       "command": "review .autonomous/improve-campfire/findings/milestone-024-until-stopped-mode.md",
       "artifact": ".autonomous/improve-campfire/findings/milestone-024-until-stopped-mode.md",
       "summary": "Recorded why Campfire needed an explicit manual-stop rolling style instead of a stronger bounded floor."
@@ -126,6 +135,27 @@
       "command": "./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh",
       "artifact": "skills/task-handoff-state/scripts/verify_until_stopped_mode.sh",
       "summary": "Until-stopped rolling verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh",
+      "summary": "Automation prompt helper verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh",
+      "summary": "Resume automation-guidance verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-028-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-028-evaluation.md",
+      "summary": "Evaluation note confirms the automation-helper backlog is complete."
     },
     {
       "type": "milestone_evaluation",
@@ -187,7 +217,7 @@
       "type": "repo_verification",
       "result": "pass",
       "command": "./scripts/verify_repo.sh",
-      "summary": "Repo verification passed after the autonomous rolling-floor policy, verifier, and example updates."
+      "summary": "Repo verification passed after the automation helper, resume integration, and verifier updates."
     },
     {
       "type": "milestone_evaluation",

@@ -199,6 +199,12 @@ Useful recurring patterns:
 - Verifier sweep: re-run the strongest existing validation for a task and refresh its evaluation state without broad implementation.
 - Weekly backlog refresh: tighten the next queued milestones and execution policy when the plan has gone stale.
 
+If you already have Campfire state and want task-only prompt bodies without copying the examples by hand, generate them directly:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/automation_prompt_helper.sh --root /path/to/project <task-slug>
+```
+
 ## Repo Layout
 
 ```text
@@ -329,6 +335,12 @@ And the automation-pattern verifier:
 ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
 ```
 
+And the automation prompt helper verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh
+```
+
 And the autonomous-floor verifier:
 
 ```bash
@@ -339,6 +351,12 @@ And the until-stopped verifier:
 
 ```bash
 ./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
+```
+
+And the resume automation-guidance verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh
 ```
 
 ## Example Workspace
@@ -424,7 +442,7 @@ Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and 
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses fourteen kinds of checks:
+The prototype currently uses sixteen kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
@@ -438,8 +456,10 @@ The prototype currently uses fourteen kinds of checks:
 - rolling waiting-on-decision tests that simulate a paused run at a real decision boundary
 - rolling-mode helper tests that simulate converting an existing task into a queued rolling run
 - automation-pattern tests that keep recurring automation references and example guidance aligned
+- automation prompt helper tests that keep task-only recurring prompt variants aligned with Campfire state
 - autonomous-floor tests that keep the stronger unattended-run defaults and external-only manual pause semantics aligned
 - until-stopped tests that keep manual-stop rolling runs free of internal runtime budgets and milestone caps
+- resume automation-guidance tests that keep rolling resume output aligned with the automation prompt helper
 
 The goal is for every Campfire implementation to prove:
 
@@ -477,6 +497,7 @@ Campfire is early, but it is now concrete enough to install and test:
 - dynamic rolling queue-replenishment coverage so unattended runs do not stop just because the queue empties
 - explicit rolling stop-condition coverage for budget-limit and waiting-on-decision pauses
 - explicit manual-stop rolling mode with no internal runtime budget or milestone cap
+- task-state-driven automation prompt generation plus resume-time automation guidance
 - repo-local install and verification scripts
 - a minimal example workspace
 

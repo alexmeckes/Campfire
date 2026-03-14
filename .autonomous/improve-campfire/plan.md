@@ -45,11 +45,16 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - [x] Add explicit until-stopped rolling mode with no internal budget or milestone cap
 - [x] Add deterministic verification for the until-stopped rolling style
 - [x] Queue the self-hosted Campfire task in until-stopped mode
-- [ ] Add an automation prompt helper that emits task-only recurring prompt variants from Campfire state
-- [ ] Add deterministic verification for automation prompt helper variants and task-state selection
-- [ ] Document automation prompt helper usage in README and example guidance
-- [ ] Expose automation prompt helper guidance from `resume_task.sh` for rolling tasks
-- [ ] Add deterministic verification that `resume_task.sh` surfaces automation-helper guidance correctly
+- [x] Add an automation prompt helper that emits task-only recurring prompt variants from Campfire state
+- [x] Add deterministic verification for automation prompt helper variants and task-state selection
+- [x] Document automation prompt helper usage in README and example guidance
+- [x] Expose automation prompt helper guidance from `resume_task.sh` for rolling tasks
+- [x] Add deterministic verification that `resume_task.sh` surfaces automation-helper guidance correctly
+- [ ] Add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state
+- [ ] Add deterministic verification for automation proposal helper output and task-state selection
+- [ ] Document automation proposal helper usage in README and example guidance
+- [ ] Expose automation proposal helper guidance from `resume_task.sh` for rolling tasks
+- [ ] Add deterministic verification that `resume_task.sh` surfaces automation proposal guidance correctly
 
 ## Notes
 
@@ -65,3 +70,4 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - Milestones 018 through 020 were completed in one rolling run, but the next priority became the autonomy floor because the user still experienced five-minute bursts instead of a real unattended loop
 - Milestones 021 through 023 strengthened the autonomous rolling floor, so the deferred automation-helper backlog now starts at milestone-024 with a deeper queue
 - The next refinement after the autonomy floor was explicit until-stopped mode, so the self-hosted task now runs without an internal budget or milestone cap while the automation-helper backlog stays queued behind it
+- Milestones 024 through 028 completed the automation-helper backlog, so the next bounded reframe now focuses on automation proposal metadata for Codex App recurring runs

@@ -33,8 +33,10 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_waiting_on_decision.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_autonomous_floor.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_until_stopped_mode.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh" \
   "$ROOT_DIR/scripts/install_skills.sh"
 
 echo "== Skill presence =="
@@ -112,11 +114,17 @@ echo "== Rolling mode helper verifier =="
 echo "== Automation pattern verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh"
 
+echo "== Automation prompt helper verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh"
+
 echo "== Autonomous floor verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_autonomous_floor.sh"
 
 echo "== Until-stopped verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_until_stopped_mode.sh"
+
+echo "== Resume automation-guidance verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh"
 
 rm -f /tmp/campfire_install.out
 

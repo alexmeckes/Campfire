@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(pwd -P)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+AUTOMATION_HELPER_SCRIPT="$SCRIPT_DIR/automation_prompt_helper.sh"
 
 usage() {
   cat <<'EOF'
@@ -213,3 +215,25 @@ if isinstance(execution, dict) and execution.get("mode") == "rolling":
 else:
     print(f"  Use $long-horizon-worker and $task-handoff-state to continue .autonomous/{task_slug}/ from the current handoff and validate the next slice before stopping.")
 PY
+
+if [ -f "$TASK_DIR/checkpoints.json" ] && [ -x "$AUTOMATION_HELPER_SCRIPT" ]; then
+  TASK_MODE="$(python3 - "$TASK_DIR/checkpoints.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+data = json.loads(path.read_text())
+execution = data.get("execution", {})
+if isinstance(execution, dict):
+    print(execution.get("mode", "single_milestone"))
+else:
+    print("single_milestone")
+PY
+)"
+  if [ "$TASK_MODE" = "rolling" ]; then
+    echo
+    echo "Automation prompt variants:"
+    "$AUTOMATION_HELPER_SCRIPT" --root "$ROOT_DIR" "$TASK_SLUG"
+  fi
+fi

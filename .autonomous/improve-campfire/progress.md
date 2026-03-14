@@ -260,3 +260,47 @@
 - Validation: ran `./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh`, `./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh`, `./skills/task-handoff-state/scripts/verify_autonomous_floor.sh`, `./scripts/verify_repo.sh`, and `./scripts/resume_task.sh improve-campfire` successfully.
 - Blockers: none.
 - Next slice: resume the deferred automation-helper backlog from the now manual-stop self-hosted queue.
+
+## 2026-03-14 milestone-024
+
+- Changed: added `skills/task-handoff-state/scripts/automation_prompt_helper.sh` so Campfire can emit task-only `rolling_resume`, `verifier_sweep`, and `backlog_refresh` prompt variants directly from existing task state.
+- Validation: ran `./skills/task-handoff-state/scripts/automation_prompt_helper.sh --root /Users/alexmeckes/Downloads/Campfire improve-campfire` and confirmed the prompts target `.autonomous/improve-campfire/` without embedding schedule or workspace settings.
+- Blockers: none.
+- Next slice: add deterministic verification for bounded and `until_stopped` automation prompt helper output.
+
+## 2026-03-14 milestone-025
+
+- Changed: added `skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh` and wired it into `scripts/verify_repo.sh`.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh` successfully.
+- Blockers: none.
+- Next slice: document the helper in the generic task-state docs and example automation guidance.
+
+## 2026-03-14 milestone-026
+
+- Changed: documented the helper in `README.md`, `skills/task-handoff-state/SKILL.md`, `skills/task-handoff-state/references/automation-patterns.md`, `examples/basic-workspace/AGENTS.md`, and `examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md`.
+- Validation: reviewed the helper-related docs together and confirmed they point to generated prompt variants instead of copied examples.
+- Blockers: none.
+- Next slice: surface the helper output directly from `resume_task.sh` for rolling tasks.
+
+## 2026-03-14 milestone-027
+
+- Changed: updated `skills/task-handoff-state/scripts/resume_task.sh` so rolling tasks now print automation prompt variants from `automation_prompt_helper.sh` after the main resume prompt.
+- Validation: ran `./scripts/resume_task.sh improve-campfire` successfully and confirmed the automation prompt section appeared.
+- Blockers: none.
+- Next slice: add deterministic verification for the new resume automation-guidance output.
+
+## 2026-03-14 milestone-028
+
+- Changed: added `skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh` and recorded the independent evaluator note in `findings/milestone-028-evaluation.md`.
+- Changed: expanded `scripts/verify_repo.sh` to cover the new helper and resume-guidance verifiers, then updated the Campfire runbook around the completed automation-helper backlog.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh` and `./scripts/verify_repo.sh` successfully.
+- Blockers: none.
+- Next slice: use one bounded reframe to queue the next backlog around automation proposal metadata.
+
+## 2026-03-14 milestone-029 framing
+
+- Auto reframe: after the automation-helper backlog validated, the next bounded planning slice reframed the queue around automation proposal metadata for recurring Codex App runs.
+- Changed: recorded the new backlog in `plan.md`, `runbook.md`, `handoff.md`, `checkpoints.json`, and `findings/milestone-029-automation-proposal-backlog.md`.
+- Validation: reviewed the completed helper/evaluator artifacts and confirmed the next leverage point is automation proposal metadata rather than more prompt-body duplication.
+- Blockers: none.
+- Next slice: add an automation proposal helper that emits a suggested automation name and task-only prompt from existing Campfire state.

@@ -15,6 +15,12 @@ Recurring automations work best when the task already has:
 - explicit stop conditions
 - concrete validation commands in `runbook.md`
 
+If the task already exists, prefer generating the prompt body from state instead of copying example text:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/automation_prompt_helper.sh <task-slug>
+```
+
 ## Prompt Rules
 
 Keep the automation prompt focused on the task itself.
