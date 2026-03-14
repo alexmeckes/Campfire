@@ -129,3 +129,10 @@
 - Validation: ran ./scripts/verify_repo.sh successfully and recorded the evaluation result in `findings/milestone-014-evaluation.md`.
 - Blockers: none.
 - Next slice: choose the next Campfire improvement milestone.
+
+## 2026-03-14 milestone-015 framing
+
+- Changed: framed the next Campfire backlog around optional worktree-aware bootstrapping for git repos and recorded it in `plan.md`, `handoff.md`, `checkpoints.json`, and `findings/milestone-015-worktree-backlog.md`.
+- Validation: reviewed the roadmap and repo priorities, then confirmed the new three-milestone backlog is dependency-safe and keeps Campfire generic for both git and non-git workspaces.
+- Blockers: none.
+- Next slice: implement a worktree-aware task bootstrap helper for git repos, then verify deterministic fallback behavior for non-git workspaces.

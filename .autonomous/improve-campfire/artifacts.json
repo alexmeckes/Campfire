@@ -205,6 +205,12 @@
       "type": "evaluation_note",
       "milestone_id": "milestone-014",
       "reason": "Records the independent evaluation of the dynamic rolling backlog."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-015",
+      "reason": "Defines the next rolling backlog for optional worktree-aware bootstrapping in git repos."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

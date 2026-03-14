@@ -25,6 +25,7 @@
 - Review rolling backlog brief: .autonomous/improve-campfire/findings/milestone-006-rolling-backlog.md
 - Review task brief: .autonomous/improve-campfire/findings/milestone-004-brief.md
 - Review stop-condition brief: .autonomous/improve-campfire/findings/milestone-009-rolling-stop-conditions.md
+- Review worktree backlog brief: .autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md
 
 ## Validation
 
@@ -56,3 +57,4 @@
 - When the queued rolling backlog is exhausted, stop and frame the next backlog instead of inventing one silently
 - If queue replenishment is enabled and queue depth drops below the configured threshold while budget remains, spend one bounded planning slice to refill the queue before stopping
 - A rolling pause on `budget_limit` or `waiting_on_decision` should preserve the active milestone and remaining queued milestones for the next run
+- For git repos, prefer optional worktree-backed setup only when it improves long-horizon isolation without weakening non-git portability

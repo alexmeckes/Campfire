@@ -1,24 +1,24 @@
 {
   "task_slug": "improve-campfire",
   "objective": "dogfood Campfire on itself and harden lifecycle verification coverage",
-  "status": "validated",
-  "phase": "verification",
+  "status": "ready",
+  "phase": "planning",
   "current": {
-    "milestone_id": "milestone-014",
-    "milestone_title": "Document dynamic rolling queue replenishment for Codex App runs",
-    "slice_id": "slice-019",
-    "slice_title": "Validate the dynamic rolling contract, verifier, and docs wiring",
+    "milestone_id": "milestone-015",
+    "milestone_title": "Add a worktree-aware task bootstrap helper for git repos",
+    "slice_id": "slice-020",
+    "slice_title": "Implement the worktree-aware bootstrap helper and preserve non-git portability",
     "acceptance_criteria": [
-      "Campfire supports bounded queue replenishment when a rolling run runs low on queued milestones",
-      "The repo verification suite runs a deterministic rolling reframe verifier",
-      "README, helper output, and example task state describe the dynamic rolling behavior"
+      "Campfire provides an optional worktree-backed bootstrap path for git repos",
+      "The bootstrap path preserves safe in-place behavior for non-git workspaces",
+      "README and repo verification cover when to use worktree-backed setup"
     ],
     "dependencies": [
-      "skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
-      "skills/task-handoff-state/scripts/enable_rolling_mode.sh",
+      "scripts/new_task.sh",
+      "scripts/resume_task.sh",
       "README.md",
       "scripts/verify_repo.sh",
-      ".autonomous/improve-campfire/findings/milestone-014-evaluation.md"
+      ".autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md"
     ]
   },
   "execution": {
@@ -37,8 +37,17 @@
       "budget_limit",
       "manual_pause"
     ],
-    "queued_milestones": [],
-    "notes": "Dynamic queue replenishment is now enabled. If queue depth falls to the configured threshold and budget remains, spend one bounded planning slice to refill the queue before stopping."
+    "queued_milestones": [
+      {
+        "milestone_id": "milestone-016",
+        "milestone_title": "Add deterministic verification for worktree bootstrap and non-git fallback behavior"
+      },
+      {
+        "milestone_id": "milestone-017",
+        "milestone_title": "Document worktree-aware bootstrapping in README and example guidance"
+      }
+    ],
+    "notes": "Dynamic queue replenishment is enabled. The next backlog focuses on optional worktree-backed setup for git repos while preserving non-git portability."
   },
   "blocker": {
     "status": "none",
@@ -50,13 +59,20 @@
   "last_run": {
     "started_at": "2026-03-14T19:10:00Z",
     "ended_at": "2026-03-14T21:35:00Z",
-    "stop_reason": "milestone_validated",
-    "summary": "Added dynamic rolling queue replenishment, proved it with a deterministic reframe verifier, and documented how a run can extend its own backlog when budget remains.",
-    "next_step": "Choose the next Campfire improvement milestone and frame a new rolling backlog before the next unattended run."
+    "stop_reason": "course_corrected",
+    "summary": "Framed the next rolling backlog around optional worktree-aware bootstrapping for git repos after dynamic queue replenishment was completed.",
+    "next_step": "Implement the worktree-aware bootstrap helper, then verify deterministic non-git fallback behavior."
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
   "validation": [
+    {
+      "type": "plan_review",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md",
+      "summary": "Framed the next worktree-aware backlog for the Campfire repo."
+    },
     {
       "type": "plan_review",
       "result": "pass",
