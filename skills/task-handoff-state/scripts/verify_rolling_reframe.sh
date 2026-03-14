@@ -113,7 +113,7 @@ checkpoint["execution"] = {
     "reframe_queue_below": 1,
     "target_queue_depth": 3,
     "max_reframes_per_run": 1,
-    "continue_until": ["blocked", "waiting_on_decision", "budget_limit", "manual_pause"],
+    "continue_until": ["blocked", "waiting_on_decision", "budget_limit"],
     "queued_milestones": [
         {
             "milestone_id": "milestone-003",

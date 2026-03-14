@@ -77,9 +77,11 @@ In rolling mode:
 - the task keeps a machine-readable queued backlog
 - evaluation can auto-advance to the next milestone and record that as a run event
 - low queue depth can trigger one bounded queue replenishment pass when budget remains, then continue from the replenished backlog
+- autonomous runs can set a minimum runtime and milestone floor so they do not self-pause after a tiny validated batch
 - the run stops on blockers, decision boundaries, budget limits, or an empty safe backlog
 - a budget or decision pause keeps the active milestone and queued backlog intact for the next run
 - `last_run.stop_reason` stays reserved for the actual terminal pause reason, while `last_run.events` records mid-run transitions such as `auto_advanced` and `auto_reframed`
+- `manual_pause` should be treated as an explicit user or external interruption, not the normal autonomous stop path
 
 ### 7. Project rules
 
@@ -176,7 +178,7 @@ Use $task-evaluator and $task-handoff-state to evaluate whether the current Camp
 Typical rolling-run prompt:
 
 ```text
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, and stop only on blockers, real decision boundaries, or the configured run budget.
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on blockers, real decision boundaries, or the configured run budget.
 ```
 
 ## Recurring Automation Patterns
@@ -258,6 +260,7 @@ This checks:
 - the rolling waiting-on-decision verifier passes
 - the rolling-mode helper verifier passes
 - the automation-pattern verifier passes
+- the autonomous-floor verifier passes
 
 You can also run the lifecycle verifier directly:
 
@@ -325,6 +328,12 @@ And the automation-pattern verifier:
 ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
 ```
 
+And the autonomous-floor verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
+```
+
 ## Example Workspace
 
 The example workspace under `examples/basic-workspace/` shows two minimal project-side patterns:
@@ -358,6 +367,7 @@ If you want the task to keep moving while you are away, switch it into rolling m
 ```
 
 By default, rolling mode also enables bounded queue replenishment so a long run can frame one more small backlog slice when the queue gets low and budget remains.
+By default, the rolling helper now also sets an autonomy floor: `60` minutes minimum runtime, `5` milestone transitions target, `8` milestone cap, queue depth `5`, and up to `3` bounded reframes before budget or a real blocker should stop the run.
 
 4. If the task is still vague, prompt:
 
@@ -386,14 +396,14 @@ Use $task-evaluator and $task-handoff-state to evaluate whether the current mile
 8. If you want the Codex app run to keep going while you are away, switch the task to rolling mode and prompt:
 
 ```text
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, and stop only on blockers, decision boundaries, or the configured run budget.
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on blockers, decision boundaries, or the configured run budget.
 ```
 
 ## Verification
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses eleven kinds of checks:
+The prototype currently uses thirteen kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
@@ -406,6 +416,8 @@ The prototype currently uses eleven kinds of checks:
 - rolling budget-limit tests that simulate a paused run with queued work still preserved
 - rolling waiting-on-decision tests that simulate a paused run at a real decision boundary
 - rolling-mode helper tests that simulate converting an existing task into a queued rolling run
+- automation-pattern tests that keep recurring automation references and example guidance aligned
+- autonomous-floor tests that keep the stronger unattended-run defaults and external-only manual pause semantics aligned
 
 The goal is for every Campfire implementation to prove:
 

@@ -219,6 +219,30 @@
       "reason": "Defines the next automation-helper backlog after the recurring automation reference and verifier work completed."
     },
     {
+      "path": ".autonomous/improve-campfire/findings/milestone-021-autonomy-floor-course-correction.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-021",
+      "reason": "Explains why the deferred automation-helper backlog was temporarily replaced by the more urgent autonomous rolling-floor work."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_autonomous_floor.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-022",
+      "reason": "Proves the stronger autonomous floor defaults and the absence of internal manual_pause in autonomous continue_until."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-023-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-023",
+      "reason": "Records the independent evaluation of the autonomous rolling-floor backlog."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-024-automation-helper-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-024",
+      "reason": "Restores the deferred automation-helper backlog with enough queue depth to benefit from the stronger autonomous floor."
+    },
+    {
       "path": "skills/task-handoff-state/scripts/enable_rolling_mode.sh",
       "type": "workflow_script",
       "milestone_id": "milestone-012",

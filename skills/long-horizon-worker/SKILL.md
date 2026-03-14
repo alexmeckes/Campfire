@@ -61,7 +61,8 @@ follow these extra rules:
 5. If `auto_reframe` is enabled and the queue depth falls to or below `reframe_queue_below` while run budget remains, spend one bounded planning slice to replenish the backlog toward `target_queue_depth`.
 6. Record `auto_advanced` and `auto_reframed` as run events in task state instead of using them as terminal stop reasons when the run continues.
 7. After a bounded reframe succeeds and budget remains, continue execution from the active or newly chosen safe milestone instead of stopping just because the queue had been low.
-8. Stop only when:
+8. If `min_runtime_minutes` or `min_milestones_per_run` are set, do not choose a voluntary `manual_pause` before those floors are met unless a blocker, decision boundary, or budget limit forces a real stop.
+9. Stop only when:
    - a configured `continue_until` condition is hit
    - the runtime budget expires
    - the queued backlog is empty and no safe next milestone can be chosen even after a permitted bounded reframe
@@ -69,6 +70,7 @@ follow these extra rules:
 In rolling mode, validation is not the default stop condition. It is the trigger for advancing to the next milestone when allowed.
 In dynamic rolling mode, low queue depth is the trigger for one bounded reframe when the execution policy allows it.
 In rolling mode, `auto_advanced` and `auto_reframed` are mid-run transitions. Reserve `last_run.stop_reason` for the actual terminal pause reason.
+In autonomous rolling mode, `manual_pause` should be treated as external-only unless the run has already satisfied its configured minimum runtime and milestone floor.
 
 ## Loop Contract
 
@@ -129,6 +131,7 @@ If `execution.mode` is `rolling`, replace the first rule with:
 - or the rolling backlog is exhausted and no safe next milestone can be chosen even after a permitted bounded reframe
 
 If a bounded reframe replenishes the backlog successfully and budget remains, that is not a stop condition by itself.
+If the run has not yet met `min_runtime_minutes` or `min_milestones_per_run`, that is also not a stop condition by itself.
 
 If the same validation failure repeats twice, stop broadening scope. Fix the failure or report the blocker.
 

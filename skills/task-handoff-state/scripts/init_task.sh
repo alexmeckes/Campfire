@@ -245,6 +245,8 @@ normalized = {
         "auto_reframe": data.get("execution", {}).get("auto_reframe", False) if isinstance(data.get("execution", {}), dict) else False,
         "planning_slice_minutes": data.get("execution", {}).get("planning_slice_minutes", 15) if isinstance(data.get("execution", {}), dict) else 15,
         "runtime_budget_minutes": data.get("execution", {}).get("runtime_budget_minutes", 0) if isinstance(data.get("execution", {}), dict) else 0,
+        "min_runtime_minutes": data.get("execution", {}).get("min_runtime_minutes", 0) if isinstance(data.get("execution", {}), dict) else 0,
+        "min_milestones_per_run": data.get("execution", {}).get("min_milestones_per_run", 1) if isinstance(data.get("execution", {}), dict) else 1,
         "max_milestones_per_run": data.get("execution", {}).get("max_milestones_per_run", 1) if isinstance(data.get("execution", {}), dict) else 1,
         "reframe_queue_below": data.get("execution", {}).get("reframe_queue_below", 0) if isinstance(data.get("execution", {}), dict) else 0,
         "target_queue_depth": data.get("execution", {}).get("target_queue_depth", 0) if isinstance(data.get("execution", {}), dict) else 0,

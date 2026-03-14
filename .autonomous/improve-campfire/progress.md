@@ -205,3 +205,42 @@
 - Validation: reviewed the roadmap and confirmed the new helper backlog is the next dependency-safe improvement after the automation-pattern docs.
 - Blockers: none.
 - Next slice: add a helper that emits task-only automation prompt variants from existing Campfire state.
+
+## 2026-03-14 milestone-021 course-correction
+
+- Course correction: the user reported that Campfire still felt like five-minute bursts, so the automation-helper backlog was deferred in favor of strengthening the autonomous rolling floor itself.
+- Changed: recorded the reprioritization in `findings/milestone-021-autonomy-floor-course-correction.md` and rewrote the forward backlog around minimum runtime, minimum milestone floors, and external-only `manual_pause`.
+- Validation: reviewed the current rolling execution policy and confirmed that `max_milestones_per_run: 3`, queue depth `3`, and `manual_pause` in `continue_until` were the concrete reasons the runs stayed too short.
+- Blockers: none.
+- Next slice: enforce stronger autonomous defaults in the rolling helper and task-state contract.
+
+## 2026-03-14 milestone-021
+
+- Changed: updated the rolling helper, checkpoint normalization, and resume output to support `min_runtime_minutes`, `min_milestones_per_run`, stronger queue/reframe defaults, and external-only `manual_pause`.
+- Changed: updated the worker, framer, evaluator, task-state skill, and task-state contract so autonomous runs do not voluntarily self-pause before the configured floor unless a blocker, decision boundary, or budget limit forces a real stop.
+- Validation: reviewed the updated helper and contract together to confirm the defaults now target longer unattended runs.
+- Blockers: none.
+- Next slice: add deterministic verifier coverage for the new autonomous floor and update the rolling example state.
+
+## 2026-03-14 milestone-022
+
+- Changed: added `skills/task-handoff-state/scripts/verify_autonomous_floor.sh` and updated `verify_enable_rolling_mode.sh` so Campfire proves the stronger floor defaults and the absence of internal `manual_pause` in autonomous `continue_until`.
+- Changed: updated `scripts/verify_repo.sh` to include the new verifier and aligned the example rolling task state with the stronger autonomy floor.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_autonomous_floor.sh`, `./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh`, and `./scripts/verify_repo.sh` successfully.
+- Blockers: none.
+- Next slice: document the autonomy floor behavior in README and example guidance, then evaluate the backlog.
+
+## 2026-03-14 milestone-023
+
+- Changed: documented the autonomy floor in `README.md`, the rolling example handoff, and the task-state docs, then recorded the evaluation in `findings/milestone-023-evaluation.md`.
+- Validation: ran `./scripts/verify_repo.sh` successfully after the policy, verifier, and example updates.
+- Blockers: none.
+- Next slice: use one bounded reframe to restore the deferred automation-helper backlog with a deeper queue.
+
+## 2026-03-14 milestone-024 framing
+
+- Auto reframe: after the autonomy-floor backlog validated, the next bounded planning slice restored the deferred automation-helper work as a deeper queue.
+- Changed: recorded the restored backlog in `plan.md`, `handoff.md`, `checkpoints.json`, and `findings/milestone-024-automation-helper-backlog.md`.
+- Validation: reviewed the roadmap and confirmed the restored backlog now has enough depth to benefit from the stronger autonomous floor.
+- Blockers: none.
+- Next slice: add the automation prompt helper that emits task-only recurring prompt variants from existing Campfire state.

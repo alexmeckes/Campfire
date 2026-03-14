@@ -9,4 +9,4 @@
 
 ## Resume Prompt
 
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue this task from `.autonomous/rolling-task/`. Keep planning bounded, auto-advance through the queued milestones, replenish the queue when policy allows and budget remains, and stop only on a real blocker, decision boundary, budget limit, or manual pause.
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue this task from `.autonomous/rolling-task/`. Keep planning bounded, auto-advance through the queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on a real blocker, decision boundary, budget limit, or an external manual pause.

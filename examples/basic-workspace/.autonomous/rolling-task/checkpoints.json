@@ -23,15 +23,16 @@
     "auto_reframe": true,
     "planning_slice_minutes": 10,
     "runtime_budget_minutes": 120,
-    "max_milestones_per_run": 3,
+    "min_runtime_minutes": 60,
+    "min_milestones_per_run": 5,
+    "max_milestones_per_run": 8,
     "reframe_queue_below": 1,
-    "target_queue_depth": 3,
-    "max_reframes_per_run": 1,
+    "target_queue_depth": 5,
+    "max_reframes_per_run": 3,
     "continue_until": [
       "blocked",
       "waiting_on_decision",
-      "budget_limit",
-      "manual_pause"
+      "budget_limit"
     ],
     "queued_milestones": [
       {
@@ -39,7 +40,7 @@
         "milestone_title": "Wrap the rolling run with documentation and final evaluation"
       }
     ],
-    "notes": "This example starts after one validated milestone to show auto-advance and bounded queue replenishment when the queue gets short."
+    "notes": "This example starts after one validated milestone to show auto-advance, bounded queue replenishment, and a stronger autonomy floor before a run should voluntarily pause."
   },
   "blocker": {
     "status": "none",

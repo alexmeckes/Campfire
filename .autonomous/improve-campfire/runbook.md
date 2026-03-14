@@ -17,6 +17,7 @@
 - Rolling-execution verification: ./skills/task-handoff-state/scripts/verify_rolling_execution.sh
 - Rolling reframe verification: ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
 - Rolling-mode helper verification: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+- Autonomous-floor verification: ./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
 - Rolling budget-limit verification: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Rolling waiting-on-decision verification: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
 - Automation-pattern verification: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
@@ -28,6 +29,9 @@
 - Review stop-condition brief: .autonomous/improve-campfire/findings/milestone-009-rolling-stop-conditions.md
 - Review worktree backlog brief: .autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md
 - Review automation backlog brief: .autonomous/improve-campfire/findings/milestone-018-automation-backlog.md
+- Review autonomy-floor correction note: .autonomous/improve-campfire/findings/milestone-021-autonomy-floor-course-correction.md
+- Review autonomy-floor evaluation: .autonomous/improve-campfire/findings/milestone-023-evaluation.md
+- Review automation-helper backlog brief: .autonomous/improve-campfire/findings/milestone-024-automation-helper-backlog.md
 - Review automation patterns reference: skills/task-handoff-state/references/automation-patterns.md
 
 ## Validation
@@ -40,6 +44,7 @@
 - Secondary: ./skills/task-handoff-state/scripts/verify_rolling_execution.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
@@ -61,5 +66,6 @@
 - When the queued rolling backlog is exhausted, stop and frame the next backlog instead of inventing one silently
 - If queue replenishment is enabled and queue depth drops below the configured threshold while budget remains, spend one bounded planning slice to refill the queue before stopping
 - A rolling pause on `budget_limit` or `waiting_on_decision` should preserve the active milestone and remaining queued milestones for the next run
+- For autonomous runs, `manual_pause` should be treated as external-only and not chosen before the minimum runtime and milestone floor are met
 - For git repos, prefer optional worktree-backed setup only when it improves long-horizon isolation without weakening non-git portability
 - For recurring Codex App automations, prefer reusable prompt patterns and explicit workspace guidance over project-specific magic

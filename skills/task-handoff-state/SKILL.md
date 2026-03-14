@@ -126,6 +126,12 @@ Verify recurring automation-pattern coverage:
 ~/.codex/skills/task-handoff-state/scripts/verify_automation_patterns.sh
 ```
 
+Verify the autonomous rolling floor defaults:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_autonomous_floor.sh
+```
+
 ## File Contract
 
 ### `plan.md`
@@ -196,6 +202,7 @@ Verify recurring automation-pattern coverage:
 - For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
 - Dynamic rolling runs should usually enable queue replenishment so a run can keep going until budget, blocker, or decision boundary instead of stopping on an empty queue.
 - In rolling mode, record `auto_advanced` and `auto_reframed` in `last_run.events` and keep `last_run.stop_reason` for the real terminal pause reason.
+- For autonomous rolling runs, prefer explicit minimum runtime and milestone floors so the worker does not self-pause after a tiny validated batch.
 - For git repos, prefer worktree-backed bootstrap only when isolation helps; keep non-git and low-risk tasks on the in-place path.
 
 ## Pairing

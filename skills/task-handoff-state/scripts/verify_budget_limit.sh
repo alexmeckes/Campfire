@@ -107,7 +107,7 @@ checkpoint["execution"] = {
     "planning_slice_minutes": 10,
     "runtime_budget_minutes": 45,
     "max_milestones_per_run": 3,
-    "continue_until": ["blocked", "waiting_on_decision", "budget_limit", "manual_pause"],
+    "continue_until": ["blocked", "waiting_on_decision", "budget_limit"],
     "queued_milestones": [
         {
             "milestone_id": "milestone-003",

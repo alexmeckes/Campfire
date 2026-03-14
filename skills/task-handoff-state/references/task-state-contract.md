@@ -149,6 +149,8 @@ Suggested fields:
 - `auto_reframe`: whether a low queue should trigger one bounded reframe instead of stopping
 - `planning_slice_minutes`: how much planning is allowed before each implementation cycle
 - `runtime_budget_minutes`: total run budget for the current session
+- `min_runtime_minutes`: minimum autonomous runtime target before the worker may voluntarily self-pause
+- `min_milestones_per_run`: minimum number of milestone transitions to aim for before voluntarily self-pausing
 - `max_milestones_per_run`: optional cap on how many milestones may be advanced in one run
 - `reframe_queue_below`: replenish when queued milestones are at or below this count
 - `target_queue_depth`: target queued backlog size after a bounded reframe
@@ -156,18 +158,21 @@ Suggested fields:
 - `continue_until`: stop conditions for the current run
 - `queued_milestones`: the next milestone IDs and titles in order
 
-Recommended `continue_until` values:
+Recommended `continue_until` values for autonomous rolling runs:
 
 - `blocked`
 - `waiting_on_decision`
 - `budget_limit`
-- `manual_pause`
+
+Use `manual_pause` only for an explicit user pause or an externally interrupted run. Do not treat it as a normal autonomous stop trigger.
 
 When a rolling run stops on `budget_limit` or `waiting_on_decision`, preserve the active milestone and remaining `queued_milestones` so the next run can resume instead of re-framing the backlog.
 
 When `auto_advance` is enabled and a milestone validates during a rolling run, record `auto_advanced` in `last_run.events`, advance to the next safe queued milestone, and keep going until a real terminal stop condition is hit.
 
 When `auto_reframe` is enabled and queued milestones fall to or below `reframe_queue_below` while budget remains, spend one bounded planning slice to replenish the backlog toward `target_queue_depth`, record `auto_reframed` in `last_run.events`, and continue from the active or newly chosen safe milestone instead of stopping just because the queue was low.
+
+When `min_runtime_minutes` or `min_milestones_per_run` are set for an autonomous rolling run, do not voluntarily stop on `manual_pause` before those floors are met unless the task becomes `blocked`, hits `waiting_on_decision`, or exhausts the run budget.
 
 In rolling mode, reserve `last_run.stop_reason` for the real terminal pause reason such as `budget_limit`, `manual_pause`, `blocked`, or `waiting_on_decision`. Do not use `auto_advanced` or `auto_reframed` as terminal stop reasons when the run continued afterward.
 
