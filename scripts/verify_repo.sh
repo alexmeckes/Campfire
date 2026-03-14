@@ -17,13 +17,18 @@ echo "== Syntax checks =="
 zsh -n \
   "$ROOT_DIR/scripts/new_task.sh" \
   "$ROOT_DIR/scripts/resume_task.sh" \
+  "$ROOT_DIR/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/resume_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_execution.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_budget_limit.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_waiting_on_decision.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh" \
   "$ROOT_DIR/scripts/install_skills.sh"
 
 echo "== Skill presence =="
@@ -50,6 +55,13 @@ expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/progres
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/handoff.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/checkpoints.json"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/artifacts.json"
+expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/plan.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/runbook.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/progress.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/handoff.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/checkpoints.json"
+expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/artifacts.json"
+expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/findings/rolling-queue.md"
 
 echo "== Installer dry run in temp CODEX_HOME =="
 TEMP_CODEX_HOME="$(mktemp -d)"
@@ -73,6 +85,15 @@ echo "== Task evaluation verifier =="
 
 echo "== Rolling execution verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_execution.sh"
+
+echo "== Rolling budget-limit verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_budget_limit.sh"
+
+echo "== Rolling waiting-on-decision verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_waiting_on_decision.sh"
+
+echo "== Rolling mode helper verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh"
 
 rm -f /tmp/campfire_install.out
 

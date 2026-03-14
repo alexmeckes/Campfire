@@ -1,0 +1,13 @@
+{
+  "task_slug": "rolling-task",
+  "last_updated": "2026-03-14",
+  "artifacts": [
+    {
+      "path": "findings/rolling-queue.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-002",
+      "reason": "Shows the queued rolling backlog for the example task."
+    }
+  ],
+  "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."
+}

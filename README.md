@@ -77,6 +77,7 @@ In rolling mode:
 - the task keeps a machine-readable queued backlog
 - evaluation can auto-advance to the next milestone
 - the run stops on blockers, decision boundaries, budget limits, or an empty safe backlog
+- a budget or decision pause keeps the active milestone and queued backlog intact for the next run
 
 ### 7. Project rules
 
@@ -123,6 +124,28 @@ Campfire is designed for Codex App usage:
 - each long task gets a durable `.autonomous/<task>/` directory
 - Codex App prompts stay short because the state is on disk
 
+## Codex App Launch Patterns
+
+Campfire supports two Codex App launch patterns for rolling runs.
+
+### Live Thread
+
+Use this when you want the work to keep moving in the active Codex App conversation.
+
+- Launch the rolling prompt in the current thread
+- Keep the app open and the machine awake
+- Codex will keep going until it hits a configured stop condition
+
+### Background Task
+
+Use this when you want the Codex App to run the same rolling task in the background.
+
+- Launch the same rolling prompt as a background task in the app
+- Keep the same `.autonomous/<task>/` state and stop conditions
+- Use this for “keep going until I get back,” not for recurring schedules
+
+Automations are optional and only matter when you want recurring runs. They are not required for a one-off rolling Codex App task.
+
 Typical prompt:
 
 ```text
@@ -164,6 +187,7 @@ Campfire/
     task-evaluator/
     task-handoff-state/
   scripts/
+    enable_rolling_mode.sh
     install_skills.sh
     verify_repo.sh
   examples/
@@ -208,6 +232,9 @@ This checks:
 - the course-correction verifier passes
 - the task-evaluation verifier passes
 - the rolling-execution verifier passes
+- the rolling budget-limit verifier passes
+- the rolling waiting-on-decision verifier passes
+- the rolling-mode helper verifier passes
 
 You can also run the lifecycle verifier directly:
 
@@ -239,12 +266,31 @@ And the rolling-execution verifier:
 ./skills/task-handoff-state/scripts/verify_rolling_execution.sh
 ```
 
+And the rolling budget-limit verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_budget_limit.sh
+```
+
+And the rolling waiting-on-decision verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
+```
+
+And the rolling-mode helper verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+```
+
 ## Example Workspace
 
-The example workspace under `examples/basic-workspace/` shows the minimal project-side pieces:
+The example workspace under `examples/basic-workspace/` shows two minimal project-side patterns:
 
 - `AGENTS.md`
 - `.autonomous/example-task/`
+- `.autonomous/rolling-task/`
 
 Use it as a reference, not as a template you must copy verbatim.
 
@@ -256,6 +302,12 @@ Use it as a reference, not as a template you must copy verbatim.
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/init_task.sh --root /path/to/project "your objective"
+```
+
+If you want the task to keep moving while you are away, switch it into rolling mode:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --root /path/to/project your-task-slug --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
 ```
 
 4. If the task is still vague, prompt:
@@ -292,7 +344,7 @@ Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and 
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses five kinds of checks:
+The prototype currently uses nine kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
@@ -300,6 +352,9 @@ The prototype currently uses five kinds of checks:
 - course-correction tests that simulate a real re-plan and verify the new milestone becomes the resume target
 - task-evaluation tests that simulate an independent milestone evaluation and validated handoff
 - rolling-execution tests that simulate a validated milestone auto-advancing into the next queued milestone
+- rolling budget-limit tests that simulate a paused run with queued work still preserved
+- rolling waiting-on-decision tests that simulate a paused run at a real decision boundary
+- rolling-mode helper tests that simulate converting an existing task into a queued rolling run
 
 The goal is for every Campfire implementation to prove:
 
@@ -311,6 +366,7 @@ The goal is for every Campfire implementation to prove:
 - course corrections can update task state without losing continuity
 - milestone evaluation can be recorded independently from worker execution
 - rolling Codex App runs can advance across multiple milestones without manual restarts
+- rolling Codex App runs can pause on budget or decision boundaries without losing the queued backlog
 
 ## Principles
 
@@ -330,6 +386,7 @@ Campfire is early, but it is now concrete enough to install and test:
 - explicit task evaluation as a first-class skill
 - durable task-state scaffolding
 - lifecycle verifiers for success, blocked retry, course correction, task evaluation, and rolling execution
+- explicit rolling stop-condition coverage for budget-limit and waiting-on-decision pauses
 - repo-local install and verification scripts
 - a minimal example workspace
 

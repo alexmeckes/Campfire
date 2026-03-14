@@ -1,0 +1,66 @@
+{
+  "task_slug": "rolling-task",
+  "objective": "Demonstrate a rolling Campfire task that can auto-advance across multiple milestones in the Codex App.",
+  "status": "ready",
+  "phase": "execution",
+  "current": {
+    "milestone_id": "milestone-002",
+    "milestone_title": "Continue after the first auto-advance",
+    "slice_id": "slice-002",
+    "slice_title": "Implement the second milestone while the run budget remains",
+    "acceptance_criteria": [
+      "The rolling execution policy is visible in task state",
+      "The task can keep going without stopping after one validated milestone"
+    ],
+    "dependencies": [
+      "findings/rolling-queue.md",
+      "handoff.md"
+    ]
+  },
+  "execution": {
+    "mode": "rolling",
+    "auto_advance": true,
+    "planning_slice_minutes": 10,
+    "runtime_budget_minutes": 120,
+    "max_milestones_per_run": 3,
+    "continue_until": [
+      "blocked",
+      "waiting_on_decision",
+      "budget_limit",
+      "manual_pause"
+    ],
+    "queued_milestones": [
+      {
+        "milestone_id": "milestone-003",
+        "milestone_title": "Wrap the rolling run with documentation and final evaluation"
+      }
+    ],
+    "notes": "This example starts after one validated milestone to show auto-advance."
+  },
+  "blocker": {
+    "status": "none",
+    "type": "",
+    "summary": "",
+    "attempts": 0,
+    "next_action": ""
+  },
+  "last_run": {
+    "started_at": "2026-03-14T20:00:00Z",
+    "ended_at": "2026-03-14T20:05:00Z",
+    "stop_reason": "auto_advanced",
+    "summary": "The example task validated its first milestone and advanced into the second one.",
+    "next_step": "Implement milestone-002 while the rolling run budget remains."
+  },
+  "runbook": "runbook.md",
+  "artifacts_manifest": "artifacts.json",
+  "validation": [
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review findings/rolling-queue.md",
+      "artifact": "findings/rolling-queue.md",
+      "summary": "The rolling queue note explains the auto-advance example."
+    }
+  ],
+  "last_updated": "2026-03-14"
+}

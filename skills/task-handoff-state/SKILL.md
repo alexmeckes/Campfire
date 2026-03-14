@@ -47,6 +47,12 @@ Inspect and resume a task:
 ~/.codex/skills/task-handoff-state/scripts/resume_task.sh build-the-next-milestone
 ```
 
+Switch an existing task into rolling mode:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh build-the-next-milestone --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
+```
+
 Verify the task-state lifecycle:
 
 ```bash
@@ -75,6 +81,24 @@ Verify rolling execution handling:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_rolling_execution.sh
+```
+
+Verify rolling budget-limit handling:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_budget_limit.sh
+```
+
+Verify rolling waiting-on-decision handling:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
+```
+
+Verify the rolling-mode helper:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
 ```
 
 ## File Contract

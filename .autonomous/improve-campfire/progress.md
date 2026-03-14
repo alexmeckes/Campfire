@@ -56,3 +56,54 @@
 - Validation: ran ./skills/task-handoff-state/scripts/verify_rolling_execution.sh, ./scripts/verify_repo.sh, and ./scripts/resume_task.sh improve-campfire successfully.
 - Blockers: none.
 - Next slice: start milestone-006 and keep moving through the rolling backlog until a real stop condition appears.
+
+## 2026-03-14 milestone-006
+
+- Changed: added `skills/task-handoff-state/scripts/enable_rolling_mode.sh` plus the repo wrapper `scripts/enable_rolling_mode.sh` so an existing Campfire task can be switched into rolling mode explicitly.
+- Changed: added `skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh` and wired it into `scripts/verify_repo.sh`.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh and ./scripts/verify_repo.sh successfully.
+- Blockers: none.
+- Next slice: auto-advance into the rolling example milestone.
+
+## 2026-03-14 milestone-007
+
+- Changed: added `examples/basic-workspace/.autonomous/rolling-task/` as a dedicated rolling-task example with execution policy, queued milestones, and a rolling handoff.
+- Validation: rolling example files are checked by ./scripts/verify_repo.sh.
+- Blockers: none.
+- Next slice: auto-advance into the Codex App launch-pattern docs milestone.
+
+## 2026-03-14 milestone-008
+
+- Changed: documented Codex App live-thread and background-task rolling launch patterns in README.md and updated the task-state docs to expose the rolling helper.
+- Validation: ran ./scripts/verify_repo.sh successfully after the docs, helper, and example updates.
+- Blockers: none.
+- Next slice: choose the next Campfire improvement milestone.
+
+## 2026-03-14 milestone-009 framing
+
+- Course correction: the rolling verifier suite proved success-driven auto-advance, but it did not yet prove the two other common Codex App stop conditions: `budget_limit` and `waiting_on_decision`.
+- Changed: framed a new rolling backlog for `milestone-009` through `milestone-011` and recorded it in `plan.md`, `handoff.md`, `checkpoints.json`, and `findings/milestone-009-rolling-stop-conditions.md`.
+- Validation: reviewed the new milestone brief and confirmed the next three milestones are dependency-safe and independently verifiable.
+- Blockers: none.
+- Next slice: implement the budget-limit and waiting-on-decision verifiers, then wire their coverage into repo verification and docs.
+
+## 2026-03-14 milestone-009
+
+- Changed: added `skills/task-handoff-state/scripts/verify_budget_limit.sh` to simulate a rolling run that pauses on `budget_limit` while preserving the active milestone and queued backlog.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_budget_limit.sh successfully.
+- Blockers: none.
+- Next slice: auto-advance into the waiting-on-decision verifier milestone.
+
+## 2026-03-14 milestone-010
+
+- Changed: added `skills/task-handoff-state/scripts/verify_waiting_on_decision.sh` to simulate a rolling run that pauses at a real decision boundary without consuming the queued backlog.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh successfully.
+- Blockers: none.
+- Next slice: auto-advance into the docs and repo-wiring milestone.
+
+## 2026-03-14 milestone-011
+
+- Changed: wired the new stop-condition verifiers into `scripts/verify_repo.sh` and documented the preserved-backlog behavior in `README.md`, `skills/task-handoff-state/SKILL.md`, and `skills/task-handoff-state/references/task-state-contract.md`.
+- Validation: ran ./scripts/verify_repo.sh successfully and recorded the evaluation result in `findings/milestone-011-evaluation.md`.
+- Blockers: none.
+- Next slice: choose the next Campfire improvement milestone.

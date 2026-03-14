@@ -141,6 +141,8 @@ Recommended `continue_until` values:
 - `budget_limit`
 - `manual_pause`
 
+When a rolling run stops on `budget_limit` or `waiting_on_decision`, preserve the active milestone and remaining `queued_milestones` so the next run can resume instead of re-framing the backlog.
+
 ## Blocker Tracking
 
 Track blockers in `checkpoints.json` with:

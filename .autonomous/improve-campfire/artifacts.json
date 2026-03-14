@@ -85,6 +85,90 @@
       "type": "planning_note",
       "milestone_id": "milestone-006",
       "reason": "Defines the queued rolling backlog and execution policy for the next Codex App run."
+    },
+    {
+      "path": "scripts/enable_rolling_mode.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-006",
+      "reason": "Provides a repo-local entry point for switching an existing task into rolling mode."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/enable_rolling_mode.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-006",
+      "reason": "Implements the generic rolling-mode helper for Campfire tasks."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-006",
+      "reason": "Validates that the rolling-mode helper writes an execution policy and rolling handoff prompt."
+    },
+    {
+      "path": "examples/basic-workspace/.autonomous/rolling-task/checkpoints.json",
+      "type": "example_state",
+      "milestone_id": "milestone-007",
+      "reason": "Shows a concrete rolling example task with a queued backlog and auto-advance policy."
+    },
+    {
+      "path": "examples/basic-workspace/.autonomous/rolling-task/handoff.md",
+      "type": "example_state",
+      "milestone_id": "milestone-007",
+      "reason": "Shows the handoff shape for a rolling example task."
+    },
+    {
+      "path": "README.md",
+      "type": "documentation",
+      "milestone_id": "milestone-008",
+      "reason": "Documents Codex App live-thread and background-task rolling launch patterns."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-009-rolling-stop-conditions.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-009",
+      "reason": "Defines the stop-condition backlog for the next rolling Codex App run."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_budget_limit.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-009",
+      "reason": "Covers the rolling stop path where a run pauses on budget_limit and preserves queued work."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_waiting_on_decision.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-010",
+      "reason": "Covers the rolling stop path where a run pauses on waiting_on_decision and preserves queued work."
+    },
+    {
+      "path": "README.md",
+      "type": "documentation",
+      "milestone_id": "milestone-011",
+      "reason": "Documents how rolling Codex App runs pause and resume on budget-limit and decision-boundary stop conditions."
+    },
+    {
+      "path": "skills/task-handoff-state/SKILL.md",
+      "type": "documentation",
+      "milestone_id": "milestone-011",
+      "reason": "Exposes the new stop-condition verifiers in the task-state skill quick start."
+    },
+    {
+      "path": "skills/task-handoff-state/references/task-state-contract.md",
+      "type": "reference_doc",
+      "milestone_id": "milestone-011",
+      "reason": "Defines that rolling pauses should preserve the active milestone and queued backlog."
+    },
+    {
+      "path": "scripts/verify_repo.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-011",
+      "reason": "Runs the budget-limit and waiting-on-decision verifiers as part of the repo suite."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-011-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-011",
+      "reason": "Records the independent evaluation of the stop-condition backlog."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

@@ -1,0 +1,12 @@
+# Handoff
+
+## Current Status
+
+- Status: ready
+- Current milestone: milestone-002 - Continue after the first auto-advance
+- Next slice: implement milestone-002 while the rolling run budget remains
+- Stop reason: auto_advanced
+
+## Resume Prompt
+
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue this task from `.autonomous/rolling-task/`. Keep planning bounded, auto-advance through the queued milestones, and stop only on a real blocker, decision boundary, budget limit, or manual pause.
