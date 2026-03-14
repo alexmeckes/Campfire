@@ -65,6 +65,12 @@ Verify course correction handling:
 ~/.codex/skills/task-handoff-state/scripts/verify_course_correction.sh
 ```
 
+Verify task evaluation handling:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_task_evaluation.sh
+```
+
 ## File Contract
 
 ### `plan.md`
@@ -116,6 +122,12 @@ Verify course correction handling:
 - why each artifact matters
 - related milestone or validation
 
+### `findings/`
+
+- evaluation notes
+- investigation writeups
+- concise reviewer or verifier output that should survive chat history
+
 ## Operating Rules
 
 - Keep one stable objective per task slug.
@@ -131,6 +143,7 @@ Verify course correction handling:
 This skill manages state. Pair it with:
 
 - `$long-horizon-worker` for execution discipline
+- `$task-evaluator` for explicit milestone completion checks
 - project-specific skills for domain rules
 
 ## Notes

@@ -37,3 +37,12 @@
 - Validation: updated plan.md, runbook.md, handoff.md, checkpoints.json, and artifacts.json to point at milestone-004.
 - Blockers: none.
 - Next slice: spend one bounded slice framing the evaluator scope, then implement the skill, wire it into the repo, and validate with verify_repo.sh.
+
+## 2026-03-14 milestone-004
+
+- Changed: added the generic `task-evaluator` skill with agent metadata and an evaluation checklist reference.
+- Changed: added `skills/task-handoff-state/scripts/verify_task_evaluation.sh` to simulate an independent milestone evaluation and validated handoff.
+- Changed: wired the evaluator into install_skills.sh, verify_repo.sh, README.md, AGENTS.md, and the task-state docs.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_task_evaluation.sh and ./scripts/verify_repo.sh successfully.
+- Blockers: none.
+- Next slice: choose the next Campfire improvement milestone.

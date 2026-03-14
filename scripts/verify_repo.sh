@@ -20,6 +20,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
   "$ROOT_DIR/scripts/install_skills.sh"
 
 echo "== Skill presence =="
@@ -34,6 +35,9 @@ expect_file "$ROOT_DIR/skills/task-handoff-state/references/task-state-contract.
 expect_file "$ROOT_DIR/skills/course-corrector/SKILL.md"
 expect_file "$ROOT_DIR/skills/course-corrector/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/course-corrector/references/course-correction-triggers.md"
+expect_file "$ROOT_DIR/skills/task-evaluator/SKILL.md"
+expect_file "$ROOT_DIR/skills/task-evaluator/agents/openai.yaml"
+expect_file "$ROOT_DIR/skills/task-evaluator/references/evaluation-checklist.md"
 
 echo "== Example workspace presence =="
 expect_file "$ROOT_DIR/examples/basic-workspace/AGENTS.md"
@@ -50,6 +54,7 @@ trap 'rm -rf "$TEMP_CODEX_HOME"' EXIT
 CODEX_HOME="$TEMP_CODEX_HOME" "$ROOT_DIR/scripts/install_skills.sh" >/tmp/campfire_install.out
 expect_file "$TEMP_CODEX_HOME/skills/long-horizon-worker"
 expect_file "$TEMP_CODEX_HOME/skills/task-handoff-state"
+expect_file "$TEMP_CODEX_HOME/skills/task-evaluator"
 
 echo "== Lifecycle verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh"
@@ -59,6 +64,9 @@ echo "== Blocked retry verifier =="
 
 echo "== Course correction verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh"
+
+echo "== Task evaluation verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh"
 
 rm -f /tmp/campfire_install.out
 

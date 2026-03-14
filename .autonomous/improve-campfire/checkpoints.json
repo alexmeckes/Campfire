@@ -1,23 +1,23 @@
 {
   "task_slug": "improve-campfire",
   "objective": "dogfood Campfire on itself and harden lifecycle verification coverage",
-  "status": "ready",
-  "phase": "planning",
+  "status": "validated",
+  "phase": "verification",
   "current": {
     "milestone_id": "milestone-004",
     "milestone_title": "Task-evaluator skill and evaluator-focused verification",
-    "slice_id": "slice-007",
-    "slice_title": "Bound the evaluator scope, then implement and validate it",
+    "slice_id": "slice-008",
+    "slice_title": "Validate Campfire after adding the evaluator layer",
     "acceptance_criteria": [
       "Campfire includes a generic task-evaluator skill with agent metadata and references",
       "The installer and repo verifier include the evaluator skill",
-      "Campfire has evaluator-focused verification coverage or a documented evaluator verification path",
+      "Campfire has evaluator-focused verification coverage",
       "README and task-state docs describe where task evaluation fits in the loop"
     ],
     "dependencies": [
-      "skills/task-framer/SKILL.md",
-      "skills/course-corrector/SKILL.md",
-      ".autonomous/improve-campfire/findings/milestone-004-brief.md",
+      "skills/task-evaluator/SKILL.md",
+      "skills/task-evaluator/references/evaluation-checklist.md",
+      "skills/task-handoff-state/scripts/verify_task_evaluation.sh",
       "scripts/verify_repo.sh",
       "README.md"
     ]
@@ -30,21 +30,27 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-14T18:05:00Z",
-    "ended_at": "2026-03-14T18:12:00Z",
-    "stop_reason": "manual_pause",
-    "summary": "Framed milestone-004 for an unattended two-hour run with a bounded planning slice and concrete execution target.",
-    "next_step": "Spend about 15 minutes tightening the evaluator scope if needed, then implement and validate milestone-004."
+    "started_at": "2026-03-14T18:20:00Z",
+    "ended_at": "2026-03-14T18:40:00Z",
+    "stop_reason": "milestone_validated",
+    "summary": "Added the task-evaluator layer, evaluator-focused verification coverage, and repo wiring.",
+    "next_step": "Choose the next Campfire improvement milestone."
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
   "validation": [
     {
-      "type": "task_framing",
+      "type": "milestone_evaluation",
       "result": "pass",
-      "command": "update Campfire task state for milestone-004",
-      "artifact": "findings/milestone-004-brief.md",
-      "summary": "Defined a concrete next milestone and bounded the planning slice for unattended execution."
+      "command": "./skills/task-handoff-state/scripts/verify_task_evaluation.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_task_evaluation.sh",
+      "summary": "Evaluator-focused verification coverage passed."
+    },
+    {
+      "type": "repo_verification",
+      "result": "pass",
+      "command": "./scripts/verify_repo.sh",
+      "summary": "Repo verification passed after adding the evaluator layer."
     }
   ],
   "last_updated": "2026-03-14"

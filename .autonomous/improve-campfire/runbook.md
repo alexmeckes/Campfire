@@ -12,8 +12,10 @@
 - Lifecycle verification: ./skills/task-handoff-state/scripts/verify_task_lifecycle.sh
 - Blocked/retry verification: ./skills/task-handoff-state/scripts/verify_blocked_retry.sh
 - Course-correction verification: ./skills/task-handoff-state/scripts/verify_course_correction.sh
+- Task-evaluation verification: ./skills/task-handoff-state/scripts/verify_task_evaluation.sh
 - Review framing skill: ./skills/task-framer/SKILL.md
 - Review correction skill: ./skills/course-corrector/SKILL.md
+- Review evaluator skill: ./skills/task-evaluator/SKILL.md
 - Review task brief: .autonomous/improve-campfire/findings/milestone-004-brief.md
 
 ## Validation
@@ -22,6 +24,7 @@
 - Secondary: ./skills/task-handoff-state/scripts/verify_task_lifecycle.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_blocked_retry.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_course_correction.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_task_evaluation.sh
 - Secondary: inspect the task-evaluator skill, reference docs, installer wiring, and repo verifier wiring
 - Record new verifier scripts in artifacts.json when they become part of the harness
 

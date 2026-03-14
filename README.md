@@ -14,6 +14,7 @@ Instead of one giant project-specific skill, Campfire uses a small stack:
 - `task-framer`
 - `course-corrector`
 - `long-horizon-worker`
+- `task-evaluator`
 - `task-handoff-state`
 - `AGENTS.md` in each repo
 - `.autonomous/<task>/` as the durable task directory
@@ -62,7 +63,11 @@ Campfire treats a long-running task as a small harness, not a giant prompt.
 
 `course-corrector` adjusts the plan when new facts, blockers, or better sequencing emerge during execution.
 
-### 5. Project rules
+### 5. Generic evaluator skill
+
+`task-evaluator` checks whether the current milestone is actually complete, records the evaluation result, and either validates the task or sends it back for one more narrow slice.
+
+### 6. Project rules
 
 Project-specific guidance belongs in:
 
@@ -100,7 +105,7 @@ Each task lives under:
 
 Campfire is designed for Codex App usage:
 
-- the two generic skills can be installed globally from this repo
+- the generic skills can be installed globally from this repo
 - framing and course-correction can stay generic while project rules stay local
 - each repo keeps its own `AGENTS.md`
 - each long task gets a durable `.autonomous/<task>/` directory
@@ -124,6 +129,12 @@ Typical course-correction prompt:
 Use $course-corrector and $task-handoff-state to update this Campfire task after new information changed the best path.
 ```
 
+Typical evaluation prompt:
+
+```text
+Use $task-evaluator and $task-handoff-state to evaluate whether the current Campfire milestone is actually complete.
+```
+
 ## Repo Layout
 
 ```text
@@ -132,6 +143,7 @@ Campfire/
     task-framer/
     course-corrector/
     long-horizon-worker/
+    task-evaluator/
     task-handoff-state/
   scripts/
     install_skills.sh
@@ -153,6 +165,7 @@ That script symlinks:
 - `skills/task-framer`
 - `skills/course-corrector`
 - `skills/long-horizon-worker`
+- `skills/task-evaluator`
 - `skills/task-handoff-state`
 
 into your Codex skills directory and backs up conflicting existing skill folders.
@@ -175,6 +188,7 @@ This checks:
 - the generic lifecycle verifier passes
 - the blocked/retry verifier passes
 - the course-correction verifier passes
+- the task-evaluation verifier passes
 
 You can also run the lifecycle verifier directly:
 
@@ -192,6 +206,12 @@ And the course-correction verifier:
 
 ```bash
 ./skills/task-handoff-state/scripts/verify_course_correction.sh
+```
+
+And the task-evaluation verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_task_evaluation.sh
 ```
 
 ## Example Workspace
@@ -231,16 +251,23 @@ Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/
 Use $course-corrector and $task-handoff-state to update this task after new facts changed the best path.
 ```
 
+7. When the milestone seems done, prompt:
+
+```text
+Use $task-evaluator and $task-handoff-state to evaluate whether the current milestone is actually complete.
+```
+
 ## Verification
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses four kinds of checks:
+The prototype currently uses five kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
 - blocked and retry tests that simulate escalation after repeated failures
 - course-correction tests that simulate a real re-plan and verify the new milestone becomes the resume target
+- task-evaluation tests that simulate an independent milestone evaluation and validated handoff
 
 The goal is for every Campfire implementation to prove:
 
@@ -250,6 +277,7 @@ The goal is for every Campfire implementation to prove:
 - milestone validation can be recorded and surfaced correctly
 - blocked and retry state can be surfaced without silent thrashing
 - course corrections can update task state without losing continuity
+- milestone evaluation can be recorded independently from worker execution
 
 ## Principles
 
@@ -266,8 +294,9 @@ Campfire is early, but it is now concrete enough to install and test:
 
 - portable generic Codex skills
 - task framing and course correction as first-class skills
+- explicit task evaluation as a first-class skill
 - durable task-state scaffolding
-- lifecycle verifiers for success, blocked retry, and course correction
+- lifecycle verifiers for success, blocked retry, course correction, and task evaluation
 - repo-local install and verification scripts
 - a minimal example workspace
 

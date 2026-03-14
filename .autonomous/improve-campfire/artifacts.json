@@ -55,6 +55,24 @@
       "type": "planning_note",
       "milestone_id": "milestone-004",
       "reason": "Defines the concrete next milestone, time budget, and first execution slices for the unattended run."
+    },
+    {
+      "path": "skills/task-evaluator/SKILL.md",
+      "type": "skill_definition",
+      "milestone_id": "milestone-004",
+      "reason": "Adds the missing evaluator layer to the Campfire skill stack."
+    },
+    {
+      "path": "skills/task-evaluator/references/evaluation-checklist.md",
+      "type": "reference_doc",
+      "milestone_id": "milestone-004",
+      "reason": "Defines how evaluator runs should judge a milestone and record their outcomes."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_task_evaluation.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-004",
+      "reason": "Covers the lifecycle path where an independent evaluator confirms or rejects a milestone."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

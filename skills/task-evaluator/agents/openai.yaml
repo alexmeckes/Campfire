@@ -1,0 +1,7 @@
+interface:
+  display_name: "Task Evaluator"
+  short_description: "Independent milestone checks for Campfire tasks"
+  default_prompt: "Use $task-evaluator and $task-handoff-state to evaluate whether the current Campfire milestone is actually complete."
+
+policy:
+  allow_implicit_invocation: false

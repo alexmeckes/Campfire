@@ -5,6 +5,7 @@
 - Use `$task-framer` when a task is not yet concrete.
 - Use `$long-horizon-worker` with `$task-handoff-state` for multi-step execution.
 - Use `$course-corrector` when new facts or blockers change the best path.
+- Use `$task-evaluator` when a milestone seems done or needs an independent completion check.
 - Keep durable task state under `.autonomous/<task>/`.
 - Create a task with `./scripts/new_task.sh "<objective>"`.
 - Resume a task with `./scripts/resume_task.sh <task-slug>`.
@@ -25,5 +26,5 @@
 
 - Strong state contract
 - Clear resume and handoff semantics
-- Verifiers for success, failure, and retry paths
+- Verifiers for success, failure, retry, and evaluation paths
 - Minimal instructions with durable scripts

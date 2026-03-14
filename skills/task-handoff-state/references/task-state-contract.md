@@ -81,6 +81,14 @@ Machine-readable artifact manifest.
 - reason it matters
 - which milestone or validation it supports
 
+### `findings/`
+
+Stable human-readable notes that should survive across runs.
+
+- milestone evaluation notes
+- investigation summaries
+- verifier findings that should not live only in chat
+
 ## Status and Stop Reason Conventions
 
 Recommended `status` values:
@@ -101,6 +109,14 @@ Recommended `last_run.stop_reason` values:
 - `environment_failure`
 - `budget_limit`
 - `manual_pause`
+
+Recommended `validation.type` values:
+
+- `file_check`
+- `repo_verification`
+- `milestone_evaluation`
+- `retry_attempt`
+- `plan_review`
 
 ## Blocker Tracking
 

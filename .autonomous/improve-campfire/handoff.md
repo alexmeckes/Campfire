@@ -2,11 +2,11 @@
 
 ## Current Status
 
-- Status: ready
+- Status: validated
 - Current milestone: milestone-004 - task-evaluator skill and evaluator-focused verification
-- Next slice: spend one bounded framing slice on the evaluator scope, then implement and validate the skill
-- Stop reason: manual_pause
+- Next slice: choose the next Campfire improvement milestone
+- Stop reason: milestone_validated
 
 ## Resume Prompt
 
-Use $task-framer, $course-corrector, $long-horizon-worker, and $task-handoff-state to continue this task from `.autonomous/improve-campfire/`. Spend at most one bounded slice tightening the evaluator milestone if needed, then keep shipping until milestone-004 is validated or a real blocker appears.
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue this task from `.autonomous/improve-campfire/` and keep working until the next concrete milestone is validated or a real blocker appears.
