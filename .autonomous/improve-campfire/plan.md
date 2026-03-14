@@ -8,6 +8,8 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 
 - README.md
 - AGENTS.md
+- skills/task-framer/SKILL.md
+- skills/course-corrector/SKILL.md
 - skills/long-horizon-worker/SKILL.md
 - skills/task-handoff-state/SKILL.md
 - skills/task-handoff-state/references/task-state-contract.md
@@ -19,9 +21,10 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - [x] Validate the repo with verify_repo.sh
 - [x] Add task framing and course-correction skills
 - [x] Add the course-correction lifecycle verifier
-- [ ] Choose the next Campfire improvement milestone
+- [ ] Add a task-evaluator skill and evaluator-focused verification coverage
 
 ## Notes
 
 - Created: 2026-03-14
 - Campfire should be able to improve itself using the same task-state contract it publishes
+- Milestone-004 is the current unattended-run target

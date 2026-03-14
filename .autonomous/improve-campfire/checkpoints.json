@@ -1,21 +1,23 @@
 {
   "task_slug": "improve-campfire",
   "objective": "dogfood Campfire on itself and harden lifecycle verification coverage",
-  "status": "validated",
-  "phase": "verification",
+  "status": "ready",
+  "phase": "planning",
   "current": {
-    "milestone_id": "milestone-003",
-    "milestone_title": "Course-correction lifecycle verifier",
-    "slice_id": "slice-006",
-    "slice_title": "Validate Campfire after adding course-correction verification coverage",
+    "milestone_id": "milestone-004",
+    "milestone_title": "Task-evaluator skill and evaluator-focused verification",
+    "slice_id": "slice-007",
+    "slice_title": "Bound the evaluator scope, then implement and validate it",
     "acceptance_criteria": [
-      "Campfire includes a lifecycle verifier for course correction",
-      "The repo verifier runs the course-correction simulation",
-      "The task-state contract documents course-corrected stop reasons"
+      "Campfire includes a generic task-evaluator skill with agent metadata and references",
+      "The installer and repo verifier include the evaluator skill",
+      "Campfire has evaluator-focused verification coverage or a documented evaluator verification path",
+      "README and task-state docs describe where task evaluation fits in the loop"
     ],
     "dependencies": [
-      "skills/task-handoff-state/scripts/verify_course_correction.sh",
-      "skills/task-handoff-state/references/task-state-contract.md",
+      "skills/task-framer/SKILL.md",
+      "skills/course-corrector/SKILL.md",
+      ".autonomous/improve-campfire/findings/milestone-004-brief.md",
       "scripts/verify_repo.sh",
       "README.md"
     ]
@@ -28,20 +30,21 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-14T17:30:00Z",
-    "ended_at": "2026-03-14T17:42:00Z",
-    "stop_reason": "milestone_validated",
-    "summary": "Added the course-correction lifecycle verifier and validated the repo.",
-    "next_step": "Choose the next Campfire improvement milestone."
+    "started_at": "2026-03-14T18:05:00Z",
+    "ended_at": "2026-03-14T18:12:00Z",
+    "stop_reason": "manual_pause",
+    "summary": "Framed milestone-004 for an unattended two-hour run with a bounded planning slice and concrete execution target.",
+    "next_step": "Spend about 15 minutes tightening the evaluator scope if needed, then implement and validate milestone-004."
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
   "validation": [
     {
-      "type": "repo_verification",
+      "type": "task_framing",
       "result": "pass",
-      "command": "./scripts/verify_repo.sh",
-      "summary": "Repo verification passed after adding course-correction lifecycle coverage."
+      "command": "update Campfire task state for milestone-004",
+      "artifact": "findings/milestone-004-brief.md",
+      "summary": "Defined a concrete next milestone and bounded the planning slice for unattended execution."
     }
   ],
   "last_updated": "2026-03-14"

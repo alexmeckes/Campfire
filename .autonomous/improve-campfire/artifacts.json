@@ -49,6 +49,12 @@
       "type": "verifier_script",
       "milestone_id": "milestone-003",
       "reason": "Covers the lifecycle path where the plan changes and the corrected milestone becomes the new resume target."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-004-brief.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-004",
+      "reason": "Defines the concrete next milestone, time budget, and first execution slices for the unattended run."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

@@ -29,3 +29,11 @@
 - Validation: ran ./skills/task-handoff-state/scripts/verify_course_correction.sh and ./scripts/verify_repo.sh successfully.
 - Blockers: none.
 - Next slice: choose the next Campfire improvement milestone.
+
+## 2026-03-14 milestone-004 framing
+
+- Changed: framed the next unattended Campfire milestone as `task-evaluator skill and evaluator-focused verification coverage`.
+- Changed: added a milestone brief with bounded planning and execution slices for a roughly two-hour run.
+- Validation: updated plan.md, runbook.md, handoff.md, checkpoints.json, and artifacts.json to point at milestone-004.
+- Blockers: none.
+- Next slice: spend one bounded slice framing the evaluator scope, then implement the skill, wire it into the repo, and validate with verify_repo.sh.
