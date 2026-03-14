@@ -244,3 +244,19 @@
 - Validation: reviewed the roadmap and confirmed the restored backlog now has enough depth to benefit from the stronger autonomous floor.
 - Blockers: none.
 - Next slice: add the automation prompt helper that emits task-only recurring prompt variants from existing Campfire state.
+
+## 2026-03-14 milestone-024 course-correction
+
+- Course correction: the user clarified that they want a true manual-stop autonomous run, not just a stronger floor on a still-bounded rolling session.
+- Changed: deferred the automation-helper implementation again, then rewired the rolling contract, helper, resume guidance, and docs around an explicit `run_style: until_stopped`.
+- Validation: reviewed the execution policy and confirmed the remaining internal stop causes were the bounded runtime budget, milestone cap, and reframe cap.
+- Blockers: none.
+- Next slice: add deterministic verification for the until-stopped rolling style and queue the self-hosted task into that mode.
+
+## 2026-03-14 milestone-024
+
+- Changed: updated `enable_rolling_mode.sh`, `init_task.sh`, `resume_task.sh`, the task-state contract, worker/framer/evaluator guidance, and README so Campfire can declare `run_style: until_stopped` with no internal runtime budget or milestone cap.
+- Changed: added `skills/task-handoff-state/scripts/verify_until_stopped_mode.sh`, wired it into `scripts/verify_repo.sh`, and refreshed Campfire's own task-state/runbook guidance to use the new manual-stop style.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh`, `./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh`, `./skills/task-handoff-state/scripts/verify_autonomous_floor.sh`, `./scripts/verify_repo.sh`, and `./scripts/resume_task.sh improve-campfire` successfully.
+- Blockers: none.
+- Next slice: resume the deferred automation-helper backlog from the now manual-stop self-hosted queue.

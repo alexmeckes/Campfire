@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(pwd -P)"
+RUN_STYLE="bounded"
 PLANNING_SLICE_MINUTES=10
 RUNTIME_BUDGET_MINUTES=120
 MIN_RUNTIME_MINUTES=60
@@ -17,7 +18,7 @@ NOTE_TEXT=""
 usage() {
   cat <<'EOF'
 Usage:
-  enable_rolling_mode.sh [--root /path/to/workspace] [--planning-slice-minutes N] [--runtime-budget-minutes N] [--min-runtime-minutes N] [--min-milestones-per-run N] [--max-milestones-per-run N] [--auto-reframe true|false] [--reframe-queue-below N] [--target-queue-depth N] [--max-reframes-per-run N] [--continue-until csv] [--note "text"] [--queue "milestone-id:Milestone title"]... <task-slug>
+  enable_rolling_mode.sh [--root /path/to/workspace] [--run-style bounded|until_stopped] [--until-stopped] [--planning-slice-minutes N] [--runtime-budget-minutes N] [--min-runtime-minutes N] [--min-milestones-per-run N] [--max-milestones-per-run N] [--auto-reframe true|false] [--reframe-queue-below N] [--target-queue-depth N] [--max-reframes-per-run N] [--continue-until csv] [--note "text"] [--queue "milestone-id:Milestone title"]... <task-slug>
 EOF
 }
 
@@ -28,6 +29,14 @@ while [ "$#" -gt 0 ]; do
     --root)
       ROOT_DIR="$2"
       shift 2
+      ;;
+    --run-style)
+      RUN_STYLE="$2"
+      shift 2
+      ;;
+    --until-stopped)
+      RUN_STYLE="until_stopped"
+      shift
       ;;
     --planning-slice-minutes)
       PLANNING_SLICE_MINUTES="$2"
@@ -116,7 +125,7 @@ fi
 
 QUEUE_JSON="$(printf '%s\n' "${QUEUE_VALUES[@]}")"
 
-export CHECKPOINT_FILE HANDOFF_FILE TASK_SLUG PLANNING_SLICE_MINUTES RUNTIME_BUDGET_MINUTES MIN_RUNTIME_MINUTES MIN_MILESTONES_PER_RUN MAX_MILESTONES_PER_RUN AUTO_REFRAME REFRAME_QUEUE_BELOW TARGET_QUEUE_DEPTH MAX_REFRAMES_PER_RUN CONTINUE_UNTIL NOTE_TEXT QUEUE_JSON
+export CHECKPOINT_FILE HANDOFF_FILE TASK_SLUG RUN_STYLE PLANNING_SLICE_MINUTES RUNTIME_BUDGET_MINUTES MIN_RUNTIME_MINUTES MIN_MILESTONES_PER_RUN MAX_MILESTONES_PER_RUN AUTO_REFRAME REFRAME_QUEUE_BELOW TARGET_QUEUE_DEPTH MAX_REFRAMES_PER_RUN CONTINUE_UNTIL NOTE_TEXT QUEUE_JSON
 
 python3 <<'PY'
 import json
@@ -126,6 +135,7 @@ from pathlib import Path
 checkpoint_path = Path(os.environ["CHECKPOINT_FILE"])
 handoff_path = Path(os.environ["HANDOFF_FILE"])
 task_slug = os.environ["TASK_SLUG"]
+run_style = os.environ["RUN_STYLE"].strip()
 planning_slice_minutes = int(os.environ["PLANNING_SLICE_MINUTES"])
 runtime_budget_minutes = int(os.environ["RUNTIME_BUDGET_MINUTES"])
 min_runtime_minutes = int(os.environ["MIN_RUNTIME_MINUTES"])
@@ -138,6 +148,17 @@ max_reframes_per_run = int(os.environ["MAX_REFRAMES_PER_RUN"])
 continue_until = [item.strip() for item in os.environ["CONTINUE_UNTIL"].split(",") if item.strip()]
 note_text = os.environ["NOTE_TEXT"].strip()
 queue_lines = [line.strip() for line in os.environ["QUEUE_JSON"].splitlines() if line.strip()]
+
+if run_style not in {"bounded", "until_stopped"}:
+    raise SystemExit("--run-style must be one of: bounded, until_stopped")
+
+if run_style == "until_stopped":
+    runtime_budget_minutes = 0
+    min_runtime_minutes = 0
+    min_milestones_per_run = 0
+    max_milestones_per_run = 0
+    max_reframes_per_run = 0
+    continue_until = ["blocked", "waiting_on_decision"]
 
 data = json.loads(checkpoint_path.read_text())
 execution = data.get("execution", {})
@@ -164,6 +185,7 @@ if min_milestones_per_run > max_milestones_per_run:
 execution.update(
     {
         "mode": "rolling",
+        "run_style": run_style,
         "auto_advance": True,
         "auto_reframe": auto_reframe,
         "planning_slice_minutes": planning_slice_minutes,
@@ -185,10 +207,20 @@ checkpoint_path.write_text(json.dumps(data, indent=2) + "\n")
 rolling_prompt = (
     f"Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state "
     f"to continue this task from `.autonomous/{task_slug}/`. Keep planning bounded, auto-advance through the "
-    f"queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the "
-    f"configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on "
-    f"a real blocker, decision boundary, budget limit, or an external manual pause."
+    f"queued milestones, replenish the queue when policy allows"
 )
+
+if run_style == "until_stopped":
+    rolling_prompt += (
+        ", and keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause "
+        "appears. Do not impose an internal runtime budget or milestone cap."
+    )
+else:
+    rolling_prompt += (
+        " and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a "
+        "blocker or decision boundary appears, and stop only on a real blocker, decision boundary, budget limit, or "
+        "an external manual pause."
+    )
 
 if handoff_path.exists():
     lines = handoff_path.read_text().splitlines()
@@ -208,4 +240,8 @@ echo "Enabled rolling mode for:"
 echo "  $TASK_DIR"
 echo
 echo "Recommended Codex App prompt:"
-echo "  Use \$task-framer, \$course-corrector, \$long-horizon-worker, \$task-evaluator, and \$task-handoff-state to continue .autonomous/$TASK_SLUG/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on a real blocker, decision boundary, budget limit, or an external manual pause."
+if [ "$RUN_STYLE" = "until_stopped" ]; then
+  echo "  Use \$task-framer, \$course-corrector, \$long-horizon-worker, \$task-evaluator, and \$task-handoff-state to continue .autonomous/$TASK_SLUG/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows, and keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause appears. Do not impose an internal runtime budget or milestone cap."
+else
+  echo "  Use \$task-framer, \$course-corrector, \$long-horizon-worker, \$task-evaluator, and \$task-handoff-state to continue .autonomous/$TASK_SLUG/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on a real blocker, decision boundary, budget limit, or an external manual pause."
+fi

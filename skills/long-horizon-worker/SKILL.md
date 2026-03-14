@@ -45,7 +45,7 @@ Do not use it for one-shot factual questions or tasks that depend on repeated hu
 
 ## Rolling Run Mode
 
-Use rolling mode when the user wants Codex to keep going until they return, a blocker appears, or a run budget expires.
+Use rolling mode when the user wants Codex to keep going until they return, a blocker appears, or a run budget expires. Use `run_style: until_stopped` when the user explicitly wants the run to continue until they manually stop it.
 
 When `checkpoints.json` has an `execution` object with:
 
@@ -64,13 +64,22 @@ follow these extra rules:
 8. If `min_runtime_minutes` or `min_milestones_per_run` are set, do not choose a voluntary `manual_pause` before those floors are met unless a blocker, decision boundary, or budget limit forces a real stop.
 9. Stop only when:
    - a configured `continue_until` condition is hit
-   - the runtime budget expires
+   - the runtime budget expires for `run_style: bounded`
    - the queued backlog is empty and no safe next milestone can be chosen even after a permitted bounded reframe
+
+When `run_style: until_stopped` is active:
+
+- treat `runtime_budget_minutes: 0` as no internal budget
+- treat `max_milestones_per_run: 0` as no milestone cap
+- treat `max_reframes_per_run: 0` as no reframe cap
+- do not stop on `budget_limit` unless the task explicitly chose a bounded run style instead
+- continue replenishing the queue with bounded reframes as long as safe work remains
 
 In rolling mode, validation is not the default stop condition. It is the trigger for advancing to the next milestone when allowed.
 In dynamic rolling mode, low queue depth is the trigger for one bounded reframe when the execution policy allows it.
 In rolling mode, `auto_advanced` and `auto_reframed` are mid-run transitions. Reserve `last_run.stop_reason` for the actual terminal pause reason.
 In autonomous rolling mode, `manual_pause` should be treated as external-only unless the run has already satisfied its configured minimum runtime and milestone floor.
+In `run_style: until_stopped`, do not invent a “clean pause” after a good batch. Keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause occurs.
 
 ## Loop Contract
 

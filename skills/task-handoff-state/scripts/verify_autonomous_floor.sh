@@ -48,6 +48,7 @@ expect_file "$TASK_DIR/handoff.md"
 "$RESUME_SCRIPT" --root "$TEMP_WORKSPACE" "$TASK_SLUG" >/tmp/campfire_floor_resume.out
 
 expect_contains "$TASK_DIR/checkpoints.json" '"mode": "rolling"'
+expect_contains "$TASK_DIR/checkpoints.json" '"run_style": "bounded"'
 expect_contains "$TASK_DIR/checkpoints.json" '"min_runtime_minutes": 60'
 expect_contains "$TASK_DIR/checkpoints.json" '"min_milestones_per_run": 5'
 expect_contains "$TASK_DIR/checkpoints.json" '"max_milestones_per_run": 8'
@@ -60,6 +61,7 @@ if /usr/bin/grep -Fq -- '"manual_pause"' "$TASK_DIR/checkpoints.json"; then
 fi
 expect_contains "$TASK_DIR/handoff.md" 'do not self-pause before the configured minimum runtime and milestone floor'
 expect_contains /tmp/campfire_floor_resume.out 'min_runtime_minutes: 60'
+expect_contains /tmp/campfire_floor_resume.out 'run_style: bounded'
 expect_contains /tmp/campfire_floor_resume.out 'min_milestones_per_run: 5'
 expect_contains /tmp/campfire_floor_resume.out 'max_milestones_per_run: 8'
 expect_contains /tmp/campfire_floor_resume.out 'target_queue_depth: 5'

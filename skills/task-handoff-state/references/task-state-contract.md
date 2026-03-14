@@ -145,16 +145,17 @@ For Codex App runs that should keep going across multiple milestones, add an `ex
 Suggested fields:
 
 - `mode`: `single_milestone` or `rolling`
+- `run_style`: `bounded` or `until_stopped`
 - `auto_advance`: whether a validated milestone should advance to the next queued milestone
 - `auto_reframe`: whether a low queue should trigger one bounded reframe instead of stopping
 - `planning_slice_minutes`: how much planning is allowed before each implementation cycle
-- `runtime_budget_minutes`: total run budget for the current session
+- `runtime_budget_minutes`: total run budget for the current session; use `0` for no internal budget in `until_stopped` runs
 - `min_runtime_minutes`: minimum autonomous runtime target before the worker may voluntarily self-pause
 - `min_milestones_per_run`: minimum number of milestone transitions to aim for before voluntarily self-pausing
-- `max_milestones_per_run`: optional cap on how many milestones may be advanced in one run
+- `max_milestones_per_run`: optional cap on how many milestones may be advanced in one run; use `0` for no cap
 - `reframe_queue_below`: replenish when queued milestones are at or below this count
 - `target_queue_depth`: target queued backlog size after a bounded reframe
-- `max_reframes_per_run`: cap on bounded reframe passes in one run
+- `max_reframes_per_run`: cap on bounded reframe passes in one run; use `0` for no cap
 - `continue_until`: stop conditions for the current run
 - `queued_milestones`: the next milestone IDs and titles in order
 
@@ -163,6 +164,8 @@ Recommended `continue_until` values for autonomous rolling runs:
 - `blocked`
 - `waiting_on_decision`
 - `budget_limit`
+
+For `run_style: until_stopped`, remove `budget_limit` from `continue_until`, set `runtime_budget_minutes: 0`, and remove internal milestone/reframe caps unless you explicitly need them.
 
 Use `manual_pause` only for an explicit user pause or an externally interrupted run. Do not treat it as a normal autonomous stop trigger.
 
@@ -175,6 +178,8 @@ When `auto_reframe` is enabled and queued milestones fall to or below `reframe_q
 When `min_runtime_minutes` or `min_milestones_per_run` are set for an autonomous rolling run, do not voluntarily stop on `manual_pause` before those floors are met unless the task becomes `blocked`, hits `waiting_on_decision`, or exhausts the run budget.
 
 In rolling mode, reserve `last_run.stop_reason` for the real terminal pause reason such as `budget_limit`, `manual_pause`, `blocked`, or `waiting_on_decision`. Do not use `auto_advanced` or `auto_reframed` as terminal stop reasons when the run continued afterward.
+
+For `run_style: until_stopped`, a normal autonomous stop should happen only when the task is `blocked`, reaches `waiting_on_decision`, or exhausts the current safe backlog even after any permitted bounded reframe. `manual_pause` stays external-only.
 
 ## Blocker Tracking
 

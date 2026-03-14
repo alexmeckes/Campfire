@@ -54,6 +54,7 @@ expect_file "$TASK_DIR/handoff.md"
 "$RESUME_SCRIPT" --root "$TEMP_WORKSPACE" "$TASK_SLUG" >/tmp/campfire_enable_resume.out
 
 expect_contains "$TASK_DIR/checkpoints.json" '"mode": "rolling"'
+expect_contains "$TASK_DIR/checkpoints.json" '"run_style": "bounded"'
 expect_contains "$TASK_DIR/checkpoints.json" '"planning_slice_minutes": 8'
 expect_contains "$TASK_DIR/checkpoints.json" '"runtime_budget_minutes": 90'
 expect_contains "$TASK_DIR/checkpoints.json" '"min_runtime_minutes": 30'
@@ -72,6 +73,7 @@ fi
 expect_contains "$TASK_DIR/handoff.md" 'replenish the queue when policy allows and budget remains'
 expect_contains "$TASK_DIR/handoff.md" 'do not self-pause before the configured minimum runtime and milestone floor'
 expect_contains /tmp/campfire_enable_resume.out 'mode: rolling'
+expect_contains /tmp/campfire_enable_resume.out 'run_style: bounded'
 expect_contains /tmp/campfire_enable_resume.out 'auto_advance: True'
 expect_contains /tmp/campfire_enable_resume.out 'auto_reframe: True'
 expect_contains /tmp/campfire_enable_resume.out 'min_runtime_minutes: 30'

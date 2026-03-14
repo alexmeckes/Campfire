@@ -9,6 +9,7 @@
 
 - Optional install into ~/.codex/skills: ./scripts/install_skills.sh
 - Rolling-mode helper: ./scripts/enable_rolling_mode.sh <task-slug> --queue "milestone-id:Milestone title"
+- Manual-stop rolling helper: ./scripts/enable_rolling_mode.sh --until-stopped <task-slug> --queue "milestone-id:Milestone title"
 - Repo verification: ./scripts/verify_repo.sh
 - Lifecycle verification: ./skills/task-handoff-state/scripts/verify_task_lifecycle.sh
 - Blocked/retry verification: ./skills/task-handoff-state/scripts/verify_blocked_retry.sh
@@ -18,6 +19,7 @@
 - Rolling reframe verification: ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
 - Rolling-mode helper verification: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
 - Autonomous-floor verification: ./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
+- Until-stopped verification: ./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
 - Rolling budget-limit verification: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Rolling waiting-on-decision verification: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
 - Automation-pattern verification: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
@@ -45,6 +47,7 @@
 - Secondary: ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
@@ -62,9 +65,11 @@
 - Repo-local AGENTS.md defines self-hosting priorities
 - Prefer improvements that strengthen portability, verifiers, or resume semantics
 - Unattended run target: about 2 hours total
+- Manual-stop unattended runs may continue without an internal budget or milestone cap until a blocker, decision boundary, safe-work exhaustion, or an external pause occurs
 - Planning is allowed, but keep each rolling planning slice to about 10 minutes before shipping code
 - When the queued rolling backlog is exhausted, stop and frame the next backlog instead of inventing one silently
-- If queue replenishment is enabled and queue depth drops below the configured threshold while budget remains, spend one bounded planning slice to refill the queue before stopping
+- If queue replenishment is enabled and queue depth drops below the configured threshold while budget remains, or no internal budget is configured, spend one bounded planning slice to refill the queue before stopping
+- In `run_style: until_stopped`, treat zero budget and zero caps as intentional: keep queue replenishment active until the run is externally paused or runs out of safe work
 - A rolling pause on `budget_limit` or `waiting_on_decision` should preserve the active milestone and remaining queued milestones for the next run
 - For autonomous runs, `manual_pause` should be treated as external-only and not chosen before the minimum runtime and milestone floor are met
 - For git repos, prefer optional worktree-backed setup only when it improves long-horizon isolation without weakening non-git portability

@@ -34,6 +34,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_autonomous_floor.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_until_stopped_mode.sh" \
   "$ROOT_DIR/scripts/install_skills.sh"
 
 echo "== Skill presence =="
@@ -113,6 +114,9 @@ echo "== Automation pattern verifier =="
 
 echo "== Autonomous floor verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_autonomous_floor.sh"
+
+echo "== Until-stopped verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_until_stopped_mode.sh"
 
 rm -f /tmp/campfire_install.out
 

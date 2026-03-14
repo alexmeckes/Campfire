@@ -65,6 +65,7 @@ A framed task should answer:
 - For Codex App background or unattended runs, frame at least the next 2 to 3 milestones and write an `execution` policy into `checkpoints.json`.
 - In rolling mode, set a planning budget, runtime budget, minimum runtime, minimum milestone floor, queued milestones, queue-replenishment policy, and explicit stop conditions instead of relying on “stop after one validated milestone.”
 - For autonomous runs, do not treat `manual_pause` as a normal internal stop condition. Reserve it for explicit user pauses or external interruptions.
+- If the user wants the run to keep going until they manually stop it, set `run_style: until_stopped`, remove internal budget/cap stop conditions, and keep queue replenishment enabled.
 
 ## Output Style
 

@@ -241,6 +241,7 @@ normalized = {
     },
     "execution": {
         "mode": data.get("execution", {}).get("mode", "single_milestone") if isinstance(data.get("execution", {}), dict) else "single_milestone",
+        "run_style": data.get("execution", {}).get("run_style", "bounded") if isinstance(data.get("execution", {}), dict) else "bounded",
         "auto_advance": data.get("execution", {}).get("auto_advance", False) if isinstance(data.get("execution", {}), dict) else False,
         "auto_reframe": data.get("execution", {}).get("auto_reframe", False) if isinstance(data.get("execution", {}), dict) else False,
         "planning_slice_minutes": data.get("execution", {}).get("planning_slice_minutes", 15) if isinstance(data.get("execution", {}), dict) else 15,

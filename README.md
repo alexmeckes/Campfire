@@ -76,9 +76,10 @@ In rolling mode:
 - planning stays bounded
 - the task keeps a machine-readable queued backlog
 - evaluation can auto-advance to the next milestone and record that as a run event
-- low queue depth can trigger one bounded queue replenishment pass when budget remains, then continue from the replenished backlog
+- low queue depth can trigger one bounded queue replenishment pass when budget remains, or no internal budget is configured, then continue from the replenished backlog
 - autonomous runs can set a minimum runtime and milestone floor so they do not self-pause after a tiny validated batch
-- the run stops on blockers, decision boundaries, budget limits, or an empty safe backlog
+- autonomous runs can also switch to `run_style: until_stopped`, which removes the internal runtime budget and milestone cap
+- bounded runs stop on blockers, decision boundaries, budget limits, or an empty safe backlog
 - a budget or decision pause keeps the active milestone and queued backlog intact for the next run
 - `last_run.stop_reason` stays reserved for the actual terminal pause reason, while `last_run.events` records mid-run transitions such as `auto_advanced` and `auto_reframed`
 - `manual_pause` should be treated as an explicit user or external interruption, not the normal autonomous stop path
@@ -334,6 +335,12 @@ And the autonomous-floor verifier:
 ./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
 ```
 
+And the until-stopped verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
+```
+
 ## Example Workspace
 
 The example workspace under `examples/basic-workspace/` shows two minimal project-side patterns:
@@ -369,6 +376,14 @@ If you want the task to keep moving while you are away, switch it into rolling m
 By default, rolling mode also enables bounded queue replenishment so a long run can frame one more small backlog slice when the queue gets low and budget remains.
 By default, the rolling helper now also sets an autonomy floor: `60` minutes minimum runtime, `5` milestone transitions target, `8` milestone cap, queue depth `5`, and up to `3` bounded reframes before budget or a real blocker should stop the run.
 
+If you want the run to keep going until you manually stop it, use the manual-stop rolling style instead:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --root /path/to/project --until-stopped your-task-slug --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
+```
+
+That style removes the internal runtime budget and milestone cap, keeps queue replenishment enabled, and stops only on a real blocker, a user decision boundary, safe-work exhaustion, or an external manual pause.
+
 4. If the task is still vague, prompt:
 
 ```text
@@ -399,11 +414,17 @@ Use $task-evaluator and $task-handoff-state to evaluate whether the current mile
 Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on blockers, decision boundaries, or the configured run budget.
 ```
 
+For a manual-stop run instead:
+
+```text
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows, and keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause appears. Do not impose an internal runtime budget or milestone cap.
+```
+
 ## Verification
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses thirteen kinds of checks:
+The prototype currently uses fourteen kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
@@ -418,6 +439,7 @@ The prototype currently uses thirteen kinds of checks:
 - rolling-mode helper tests that simulate converting an existing task into a queued rolling run
 - automation-pattern tests that keep recurring automation references and example guidance aligned
 - autonomous-floor tests that keep the stronger unattended-run defaults and external-only manual pause semantics aligned
+- until-stopped tests that keep manual-stop rolling runs free of internal runtime budgets and milestone caps
 
 The goal is for every Campfire implementation to prove:
 
@@ -454,6 +476,7 @@ Campfire is early, but it is now concrete enough to install and test:
 - lifecycle verifiers for success, blocked retry, course correction, task evaluation, and rolling execution
 - dynamic rolling queue-replenishment coverage so unattended runs do not stop just because the queue empties
 - explicit rolling stop-condition coverage for budget-limit and waiting-on-decision pauses
+- explicit manual-stop rolling mode with no internal runtime budget or milestone cap
 - repo-local install and verification scripts
 - a minimal example workspace
 

@@ -68,6 +68,7 @@ A good evaluation answers:
 - In dynamic rolling mode, do not stop on an empty queue until a permitted bounded reframe has either replenished it or failed to find a safe next milestone.
 - In rolling mode, keep `last_run.stop_reason` for the actual terminal pause reason. Treat `auto_advanced` and `auto_reframed` as run events.
 - In autonomous rolling mode, do not recommend a voluntary `manual_pause` before the configured minimum runtime and milestone floor are met unless a blocker, decision boundary, or budget limit forced the stop.
+- In `run_style: until_stopped`, do not treat “good progress” or a consumed batch as a stop reason. The only normal terminal outcomes are `blocked`, `waiting_on_decision`, safe-work exhaustion after permitted reframes, or an external manual pause.
 
 ## Output Style
 

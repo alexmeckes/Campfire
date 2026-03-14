@@ -66,6 +66,7 @@ if not isinstance(execution, dict):
     execution = {}
 
 mode = execution.get("mode", "single_milestone")
+run_style = execution.get("run_style", "bounded")
 auto_advance = execution.get("auto_advance", False)
 auto_reframe = execution.get("auto_reframe", False)
 planning_slice = execution.get("planning_slice_minutes", 15)
@@ -80,17 +81,22 @@ continue_until = execution.get("continue_until", [])
 queued = execution.get("queued_milestones", [])
 notes = execution.get("notes", "")
 
+runtime_budget_display = "unlimited" if mode == "rolling" and run_style == "until_stopped" and runtime_budget == 0 else runtime_budget
+max_milestones_display = "unlimited" if mode == "rolling" and run_style == "until_stopped" and max_milestones == 0 else max_milestones
+max_reframes_display = "unlimited" if mode == "rolling" and run_style == "until_stopped" and max_reframes_per_run == 0 else max_reframes_per_run
+
 print(f"  mode: {mode}")
+print(f"  run_style: {run_style}")
 print(f"  auto_advance: {auto_advance}")
 print(f"  auto_reframe: {auto_reframe}")
 print(f"  planning_slice_minutes: {planning_slice}")
-print(f"  runtime_budget_minutes: {runtime_budget}")
+print(f"  runtime_budget_minutes: {runtime_budget_display}")
 print(f"  min_runtime_minutes: {min_runtime}")
 print(f"  min_milestones_per_run: {min_milestones}")
-print(f"  max_milestones_per_run: {max_milestones}")
+print(f"  max_milestones_per_run: {max_milestones_display}")
 print(f"  reframe_queue_below: {reframe_queue_below}")
 print(f"  target_queue_depth: {target_queue_depth}")
-print(f"  max_reframes_per_run: {max_reframes_per_run}")
+print(f"  max_reframes_per_run: {max_reframes_display}")
 print(f"  continue_until: {continue_until}")
 if queued:
     print("  queued_milestones:")
@@ -200,7 +206,10 @@ task_slug = sys.argv[2]
 data = json.loads(path.read_text())
 execution = data.get("execution", {})
 if isinstance(execution, dict) and execution.get("mode") == "rolling":
-    print(f"  Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/{task_slug}/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on the configured run limits or a real blocker.")
+    if execution.get("run_style") == "until_stopped":
+        print(f"  Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/{task_slug}/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows, and keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause appears. Do not impose an internal runtime budget or milestone cap.")
+    else:
+        print(f"  Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/{task_slug}/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on the configured run limits or a real blocker.")
 else:
     print(f"  Use $long-horizon-worker and $task-handoff-state to continue .autonomous/{task_slug}/ from the current handoff and validate the next slice before stopping.")
 PY

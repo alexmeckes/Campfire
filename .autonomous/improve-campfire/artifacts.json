@@ -325,6 +325,24 @@
       "type": "planning_note",
       "milestone_id": "milestone-018",
       "reason": "Defines the next automation-pattern backlog after the worktree-aware backlog completed."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-024-until-stopped-mode.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-024",
+      "reason": "Records why Campfire needed an explicit manual-stop rolling style instead of just a stronger bounded floor."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_until_stopped_mode.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-024",
+      "reason": "Proves that the manual-stop rolling style removes internal runtime budgets and milestone caps while keeping manual_pause external-only."
+    },
+    {
+      "path": "README.md",
+      "type": "documentation",
+      "milestone_id": "milestone-024",
+      "reason": "Documents how to enable and prompt Campfire's until-stopped rolling style."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

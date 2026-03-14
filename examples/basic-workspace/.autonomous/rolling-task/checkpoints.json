@@ -19,6 +19,7 @@
   },
   "execution": {
     "mode": "rolling",
+    "run_style": "bounded",
     "auto_advance": true,
     "auto_reframe": true,
     "planning_slice_minutes": 10,

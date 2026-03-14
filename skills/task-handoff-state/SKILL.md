@@ -60,6 +60,12 @@ Switch an existing task into rolling mode:
 ~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh build-the-next-milestone --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
 ```
 
+Switch an existing task into manual-stop rolling mode:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --until-stopped build-the-next-milestone --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
+```
+
 Verify the task-state lifecycle:
 
 ```bash
@@ -132,6 +138,12 @@ Verify the autonomous rolling floor defaults:
 ~/.codex/skills/task-handoff-state/scripts/verify_autonomous_floor.sh
 ```
 
+Verify the until-stopped rolling style:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
+```
+
 ## File Contract
 
 ### `plan.md`
@@ -202,6 +214,7 @@ Verify the autonomous rolling floor defaults:
 - For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
 - Dynamic rolling runs should usually enable queue replenishment so a run can keep going until budget, blocker, or decision boundary instead of stopping on an empty queue.
 - In rolling mode, record `auto_advanced` and `auto_reframed` in `last_run.events` and keep `last_run.stop_reason` for the real terminal pause reason.
+- In `run_style: until_stopped`, remove internal budget/cap stop conditions and keep `manual_pause` external-only.
 - For autonomous rolling runs, prefer explicit minimum runtime and milestone floors so the worker does not self-pause after a tiny validated batch.
 - For git repos, prefer worktree-backed bootstrap only when isolation helps; keep non-git and low-risk tasks on the in-place path.
 

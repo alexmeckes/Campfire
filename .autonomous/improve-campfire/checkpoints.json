@@ -26,17 +26,16 @@
     "auto_advance": true,
     "auto_reframe": true,
     "planning_slice_minutes": 10,
-    "runtime_budget_minutes": 120,
-    "min_runtime_minutes": 60,
-    "min_milestones_per_run": 5,
-    "max_milestones_per_run": 8,
+    "runtime_budget_minutes": 0,
+    "min_runtime_minutes": 0,
+    "min_milestones_per_run": 0,
+    "max_milestones_per_run": 0,
     "reframe_queue_below": 1,
     "target_queue_depth": 5,
-    "max_reframes_per_run": 3,
+    "max_reframes_per_run": 0,
     "continue_until": [
       "blocked",
-      "waiting_on_decision",
-      "budget_limit"
+      "waiting_on_decision"
     ],
     "queued_milestones": [
       {
@@ -56,7 +55,8 @@
         "milestone_title": "Add deterministic verification that resume_task.sh surfaces automation-helper guidance correctly"
       }
     ],
-    "notes": "Dynamic queue replenishment is enabled. Autonomous rolling runs now target longer unattended work with stronger runtime and milestone floors while the deferred automation-helper backlog resumes with a deeper queue."
+    "notes": "The self-hosted task is now configured for manual-stop autonomous runs with no internal budget or milestone cap.",
+    "run_style": "until_stopped"
   },
   "blocker": {
     "status": "none",
@@ -66,15 +66,13 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-14T23:15:00Z",
-    "ended_at": "2026-03-14T23:45:00Z",
+    "started_at": "2026-03-15T00:05:00Z",
+    "ended_at": "2026-03-15T00:20:00Z",
     "stop_reason": "manual_pause",
-    "summary": "Course-corrected the backlog toward autonomous rolling floors, completed milestones 021 through 023, restored the deferred automation-helper backlog with a deeper queue, and then paused with milestone-024 ready.",
+    "summary": "Course-corrected the rolling policy toward explicit until-stopped runs, added verifier coverage for the new style, and re-queued the self-hosted task in manual-stop mode with the automation-helper backlog still intact.",
     "next_step": "Add the automation prompt helper, then verify it, document it, and expose it through resume guidance.",
     "events": [
-      "course_corrected",
-      "auto_advanced",
-      "auto_reframed"
+      "course_corrected"
     ]
   },
   "runbook": "runbook.md",
@@ -104,6 +102,13 @@
     {
       "type": "plan_review",
       "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-024-until-stopped-mode.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-024-until-stopped-mode.md",
+      "summary": "Recorded why Campfire needed an explicit manual-stop rolling style instead of a stronger bounded floor."
+    },
+    {
+      "type": "plan_review",
+      "result": "pass",
       "command": "review .autonomous/improve-campfire/findings/milestone-018-rolling-events-fix.md",
       "artifact": ".autonomous/improve-campfire/findings/milestone-018-rolling-events-fix.md",
       "summary": "Recorded the earlier rolling stop-reason fix so auto-advance and bounded reframe remain mid-run events."
@@ -114,6 +119,13 @@
       "command": "./skills/task-handoff-state/scripts/verify_autonomous_floor.sh",
       "artifact": "skills/task-handoff-state/scripts/verify_autonomous_floor.sh",
       "summary": "Autonomous-floor verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_until_stopped_mode.sh",
+      "summary": "Until-stopped rolling verifier passed."
     },
     {
       "type": "milestone_evaluation",
