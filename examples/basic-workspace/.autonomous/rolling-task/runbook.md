@@ -15,6 +15,7 @@
 - Confirm the rolling execution policy exists
 - Confirm the current milestone differs from the queued milestones
 - Confirm the handoff prompt allows auto-advance
+- Confirm the automation-ready prompt example stays aligned with the rolling task path
 
 ## Observability
 

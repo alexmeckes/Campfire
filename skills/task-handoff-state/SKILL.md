@@ -10,6 +10,7 @@ Use this skill when a task needs durable on-disk state that survives Codex App r
 This skill standardizes a task directory at `.autonomous/<task>/` inside the active workspace.
 
 Read [references/task-state-contract.md](references/task-state-contract.md) when you need the full file contract and schema conventions.
+Read [references/automation-patterns.md](references/automation-patterns.md) when the task should drive a recurring Codex App automation instead of a one-off run.
 
 ## What It Creates
 
@@ -117,6 +118,12 @@ Verify the rolling-mode helper:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+```
+
+Verify recurring automation-pattern coverage:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_automation_patterns.sh
 ```
 
 ## File Contract

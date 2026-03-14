@@ -4,21 +4,21 @@
   "status": "ready",
   "phase": "execution",
   "current": {
-    "milestone_id": "milestone-018",
-    "milestone_title": "Add a reusable automation-pattern reference for recurring Codex App runs",
-    "slice_id": "slice-024",
-    "slice_title": "Add the automation-pattern reference and keep it generic for recurring Campfire runs",
+    "milestone_id": "milestone-021",
+    "milestone_title": "Add an automation prompt helper that emits task-only recurring prompt variants from Campfire state",
+    "slice_id": "slice-025",
+    "slice_title": "Add a helper under skills/task-handoff-state/scripts that prints recurring automation prompt variants for an existing task slug",
     "acceptance_criteria": [
-      "Campfire provides a reusable reference for automation-ready prompts that pair with the task-state contract",
-      "The repo contains deterministic evidence or example coverage for automation-ready workflow guidance",
-      "README and self-hosted task state describe when to use recurring automations versus one-off rolling runs"
+      "Campfire provides a reusable helper that prints at least rolling_resume, verifier_sweep, and backlog_refresh prompt variants from existing task state",
+      "The helper keeps schedule and workspace out of the prompt body while targeting a concrete .autonomous/<task>/ directory",
+      "The generic task-state skill and repo docs can point to the helper once it exists"
     ],
     "dependencies": [
-      "README.md",
-      "examples/basic-workspace/AGENTS.md",
+      "skills/task-handoff-state/references/automation-patterns.md",
       "skills/task-handoff-state/SKILL.md",
+      "README.md",
       "scripts/verify_repo.sh",
-      ".autonomous/improve-campfire/findings/milestone-018-automation-backlog.md"
+      ".autonomous/improve-campfire/findings/milestone-021-automation-helper-backlog.md"
     ]
   },
   "execution": {
@@ -39,15 +39,15 @@
     ],
     "queued_milestones": [
       {
-        "milestone_id": "milestone-019",
-        "milestone_title": "Add deterministic verification or example coverage for automation-ready prompts and workspace guidance"
+        "milestone_id": "milestone-022",
+        "milestone_title": "Add deterministic verification for automation prompt helper variants and task-state selection"
       },
       {
-        "milestone_id": "milestone-020",
-        "milestone_title": "Document recurring automation patterns in README and example guidance"
+        "milestone_id": "milestone-023",
+        "milestone_title": "Document automation prompt helper usage in README and example guidance"
       }
     ],
-    "notes": "Dynamic queue replenishment is enabled. The next backlog focuses on recurring Codex App automation patterns while keeping Campfire generic."
+    "notes": "Dynamic queue replenishment is enabled. The next backlog focuses on generating automation-ready prompt variants directly from Campfire state while keeping schedule and workspace outside the prompt."
   },
   "blocker": {
     "status": "none",
@@ -57,12 +57,15 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-14T22:20:00Z",
-    "ended_at": "2026-03-14T22:35:00Z",
+    "started_at": "2026-03-14T22:40:00Z",
+    "ended_at": "2026-03-14T23:10:00Z",
     "stop_reason": "manual_pause",
-    "summary": "Corrected rolling semantics so auto-advance and bounded reframe are recorded as run events instead of terminal stop reasons, then paused with milestone-018 still active.",
-    "next_step": "Add the automation-pattern reference, then cover automation-ready prompts and workspace guidance.",
-    "events": []
+    "summary": "Completed the recurring automation backlog, auto-advanced through milestones 018 through 020, auto-reframed the next backlog around automation prompt helpers, and then paused with milestone-021 ready.",
+    "next_step": "Add the automation prompt helper, then verify it and document its usage.",
+    "events": [
+      "auto_advanced",
+      "auto_reframed"
+    ]
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
@@ -77,6 +80,13 @@
     {
       "type": "plan_review",
       "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-021-automation-helper-backlog.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-021-automation-helper-backlog.md",
+      "summary": "Queued the next automation-helper backlog after the recurring automation milestone set validated."
+    },
+    {
+      "type": "plan_review",
+      "result": "pass",
       "command": "review .autonomous/improve-campfire/findings/milestone-018-rolling-events-fix.md",
       "artifact": ".autonomous/improve-campfire/findings/milestone-018-rolling-events-fix.md",
       "summary": "Recorded the rolling stop-reason fix so auto-advance and bounded reframe remain mid-run events."
@@ -87,6 +97,20 @@
       "command": "review .autonomous/improve-campfire/findings/milestone-009-rolling-stop-conditions.md",
       "artifact": ".autonomous/improve-campfire/findings/milestone-009-rolling-stop-conditions.md",
       "summary": "Framed the next rolling backlog around stop conditions other than success."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_automation_patterns.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_automation_patterns.sh",
+      "summary": "Automation-pattern verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-020-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-020-evaluation.md",
+      "summary": "Evaluation note confirms the recurring automation backlog is complete."
     },
     {
       "type": "milestone_evaluation",
@@ -134,7 +158,7 @@
       "type": "repo_verification",
       "result": "pass",
       "command": "./scripts/verify_repo.sh",
-      "summary": "Repo verification passed after the rolling stop-reason semantics fix."
+      "summary": "Repo verification passed after the recurring automation reference, verifier, and example guidance updates."
     },
     {
       "type": "milestone_evaluation",

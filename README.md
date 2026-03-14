@@ -179,6 +179,23 @@ Typical rolling-run prompt:
 Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, and stop only on blockers, real decision boundaries, or the configured run budget.
 ```
 
+## Recurring Automation Patterns
+
+Automations are best when the task already has stable Campfire state and a known task slug.
+
+- Keep the automation prompt task-only. Let the automation configuration own schedule and workspace.
+- Point the automation at one workspace root and one stable `.autonomous/<task>/` directory.
+- Reuse the rolling execution contract so recurring runs preserve backlog, stop reasons, and findings.
+- Require updates to `progress.md`, `handoff.md`, `checkpoints.json`, and `artifacts.json` on every meaningful run.
+
+See [skills/task-handoff-state/references/automation-patterns.md](skills/task-handoff-state/references/automation-patterns.md) for the reusable reference.
+
+Useful recurring patterns:
+
+- Nightly rolling resume: continue the active rolling task with bounded planning and explicit stop conditions.
+- Verifier sweep: re-run the strongest existing validation for a task and refresh its evaluation state without broad implementation.
+- Weekly backlog refresh: tighten the next queued milestones and execution policy when the plan has gone stale.
+
 ## Repo Layout
 
 ```text
@@ -240,6 +257,7 @@ This checks:
 - the rolling budget-limit verifier passes
 - the rolling waiting-on-decision verifier passes
 - the rolling-mode helper verifier passes
+- the automation-pattern verifier passes
 
 You can also run the lifecycle verifier directly:
 
@@ -299,6 +317,12 @@ And the rolling-mode helper verifier:
 
 ```bash
 ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+```
+
+And the automation-pattern verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_automation_patterns.sh
 ```
 
 ## Example Workspace

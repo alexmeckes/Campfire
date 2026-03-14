@@ -3,8 +3,8 @@
 ## Current Status
 
 - Status: ready
-- Current milestone: milestone-018 - add a reusable automation-pattern reference for recurring Codex App runs
-- Next slice: add the automation-pattern reference, then cover automation-ready prompts and workspace guidance deterministically
+- Current milestone: milestone-021 - add an automation prompt helper that emits task-only recurring prompt variants from Campfire state
+- Next slice: add a helper under `skills/task-handoff-state/scripts/` that prints `rolling_resume`, `verifier_sweep`, and `backlog_refresh` prompt variants for an existing task slug
 - Stop reason: manual_pause
 
 ## Resume Prompt

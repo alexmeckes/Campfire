@@ -19,6 +19,7 @@
 - Rolling-mode helper verification: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
 - Rolling budget-limit verification: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Rolling waiting-on-decision verification: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
+- Automation-pattern verification: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
 - Review framing skill: ./skills/task-framer/SKILL.md
 - Review correction skill: ./skills/course-corrector/SKILL.md
 - Review evaluator skill: ./skills/task-evaluator/SKILL.md
@@ -27,6 +28,7 @@
 - Review stop-condition brief: .autonomous/improve-campfire/findings/milestone-009-rolling-stop-conditions.md
 - Review worktree backlog brief: .autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md
 - Review automation backlog brief: .autonomous/improve-campfire/findings/milestone-018-automation-backlog.md
+- Review automation patterns reference: skills/task-handoff-state/references/automation-patterns.md
 
 ## Validation
 
@@ -40,6 +42,7 @@
 - Secondary: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
 - Secondary: inspect the task-evaluator skill, reference docs, installer wiring, and repo verifier wiring
 - Record new verifier scripts in artifacts.json when they become part of the harness
 

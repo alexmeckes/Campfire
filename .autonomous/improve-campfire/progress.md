@@ -174,3 +174,34 @@
 - Validation: ran `./skills/task-handoff-state/scripts/verify_rolling_execution.sh`, `./skills/task-handoff-state/scripts/verify_rolling_reframe.sh`, `./scripts/verify_repo.sh`, and `./scripts/resume_task.sh improve-campfire`.
 - Blockers: none.
 - Next slice: continue milestone-018 by adding the automation-pattern reference and automation-ready guidance backlog.
+
+## 2026-03-14 milestone-018
+
+- Changed: added `skills/task-handoff-state/references/automation-patterns.md` and linked it from the generic task-state skill so recurring Codex App automations have a reusable Campfire reference.
+- Validation: reviewed the new reference and confirmed it covers launch mode choice, prompt rules, workspace guidance, and reusable recurring patterns.
+- Blockers: none.
+- Next slice: add deterministic coverage and concrete example guidance for automation-ready prompts.
+
+## 2026-03-14 milestone-019
+
+- Changed: added `skills/task-handoff-state/scripts/verify_automation_patterns.sh` and wired it into `scripts/verify_repo.sh`.
+- Changed: added `examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md` plus related example updates so the automation guidance is visible in a real rolling task.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_automation_patterns.sh` successfully.
+- Blockers: none.
+- Next slice: document the recurring automation patterns in README and example guidance, then evaluate the backlog.
+
+## 2026-03-14 milestone-020
+
+- Changed: documented recurring automation patterns in `README.md`, `examples/basic-workspace/AGENTS.md`, and the rolling example task metadata.
+- Changed: recorded the backlog evaluation in `findings/milestone-020-evaluation.md`.
+- Validation: ran `./scripts/verify_repo.sh` successfully after adding the automation reference, verifier, and example guidance.
+- Blockers: none.
+- Next slice: use one bounded reframe to queue the next automation-helper backlog now that the recurring automation backlog is complete.
+
+## 2026-03-14 milestone-021 framing
+
+- Auto reframe: queue depth reached zero after the recurring automation backlog completed, so the run spent one bounded planning slice framing the next backlog around automation prompt helpers.
+- Changed: recorded the next backlog in `plan.md`, `handoff.md`, `checkpoints.json`, and `findings/milestone-021-automation-helper-backlog.md`.
+- Validation: reviewed the roadmap and confirmed the new helper backlog is the next dependency-safe improvement after the automation-pattern docs.
+- Blockers: none.
+- Next slice: add a helper that emits task-only automation prompt variants from existing Campfire state.

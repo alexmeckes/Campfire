@@ -183,6 +183,42 @@
       "reason": "Explains why rolling runs now record auto-advance and bounded reframe as mid-run events instead of terminal stop reasons."
     },
     {
+      "path": "skills/task-handoff-state/references/automation-patterns.md",
+      "type": "reference_doc",
+      "milestone_id": "milestone-018",
+      "reason": "Provides reusable recurring automation patterns that keep schedule and workspace outside the prompt body."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_automation_patterns.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-019",
+      "reason": "Validates that the automation-pattern reference, README, and example guidance stay aligned."
+    },
+    {
+      "path": "examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md",
+      "type": "example_state",
+      "milestone_id": "milestone-019",
+      "reason": "Shows concrete recurring automation prompts against the example rolling task."
+    },
+    {
+      "path": "examples/basic-workspace/AGENTS.md",
+      "type": "documentation",
+      "milestone_id": "milestone-020",
+      "reason": "Shows how example project guidance should describe recurring automation prompts and workspace ownership."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-020-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-020",
+      "reason": "Records the independent evaluation of the recurring automation backlog."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-021-automation-helper-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-021",
+      "reason": "Defines the next automation-helper backlog after the recurring automation reference and verifier work completed."
+    },
+    {
       "path": "skills/task-handoff-state/scripts/enable_rolling_mode.sh",
       "type": "workflow_script",
       "milestone_id": "milestone-012",

@@ -7,6 +7,12 @@
       "type": "planning_note",
       "milestone_id": "milestone-002",
       "reason": "Shows the queued rolling backlog for the example task."
+    },
+    {
+      "path": "findings/automation-ready.md",
+      "type": "reference_note",
+      "milestone_id": "milestone-002",
+      "reason": "Shows recurring automation prompts that target the example rolling task without mixing schedule or workspace into the prompt body."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

@@ -32,6 +32,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_budget_limit.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_waiting_on_decision.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh" \
   "$ROOT_DIR/scripts/install_skills.sh"
 
 echo "== Skill presence =="
@@ -43,6 +44,7 @@ expect_file "$ROOT_DIR/skills/task-framer/references/framing-checklist.md"
 expect_file "$ROOT_DIR/skills/task-handoff-state/SKILL.md"
 expect_file "$ROOT_DIR/skills/task-handoff-state/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/task-handoff-state/references/task-state-contract.md"
+expect_file "$ROOT_DIR/skills/task-handoff-state/references/automation-patterns.md"
 expect_file "$ROOT_DIR/skills/course-corrector/SKILL.md"
 expect_file "$ROOT_DIR/skills/course-corrector/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/course-corrector/references/course-correction-triggers.md"
@@ -65,6 +67,7 @@ expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/handoff
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/checkpoints.json"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/artifacts.json"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/findings/rolling-queue.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md"
 
 echo "== Installer dry run in temp CODEX_HOME =="
 TEMP_CODEX_HOME="$(mktemp -d)"
@@ -103,6 +106,9 @@ echo "== Rolling waiting-on-decision verifier =="
 
 echo "== Rolling mode helper verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh"
+
+echo "== Automation pattern verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh"
 
 rm -f /tmp/campfire_install.out
 
