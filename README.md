@@ -1,6 +1,6 @@
 # Campfire
 
-Campfire is a simple pattern for long-horizon Codex work.
+Campfire is a small, reusable harness for long-horizon Codex work.
 
 The core idea is:
 
@@ -15,6 +15,8 @@ Instead of one giant project-specific skill, Campfire uses a small stack:
 - `task-handoff-state`
 - `AGENTS.md` in each repo
 - `.autonomous/<task>/` as the durable task directory
+
+This repo now contains the actual generic skill files, bundled scripts, an installer, and an example workspace.
 
 ## Why
 
@@ -88,12 +90,89 @@ Each task lives under:
 
 Campfire is designed for Codex App usage:
 
-- the two generic skills are installed globally
+- the two generic skills can be installed globally from this repo
 - each repo keeps its own `AGENTS.md`
 - each long task gets a durable `.autonomous/<task>/` directory
 - Codex App prompts stay short because the state is on disk
 
 Typical prompt:
+
+```text
+Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and keep working until the current milestone is validated.
+```
+
+## Repo Layout
+
+```text
+Campfire/
+  skills/
+    long-horizon-worker/
+    task-handoff-state/
+  scripts/
+    install_skills.sh
+    verify_repo.sh
+  examples/
+    basic-workspace/
+```
+
+## Install
+
+Install the Campfire skills into `~/.codex/skills`:
+
+```bash
+./scripts/install_skills.sh
+```
+
+That script symlinks:
+
+- `skills/long-horizon-worker`
+- `skills/task-handoff-state`
+
+into your Codex skills directory and backs up conflicting existing skill folders.
+
+Restart Codex App after installation so the skill list refreshes.
+
+## Verify
+
+Verify the repo itself:
+
+```bash
+./scripts/verify_repo.sh
+```
+
+This checks:
+
+- skill files and metadata exist
+- shell scripts parse
+- the example workspace exists
+- the generic lifecycle verifier passes
+
+You can also run the lifecycle verifier directly:
+
+```bash
+./skills/task-handoff-state/scripts/verify_task_lifecycle.sh
+```
+
+## Example Workspace
+
+The example workspace under `examples/basic-workspace/` shows the minimal project-side pieces:
+
+- `AGENTS.md`
+- `.autonomous/example-task/`
+
+Use it as a reference, not as a template you must copy verbatim.
+
+## Quick Start In A Real Project
+
+1. Install the Campfire skills from this repo.
+2. Add an `AGENTS.md` file to your project.
+3. Create a task:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/init_task.sh --root /path/to/project "your objective"
+```
+
+4. Open the project in Codex App and prompt:
 
 ```text
 Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and keep working until the current milestone is validated.
@@ -126,14 +205,12 @@ The goal is for every Campfire implementation to prove:
 
 ## Current Status
 
-Campfire is an emerging pattern, not a finished framework.
-
-The current implementation direction is:
+Campfire is early, but it is now concrete enough to install and test:
 
 - portable generic Codex skills
 - durable task-state scaffolding
-- repo-local wrappers and verification scripts
-- optional project-specific overlays only when they add real value
+- repo-local install and verification scripts
+- a minimal example workspace
 
 ## Roadmap
 

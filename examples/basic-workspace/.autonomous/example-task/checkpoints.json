@@ -1,0 +1,32 @@
+{
+  "task_slug": "example-task",
+  "objective": "Demonstrate the Campfire task-state contract in a generic workspace.",
+  "status": "ready",
+  "phase": "planning",
+  "current": {
+    "milestone_id": "",
+    "milestone_title": "",
+    "slice_id": "",
+    "slice_title": "",
+    "acceptance_criteria": [],
+    "dependencies": []
+  },
+  "blocker": {
+    "status": "none",
+    "type": "",
+    "summary": "",
+    "attempts": 0,
+    "next_action": ""
+  },
+  "last_run": {
+    "started_at": "",
+    "ended_at": "2026-03-14T00:00:00Z",
+    "stop_reason": "initialized",
+    "summary": "Example task scaffold created.",
+    "next_step": "Replace this example with a real milestone and validation target."
+  },
+  "runbook": "runbook.md",
+  "artifacts_manifest": "artifacts.json",
+  "validation": [],
+  "last_updated": "2026-03-14"
+}

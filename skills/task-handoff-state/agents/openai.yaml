@@ -1,0 +1,7 @@
+interface:
+  display_name: "Task Handoff State"
+  short_description: "Portable resumable task scaffolding"
+  default_prompt: "Use $task-handoff-state to create or resume durable task state for this workspace."
+
+policy:
+  allow_implicit_invocation: false

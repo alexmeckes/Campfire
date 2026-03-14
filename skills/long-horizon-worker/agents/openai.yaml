@@ -1,0 +1,7 @@
+interface:
+  display_name: "Long Horizon Worker"
+  short_description: "Validated multi-run execution with checkpoints"
+  default_prompt: "Use $long-horizon-worker to keep advancing this task until the current milestone is validated."
+
+policy:
+  allow_implicit_invocation: false
