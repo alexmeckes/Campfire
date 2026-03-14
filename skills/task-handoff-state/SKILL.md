@@ -59,6 +59,12 @@ Verify blocked and retry handling:
 ~/.codex/skills/task-handoff-state/scripts/verify_blocked_retry.sh
 ```
 
+Verify course correction handling:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_course_correction.sh
+```
+
 ## File Contract
 
 ### `plan.md`

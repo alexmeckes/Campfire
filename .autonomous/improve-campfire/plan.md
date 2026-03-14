@@ -2,7 +2,7 @@
 
 ## Objective
 
-dogfood Campfire on itself and add the blocked-run lifecycle verifier
+dogfood Campfire on itself and harden lifecycle verification coverage
 
 ## Source Docs
 
@@ -18,6 +18,7 @@ dogfood Campfire on itself and add the blocked-run lifecycle verifier
 - [x] Add the blocked and retry lifecycle verifier
 - [x] Validate the repo with verify_repo.sh
 - [x] Add task framing and course-correction skills
+- [x] Add the course-correction lifecycle verifier
 - [ ] Choose the next Campfire improvement milestone
 
 ## Notes

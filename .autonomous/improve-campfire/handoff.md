@@ -3,7 +3,7 @@
 ## Current Status
 
 - Status: validated
-- Current milestone: milestone-002 - framing and course correction
+- Current milestone: milestone-003 - course-correction lifecycle verifier
 - Next slice: choose the next Campfire improvement milestone
 - Stop reason: milestone_validated
 

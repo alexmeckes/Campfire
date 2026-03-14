@@ -1,23 +1,23 @@
 {
   "task_slug": "improve-campfire",
-  "objective": "dogfood Campfire on itself and add the blocked-run lifecycle verifier",
+  "objective": "dogfood Campfire on itself and harden lifecycle verification coverage",
   "status": "validated",
   "phase": "verification",
   "current": {
-    "milestone_id": "milestone-002",
-    "milestone_title": "Framing and course correction",
-    "slice_id": "slice-005",
-    "slice_title": "Validate Campfire after adding framing and re-planning skills",
+    "milestone_id": "milestone-003",
+    "milestone_title": "Course-correction lifecycle verifier",
+    "slice_id": "slice-006",
+    "slice_title": "Validate Campfire after adding course-correction verification coverage",
     "acceptance_criteria": [
-      "Campfire includes a generic task framing skill",
-      "Campfire includes a generic course correction skill",
-      "Installer and repo verifier include the new skills"
+      "Campfire includes a lifecycle verifier for course correction",
+      "The repo verifier runs the course-correction simulation",
+      "The task-state contract documents course-corrected stop reasons"
     ],
     "dependencies": [
-      "skills/task-framer/SKILL.md",
-      "skills/course-corrector/SKILL.md",
-      "scripts/install_skills.sh",
-      "scripts/verify_repo.sh"
+      "skills/task-handoff-state/scripts/verify_course_correction.sh",
+      "skills/task-handoff-state/references/task-state-contract.md",
+      "scripts/verify_repo.sh",
+      "README.md"
     ]
   },
   "blocker": {
@@ -28,10 +28,10 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-14T17:07:00Z",
-    "ended_at": "2026-03-14T17:17:00Z",
+    "started_at": "2026-03-14T17:30:00Z",
+    "ended_at": "2026-03-14T17:42:00Z",
     "stop_reason": "milestone_validated",
-    "summary": "Added generic task-framing and course-correction skills and validated the repo.",
+    "summary": "Added the course-correction lifecycle verifier and validated the repo.",
     "next_step": "Choose the next Campfire improvement milestone."
   },
   "runbook": "runbook.md",
@@ -41,7 +41,7 @@
       "type": "repo_verification",
       "result": "pass",
       "command": "./scripts/verify_repo.sh",
-      "summary": "Repo verification passed after adding task framing and course-correction coverage."
+      "summary": "Repo verification passed after adding course-correction lifecycle coverage."
     }
   ],
   "last_updated": "2026-03-14"

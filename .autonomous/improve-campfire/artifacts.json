@@ -43,6 +43,12 @@
       "type": "skill_definition",
       "milestone_id": "milestone-002",
       "reason": "Adjusts Campfire task plans when new facts change the best path."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_course_correction.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-003",
+      "reason": "Covers the lifecycle path where the plan changes and the corrected milestone becomes the new resume target."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

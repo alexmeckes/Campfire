@@ -21,3 +21,11 @@
 - Validation: ran ./scripts/verify_repo.sh successfully after adding the new skills and installer wiring.
 - Blockers: none.
 - Next slice: choose the next Campfire improvement milestone.
+
+## 2026-03-14 milestone-003
+
+- Changed: added skills/task-handoff-state/scripts/verify_course_correction.sh to simulate a real re-plan and prove the corrected milestone becomes the resume target.
+- Changed: updated verify_repo.sh, README.md, and the task-state contract to treat `course_corrected` as a first-class stop reason.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_course_correction.sh and ./scripts/verify_repo.sh successfully.
+- Blockers: none.
+- Next slice: choose the next Campfire improvement milestone.

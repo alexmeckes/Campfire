@@ -174,6 +174,7 @@ This checks:
 - the example workspace exists
 - the generic lifecycle verifier passes
 - the blocked/retry verifier passes
+- the course-correction verifier passes
 
 You can also run the lifecycle verifier directly:
 
@@ -185,6 +186,12 @@ And the blocked/retry verifier:
 
 ```bash
 ./skills/task-handoff-state/scripts/verify_blocked_retry.sh
+```
+
+And the course-correction verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_course_correction.sh
 ```
 
 ## Example Workspace
@@ -228,11 +235,12 @@ Use $course-corrector and $task-handoff-state to update this task after new fact
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses three kinds of checks:
+The prototype currently uses four kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
 - blocked and retry tests that simulate escalation after repeated failures
+- course-correction tests that simulate a real re-plan and verify the new milestone becomes the resume target
 
 The goal is for every Campfire implementation to prove:
 
@@ -241,6 +249,7 @@ The goal is for every Campfire implementation to prove:
 - resume output matches on-disk state
 - milestone validation can be recorded and surfaced correctly
 - blocked and retry state can be surfaced without silent thrashing
+- course corrections can update task state without losing continuity
 
 ## Principles
 
@@ -258,6 +267,7 @@ Campfire is early, but it is now concrete enough to install and test:
 - portable generic Codex skills
 - task framing and course correction as first-class skills
 - durable task-state scaffolding
+- lifecycle verifiers for success, blocked retry, and course correction
 - repo-local install and verification scripts
 - a minimal example workspace
 

@@ -19,6 +19,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/resume_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/scripts/install_skills.sh"
 
 echo "== Skill presence =="
@@ -55,6 +56,9 @@ echo "== Lifecycle verifier =="
 
 echo "== Blocked retry verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh"
+
+echo "== Course correction verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh"
 
 rm -f /tmp/campfire_install.out
 

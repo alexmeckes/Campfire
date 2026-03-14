@@ -95,6 +95,7 @@ Recommended `last_run.stop_reason` values:
 
 - `initialized`
 - `milestone_validated`
+- `course_corrected`
 - `blocked`
 - `waiting_on_decision`
 - `environment_failure`
