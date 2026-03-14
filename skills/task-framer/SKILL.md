@@ -43,6 +43,7 @@ Do not use it when the task is already well-framed and the next slice is obvious
    - expected validation commands or evidence
    - likely blockers or decision boundaries
    - the first dependency-safe slice
+   - rolling execution policy when the task should keep going unattended
 
 ## Minimum Good Output
 
@@ -61,6 +62,8 @@ A framed task should answer:
 - Keep acceptance criteria concrete and testable.
 - If setup or validation is unknown, write that explicitly into `runbook.md`.
 - If a major product decision is still unresolved, mark it as a decision boundary instead of inventing certainty.
+- For Codex App background or unattended runs, frame at least the next 2 to 3 milestones and write an `execution` policy into `checkpoints.json`.
+- In rolling mode, set a planning budget, runtime budget, queued milestones, and explicit stop conditions instead of relying on “stop after one validated milestone.”
 
 ## Output Style
 

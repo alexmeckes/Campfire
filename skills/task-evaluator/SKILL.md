@@ -44,6 +44,7 @@ Do not use it as a replacement for implementation. Use it to judge whether imple
    - mark the milestone `validated` only if the evidence is real and sufficient
    - otherwise record the missing proof or missing implementation and set the next slice
    - if the milestone itself is wrong, hand off to `$course-corrector`
+   - if `execution.mode` is `rolling` and `auto_advance` is enabled, advance to the next queued milestone after recording the evaluation result
 
 ## Minimum Good Output
 
@@ -62,6 +63,7 @@ A good evaluation answers:
 - Prefer a narrow follow-up slice over a broad critique.
 - Keep the evaluation independent from the implementation narrative.
 - Record the evaluation artifact in `artifacts.json`.
+- In rolling mode, validation should normally move the task to the next queued milestone instead of leaving it parked on the one that just passed.
 
 ## Output Style
 

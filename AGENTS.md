@@ -6,6 +6,7 @@
 - Use `$long-horizon-worker` with `$task-handoff-state` for multi-step execution.
 - Use `$course-corrector` when new facts or blockers change the best path.
 - Use `$task-evaluator` when a milestone seems done or needs an independent completion check.
+- For Codex App runs that should keep going while the user is away, use rolling execution in `checkpoints.json` with queued milestones and bounded planning slices.
 - Keep durable task state under `.autonomous/<task>/`.
 - Create a task with `./scripts/new_task.sh "<objective>"`.
 - Resume a task with `./scripts/resume_task.sh <task-slug>`.

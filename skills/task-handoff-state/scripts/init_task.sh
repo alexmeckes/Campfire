@@ -232,6 +232,19 @@ normalized = {
         "acceptance_criteria": current.get("acceptance_criteria", []),
         "dependencies": current.get("dependencies", []),
     },
+    "execution": {
+        "mode": data.get("execution", {}).get("mode", "single_milestone") if isinstance(data.get("execution", {}), dict) else "single_milestone",
+        "auto_advance": data.get("execution", {}).get("auto_advance", False) if isinstance(data.get("execution", {}), dict) else False,
+        "planning_slice_minutes": data.get("execution", {}).get("planning_slice_minutes", 15) if isinstance(data.get("execution", {}), dict) else 15,
+        "runtime_budget_minutes": data.get("execution", {}).get("runtime_budget_minutes", 0) if isinstance(data.get("execution", {}), dict) else 0,
+        "max_milestones_per_run": data.get("execution", {}).get("max_milestones_per_run", 1) if isinstance(data.get("execution", {}), dict) else 1,
+        "continue_until": data.get("execution", {}).get(
+            "continue_until",
+            ["milestone_validated", "blocked", "waiting_on_decision"],
+        ) if isinstance(data.get("execution", {}), dict) else ["milestone_validated", "blocked", "waiting_on_decision"],
+        "queued_milestones": data.get("execution", {}).get("queued_milestones", []) if isinstance(data.get("execution", {}), dict) else [],
+        "notes": data.get("execution", {}).get("notes", "") if isinstance(data.get("execution", {}), dict) else "",
+    },
     "blocker": {
         "status": blocker.get("status", "none"),
         "type": blocker.get("type", ""),

@@ -67,7 +67,18 @@ Campfire treats a long-running task as a small harness, not a giant prompt.
 
 `task-evaluator` checks whether the current milestone is actually complete, records the evaluation result, and either validates the task or sends it back for one more narrow slice.
 
-### 6. Project rules
+### 6. Rolling execution policy
+
+Campfire can also run in a rolling mode for Codex App sessions that should keep going while you are away.
+
+In rolling mode:
+
+- planning stays bounded
+- the task keeps a machine-readable queued backlog
+- evaluation can auto-advance to the next milestone
+- the run stops on blockers, decision boundaries, budget limits, or an empty safe backlog
+
+### 7. Project rules
 
 Project-specific guidance belongs in:
 
@@ -99,6 +110,7 @@ Each task lives under:
 - `progress.md`: append-only log of changes, validation, blockers, next slice
 - `handoff.md`: concise resume note with current status and stop reason
 - `checkpoints.json`: machine-readable task state for resumption and automation
+- `checkpoints.json.execution`: machine-readable run policy for single-milestone or rolling runs
 - `artifacts.json`: manifest of outputs that matter for review or proof
 
 ## Codex App Fit
@@ -133,6 +145,12 @@ Typical evaluation prompt:
 
 ```text
 Use $task-evaluator and $task-handoff-state to evaluate whether the current Campfire milestone is actually complete.
+```
+
+Typical rolling-run prompt:
+
+```text
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, and stop only on blockers, real decision boundaries, or the configured run budget.
 ```
 
 ## Repo Layout
@@ -189,6 +207,7 @@ This checks:
 - the blocked/retry verifier passes
 - the course-correction verifier passes
 - the task-evaluation verifier passes
+- the rolling-execution verifier passes
 
 You can also run the lifecycle verifier directly:
 
@@ -212,6 +231,12 @@ And the task-evaluation verifier:
 
 ```bash
 ./skills/task-handoff-state/scripts/verify_task_evaluation.sh
+```
+
+And the rolling-execution verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_rolling_execution.sh
 ```
 
 ## Example Workspace
@@ -257,6 +282,12 @@ Use $course-corrector and $task-handoff-state to update this task after new fact
 Use $task-evaluator and $task-handoff-state to evaluate whether the current milestone is actually complete.
 ```
 
+8. If you want the Codex app run to keep going while you are away, switch the task to rolling mode and prompt:
+
+```text
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, and stop only on blockers, decision boundaries, or the configured run budget.
+```
+
 ## Verification
 
 Campfire is meant to be testable, not just described.
@@ -268,6 +299,7 @@ The prototype currently uses five kinds of checks:
 - blocked and retry tests that simulate escalation after repeated failures
 - course-correction tests that simulate a real re-plan and verify the new milestone becomes the resume target
 - task-evaluation tests that simulate an independent milestone evaluation and validated handoff
+- rolling-execution tests that simulate a validated milestone auto-advancing into the next queued milestone
 
 The goal is for every Campfire implementation to prove:
 
@@ -278,6 +310,7 @@ The goal is for every Campfire implementation to prove:
 - blocked and retry state can be surfaced without silent thrashing
 - course corrections can update task state without losing continuity
 - milestone evaluation can be recorded independently from worker execution
+- rolling Codex App runs can advance across multiple milestones without manual restarts
 
 ## Principles
 
@@ -296,7 +329,7 @@ Campfire is early, but it is now concrete enough to install and test:
 - task framing and course correction as first-class skills
 - explicit task evaluation as a first-class skill
 - durable task-state scaffolding
-- lifecycle verifiers for success, blocked retry, course correction, and task evaluation
+- lifecycle verifiers for success, blocked retry, course correction, task evaluation, and rolling execution
 - repo-local install and verification scripts
 - a minimal example workspace
 

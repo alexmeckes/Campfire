@@ -1,26 +1,48 @@
 {
   "task_slug": "improve-campfire",
   "objective": "dogfood Campfire on itself and harden lifecycle verification coverage",
-  "status": "validated",
-  "phase": "verification",
+  "status": "ready",
+  "phase": "execution",
   "current": {
-    "milestone_id": "milestone-004",
-    "milestone_title": "Task-evaluator skill and evaluator-focused verification",
-    "slice_id": "slice-008",
-    "slice_title": "Validate Campfire after adding the evaluator layer",
+    "milestone_id": "milestone-006",
+    "milestone_title": "Add a helper script for switching an existing task into rolling mode",
+    "slice_id": "slice-010",
+    "slice_title": "Implement the rolling-mode helper and validate it before auto-advancing",
     "acceptance_criteria": [
-      "Campfire includes a generic task-evaluator skill with agent metadata and references",
-      "The installer and repo verifier include the evaluator skill",
-      "Campfire has evaluator-focused verification coverage",
-      "README and task-state docs describe where task evaluation fits in the loop"
+      "Campfire provides a helper for switching an existing task into rolling mode",
+      "The helper writes a valid execution policy into checkpoints.json",
+      "The helper is documented and validated"
     ],
     "dependencies": [
-      "skills/task-evaluator/SKILL.md",
-      "skills/task-evaluator/references/evaluation-checklist.md",
-      "skills/task-handoff-state/scripts/verify_task_evaluation.sh",
-      "scripts/verify_repo.sh",
-      "README.md"
+      ".autonomous/improve-campfire/findings/milestone-006-rolling-backlog.md",
+      "skills/task-handoff-state/scripts/init_task.sh",
+      "skills/task-handoff-state/scripts/resume_task.sh",
+      "scripts/verify_repo.sh"
     ]
+  },
+  "execution": {
+    "mode": "rolling",
+    "auto_advance": true,
+    "planning_slice_minutes": 10,
+    "runtime_budget_minutes": 120,
+    "max_milestones_per_run": 3,
+    "continue_until": [
+      "blocked",
+      "waiting_on_decision",
+      "budget_limit",
+      "manual_pause"
+    ],
+    "queued_milestones": [
+      {
+        "milestone_id": "milestone-007",
+        "milestone_title": "Add a dedicated rolling-task example under examples/basic-workspace/"
+      },
+      {
+        "milestone_id": "milestone-008",
+        "milestone_title": "Document Codex App launch patterns for live-thread and background-task rolling runs"
+      }
+    ],
+    "notes": "Milestone-005 validated. Keep moving through the queued backlog while the Codex App run budget remains."
   },
   "blocker": {
     "status": "none",
@@ -30,11 +52,11 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-14T18:20:00Z",
-    "ended_at": "2026-03-14T18:40:00Z",
-    "stop_reason": "milestone_validated",
-    "summary": "Added the task-evaluator layer, evaluator-focused verification coverage, and repo wiring.",
-    "next_step": "Choose the next Campfire improvement milestone."
+    "started_at": "2026-03-14T19:10:00Z",
+    "ended_at": "2026-03-14T19:42:00Z",
+    "stop_reason": "auto_advanced",
+    "summary": "Added rolling execution policy, hardened the repo wrappers to prefer local skill copies, refreshed the installed skills, and advanced the self-hosted task into the next rolling milestone.",
+    "next_step": "Implement the rolling-mode helper script and keep auto-advancing while the run budget remains."
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
@@ -42,15 +64,15 @@
     {
       "type": "milestone_evaluation",
       "result": "pass",
-      "command": "./skills/task-handoff-state/scripts/verify_task_evaluation.sh",
-      "artifact": "skills/task-handoff-state/scripts/verify_task_evaluation.sh",
-      "summary": "Evaluator-focused verification coverage passed."
+      "command": "./skills/task-handoff-state/scripts/verify_rolling_execution.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_rolling_execution.sh",
+      "summary": "Rolling execution coverage passed."
     },
     {
       "type": "repo_verification",
       "result": "pass",
       "command": "./scripts/verify_repo.sh",
-      "summary": "Repo verification passed after adding the evaluator layer."
+      "summary": "Repo verification passed after adding rolling execution coverage and wrapper launch checks."
     }
   ],
   "last_updated": "2026-03-14"

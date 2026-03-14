@@ -46,3 +46,13 @@
 - Validation: ran ./skills/task-handoff-state/scripts/verify_task_evaluation.sh and ./scripts/verify_repo.sh successfully.
 - Blockers: none.
 - Next slice: choose the next Campfire improvement milestone.
+
+## 2026-03-14 milestone-005
+
+- Changed: added rolling execution policy to the task-state contract and checkpoint normalization so Campfire can distinguish single-milestone runs from rolling Codex App runs.
+- Changed: updated the framing, execution, course-correction, and evaluation skills to honor rolling auto-advance semantics.
+- Changed: added `skills/task-handoff-state/scripts/verify_rolling_execution.sh` and wired it into the repo verifier.
+- Changed: updated the repo-local task wrappers to prefer the repo skill copies over stale global installs, then refreshed the global skill install with `./scripts/install_skills.sh`.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_rolling_execution.sh, ./scripts/verify_repo.sh, and ./scripts/resume_task.sh improve-campfire successfully.
+- Blockers: none.
+- Next slice: start milestone-006 and keep moving through the rolling backlog until a real stop condition appears.

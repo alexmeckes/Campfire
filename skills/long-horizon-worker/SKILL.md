@@ -15,6 +15,8 @@ This skill does not own project knowledge. It owns the operating loop. Project-s
 
 Pair this skill with `$task-handoff-state` whenever the task needs durable state.
 
+If `checkpoints.json` contains an `execution.mode` of `rolling`, treat the task as a rolling Codex App run rather than a single-milestone pass.
+
 ## When To Use
 
 Use this skill for:
@@ -40,6 +42,28 @@ Do not use it for one-shot factual questions or tasks that depend on repeated hu
    - `artifacts.json`
 5. Identify the next dependency-safe slice.
 6. Make the smallest useful change set, validate it, and update task state before moving on.
+
+## Rolling Run Mode
+
+Use rolling mode when the user wants Codex to keep going until they return, a blocker appears, or a run budget expires.
+
+When `checkpoints.json` has an `execution` object with:
+
+- `mode: rolling`
+- `auto_advance: true`
+
+follow these extra rules:
+
+1. Keep planning bounded to `planning_slice_minutes`.
+2. Maintain a queued backlog of the next milestones in `execution.queued_milestones`.
+3. After a milestone validates, use `$task-evaluator` logic to confirm it and then advance to the next queued milestone instead of stopping.
+4. Update `checkpoints.json`, `handoff.md`, and `progress.md` at each milestone boundary.
+5. Stop only when:
+   - a configured `continue_until` condition is hit
+   - the runtime budget expires
+   - the queued backlog is empty and no safe next milestone can be chosen
+
+In rolling mode, validation is not the default stop condition. It is the trigger for advancing to the next milestone when allowed.
 
 ## Loop Contract
 
@@ -93,6 +117,11 @@ Continue until one of these is true:
 - the current milestone is implemented and validated
 - the next step requires a user decision that cannot be safely assumed
 - the environment blocks further progress
+
+If `execution.mode` is `rolling`, replace the first rule with:
+
+- the current milestone is implemented and validated and the run policy says to stop instead of auto-advance
+- or the rolling backlog is exhausted and no safe next milestone can be chosen
 
 If the same validation failure repeats twice, stop broadening scope. Fix the failure or report the blocker.
 

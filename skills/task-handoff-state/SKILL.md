@@ -71,6 +71,12 @@ Verify task evaluation handling:
 ~/.codex/skills/task-handoff-state/scripts/verify_task_evaluation.sh
 ```
 
+Verify rolling execution handling:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_rolling_execution.sh
+```
+
 ## File Contract
 
 ### `plan.md`
@@ -110,6 +116,7 @@ Verify task evaluation handling:
 - current status
 - phase
 - milestone metadata
+- execution policy metadata
 - blocker metadata
 - last run summary and stop reason
 - last updated date
@@ -137,6 +144,7 @@ Verify task evaluation handling:
 - Keep `runbook.md` current when setup, validation, or observability changes.
 - Record review-relevant outputs in `artifacts.json`.
 - Keep logs and generated evidence inside the task folder when practical.
+- For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
 
 ## Pairing
 

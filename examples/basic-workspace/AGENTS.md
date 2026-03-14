@@ -4,6 +4,7 @@
 
 - Use `$long-horizon-worker` with `$task-handoff-state` for long-running multi-step work.
 - Use `$task-evaluator` before treating a milestone as fully complete.
+- For unattended Codex App runs, prefer a rolling backlog with explicit stop conditions instead of one milestone at a time.
 - Keep durable task state under `.autonomous/<task>/`.
 - Put project-specific rules here instead of into the global skills.
 

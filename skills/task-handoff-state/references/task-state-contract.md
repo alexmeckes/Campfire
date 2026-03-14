@@ -65,6 +65,7 @@ Suggested fields:
 - `status`
 - `phase`
 - `current`
+- `execution`
 - `blocker`
 - `last_run`
 - `runbook`
@@ -103,6 +104,7 @@ Recommended `last_run.stop_reason` values:
 
 - `initialized`
 - `milestone_validated`
+- `auto_advanced`
 - `course_corrected`
 - `blocked`
 - `waiting_on_decision`
@@ -117,6 +119,27 @@ Recommended `validation.type` values:
 - `milestone_evaluation`
 - `retry_attempt`
 - `plan_review`
+
+## Execution Policy
+
+For Codex App runs that should keep going across multiple milestones, add an `execution` object to `checkpoints.json`.
+
+Suggested fields:
+
+- `mode`: `single_milestone` or `rolling`
+- `auto_advance`: whether a validated milestone should advance to the next queued milestone
+- `planning_slice_minutes`: how much planning is allowed before each implementation cycle
+- `runtime_budget_minutes`: total run budget for the current session
+- `max_milestones_per_run`: optional cap on how many milestones may be advanced in one run
+- `continue_until`: stop conditions for the current run
+- `queued_milestones`: the next milestone IDs and titles in order
+
+Recommended `continue_until` values:
+
+- `blocked`
+- `waiting_on_decision`
+- `budget_limit`
+- `manual_pause`
 
 ## Blocker Tracking
 

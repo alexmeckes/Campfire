@@ -43,6 +43,7 @@ Do not use it just because a task is hard. Use it when the plan itself needs to 
    - acceptance criteria
    - blocker state
    - runbook commands
+   - execution queue and run budget assumptions
    - next slice
 5. Update `handoff.md` and `checkpoints.json` so the next run resumes from the corrected plan instead of the stale one.
 
@@ -60,6 +61,7 @@ A good course correction makes these things clearer:
 - what changed
 - why the old path is no longer best
 - what the new current milestone is
+- what the new queued milestones are, if rolling mode is active
 - what the new next slice is
 - whether the task is blocked, waiting on a decision, or ready again
 

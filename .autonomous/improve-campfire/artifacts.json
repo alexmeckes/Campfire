@@ -73,6 +73,18 @@
       "type": "verifier_script",
       "milestone_id": "milestone-004",
       "reason": "Covers the lifecycle path where an independent evaluator confirms or rejects a milestone."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_rolling_execution.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-005",
+      "reason": "Covers the lifecycle path where a validated milestone auto-advances into the next queued milestone."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-006-rolling-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-006",
+      "reason": "Defines the queued rolling backlog and execution policy for the next Codex App run."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

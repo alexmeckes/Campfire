@@ -23,10 +23,13 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - [x] Add task framing and course-correction skills
 - [x] Add the course-correction lifecycle verifier
 - [x] Add a task-evaluator skill and evaluator-focused verification coverage
-- [ ] Choose the next Campfire improvement milestone
+- [x] Add rolling execution policy and auto-advance verification coverage
+- [ ] Add a helper script for switching an existing task into rolling mode
+- [ ] Add a dedicated rolling-task example under `examples/basic-workspace/`
+- [ ] Document Codex App launch patterns for live-thread and background-task rolling runs
 
 ## Notes
 
 - Created: 2026-03-14
 - Campfire should be able to improve itself using the same task-state contract it publishes
-- Milestone-004 is the current unattended-run target and should end with repo verification
+- Milestone-005 adds rolling execution policy for Codex App runs that should keep going while the user is away
