@@ -99,6 +99,35 @@ PY
   echo
 fi
 
+if [ -f "$TASK_DIR/checkpoints.json" ]; then
+  echo "Workspace strategy:"
+  python3 - "$TASK_DIR/checkpoints.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+data = json.loads(path.read_text())
+workspace = data.get("workspace", {})
+if not isinstance(workspace, dict):
+    workspace = {}
+
+strategy = workspace.get("strategy", "")
+root = workspace.get("root", "")
+git_root = workspace.get("git_root", "")
+branch = workspace.get("branch", "")
+
+print(f"  strategy: {strategy or 'unknown'}")
+if root:
+    print(f"  root: {root}")
+if git_root:
+    print(f"  git_root: {git_root}")
+if branch:
+    print(f"  branch: {branch}")
+PY
+  echo
+fi
+
 if [ -f "$TASK_DIR/runbook.md" ]; then
   echo "Runbook:"
   sed -n '1,120p' "$TASK_DIR/runbook.md"

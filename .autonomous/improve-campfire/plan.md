@@ -33,9 +33,12 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - [x] Add dynamic rolling queue-replenishment policy and helper defaults
 - [x] Add rolling reframe verification coverage
 - [x] Document dynamic rolling queue replenishment for Codex App runs
-- [ ] Add a worktree-aware task bootstrap helper for git repos
-- [ ] Add deterministic verification for worktree bootstrap and non-git fallback behavior
-- [ ] Document worktree-aware bootstrapping in README and example guidance
+- [x] Add a worktree-aware task bootstrap helper for git repos
+- [x] Add deterministic verification for worktree bootstrap and non-git fallback behavior
+- [x] Document worktree-aware bootstrapping in README and example guidance
+- [ ] Add a reusable automation-pattern reference for recurring Codex App runs
+- [ ] Add deterministic verification or example coverage for automation-ready prompts and workspace guidance
+- [ ] Document recurring automation patterns in README and example guidance
 
 ## Notes
 
@@ -47,3 +50,4 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - Milestones 009 through 011 were completed in one rolling run, so the next unattended session should frame a fresh backlog before continuing
 - Milestones 012 through 014 make rolling mode self-replenishing so the next unattended session can keep going when queue depth gets low and budget remains
 - The next backlog focuses on optional worktree-aware bootstrapping so git-backed long runs can isolate risky work without weakening non-git portability
+- Milestones 015 through 017 were completed in one rolling run, so the next bounded reframe focuses on recurring automation patterns for Codex App tasks

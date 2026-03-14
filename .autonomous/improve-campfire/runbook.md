@@ -26,6 +26,7 @@
 - Review task brief: .autonomous/improve-campfire/findings/milestone-004-brief.md
 - Review stop-condition brief: .autonomous/improve-campfire/findings/milestone-009-rolling-stop-conditions.md
 - Review worktree backlog brief: .autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md
+- Review automation backlog brief: .autonomous/improve-campfire/findings/milestone-018-automation-backlog.md
 
 ## Validation
 
@@ -58,3 +59,4 @@
 - If queue replenishment is enabled and queue depth drops below the configured threshold while budget remains, spend one bounded planning slice to refill the queue before stopping
 - A rolling pause on `budget_limit` or `waiting_on_decision` should preserve the active milestone and remaining queued milestones for the next run
 - For git repos, prefer optional worktree-backed setup only when it improves long-horizon isolation without weakening non-git portability
+- For recurring Codex App automations, prefer reusable prompt patterns and explicit workspace guidance over project-specific magic

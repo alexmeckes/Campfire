@@ -4,21 +4,21 @@
   "status": "ready",
   "phase": "planning",
   "current": {
-    "milestone_id": "milestone-015",
-    "milestone_title": "Add a worktree-aware task bootstrap helper for git repos",
-    "slice_id": "slice-020",
-    "slice_title": "Implement the worktree-aware bootstrap helper and preserve non-git portability",
+    "milestone_id": "milestone-018",
+    "milestone_title": "Add a reusable automation-pattern reference for recurring Codex App runs",
+    "slice_id": "slice-024",
+    "slice_title": "Add the automation-pattern reference and keep it generic for recurring Campfire runs",
     "acceptance_criteria": [
-      "Campfire provides an optional worktree-backed bootstrap path for git repos",
-      "The bootstrap path preserves safe in-place behavior for non-git workspaces",
-      "README and repo verification cover when to use worktree-backed setup"
+      "Campfire provides a reusable reference for automation-ready prompts that pair with the task-state contract",
+      "The repo contains deterministic evidence or example coverage for automation-ready workflow guidance",
+      "README and self-hosted task state describe when to use recurring automations versus one-off rolling runs"
     ],
     "dependencies": [
-      "scripts/new_task.sh",
-      "scripts/resume_task.sh",
       "README.md",
+      "examples/basic-workspace/AGENTS.md",
+      "skills/task-handoff-state/SKILL.md",
       "scripts/verify_repo.sh",
-      ".autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md"
+      ".autonomous/improve-campfire/findings/milestone-018-automation-backlog.md"
     ]
   },
   "execution": {
@@ -39,15 +39,15 @@
     ],
     "queued_milestones": [
       {
-        "milestone_id": "milestone-016",
-        "milestone_title": "Add deterministic verification for worktree bootstrap and non-git fallback behavior"
+        "milestone_id": "milestone-019",
+        "milestone_title": "Add deterministic verification or example coverage for automation-ready prompts and workspace guidance"
       },
       {
-        "milestone_id": "milestone-017",
-        "milestone_title": "Document worktree-aware bootstrapping in README and example guidance"
+        "milestone_id": "milestone-020",
+        "milestone_title": "Document recurring automation patterns in README and example guidance"
       }
     ],
-    "notes": "Dynamic queue replenishment is enabled. The next backlog focuses on optional worktree-backed setup for git repos while preserving non-git portability."
+    "notes": "Dynamic queue replenishment is enabled. The next backlog focuses on recurring Codex App automation patterns while keeping Campfire generic."
   },
   "blocker": {
     "status": "none",
@@ -58,10 +58,10 @@
   },
   "last_run": {
     "started_at": "2026-03-14T19:10:00Z",
-    "ended_at": "2026-03-14T21:35:00Z",
-    "stop_reason": "course_corrected",
-    "summary": "Framed the next rolling backlog around optional worktree-aware bootstrapping for git repos after dynamic queue replenishment was completed.",
-    "next_step": "Implement the worktree-aware bootstrap helper, then verify deterministic non-git fallback behavior."
+    "ended_at": "2026-03-14T22:15:00Z",
+    "stop_reason": "auto_reframed",
+    "summary": "Completed the worktree-aware bootstrap backlog, then used one bounded reframe to queue the next automation-pattern backlog when the rolling queue emptied.",
+    "next_step": "Add the automation-pattern reference, then cover automation-ready prompts and workspace guidance."
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
@@ -69,9 +69,9 @@
     {
       "type": "plan_review",
       "result": "pass",
-      "command": "review .autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md",
-      "artifact": ".autonomous/improve-campfire/findings/milestone-015-worktree-backlog.md",
-      "summary": "Framed the next worktree-aware backlog for the Campfire repo."
+      "command": "review .autonomous/improve-campfire/findings/milestone-018-automation-backlog.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-018-automation-backlog.md",
+      "summary": "Replenished the rolling queue with the next automation-pattern backlog."
     },
     {
       "type": "plan_review",
@@ -97,6 +97,13 @@
     {
       "type": "milestone_evaluation",
       "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh",
+      "summary": "Worktree bootstrap verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
       "command": "./skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
       "artifact": "skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
       "summary": "Rolling reframe verifier passed."
@@ -117,9 +124,9 @@
     {
       "type": "milestone_evaluation",
       "result": "pass",
-      "command": "review .autonomous/improve-campfire/findings/milestone-014-evaluation.md",
-      "artifact": ".autonomous/improve-campfire/findings/milestone-014-evaluation.md",
-      "summary": "Evaluation note confirms the dynamic rolling backlog is complete."
+      "command": "review .autonomous/improve-campfire/findings/milestone-017-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-017-evaluation.md",
+      "summary": "Evaluation note confirms the worktree-aware backlog is complete."
     }
   ],
   "last_updated": "2026-03-14"

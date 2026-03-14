@@ -232,6 +232,7 @@ This checks:
 - the blocked/retry verifier passes
 - the course-correction verifier passes
 - the task-evaluation verifier passes
+- the worktree bootstrap verifier passes
 - the rolling-execution verifier passes
 - the rolling reframe verifier passes
 - the rolling budget-limit verifier passes
@@ -260,6 +261,12 @@ And the task-evaluation verifier:
 
 ```bash
 ./skills/task-handoff-state/scripts/verify_task_evaluation.sh
+```
+
+And the worktree bootstrap verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh
 ```
 
 And the rolling-execution verifier:
@@ -312,6 +319,12 @@ Use it as a reference, not as a template you must copy verbatim.
 ~/.codex/skills/task-handoff-state/scripts/init_task.sh --root /path/to/project "your objective"
 ```
 
+If the project is a git repo and you want isolation for risky or long-lived work, bootstrap the task in a dedicated worktree instead:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/bootstrap_task.sh --root /path/to/project --worktree "your objective"
+```
+
 If you want the task to keep moving while you are away, switch it into rolling mode:
 
 ```bash
@@ -354,13 +367,14 @@ Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and 
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses ten kinds of checks:
+The prototype currently uses eleven kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
 - blocked and retry tests that simulate escalation after repeated failures
 - course-correction tests that simulate a real re-plan and verify the new milestone becomes the resume target
 - task-evaluation tests that simulate an independent milestone evaluation and validated handoff
+- worktree bootstrap tests that simulate a git worktree path and a deterministic non-git fallback path
 - rolling-execution tests that simulate a validated milestone auto-advancing into the next queued milestone
 - rolling reframe tests that simulate a low queue triggering one bounded queue-replenishment pass
 - rolling budget-limit tests that simulate a paused run with queued work still preserved
@@ -376,6 +390,7 @@ The goal is for every Campfire implementation to prove:
 - blocked and retry state can be surfaced without silent thrashing
 - course corrections can update task state without losing continuity
 - milestone evaluation can be recorded independently from worker execution
+- worktree-backed setup can be bootstrapped for git repos without breaking non-git projects
 - rolling Codex App runs can advance across multiple milestones without manual restarts
 - rolling Codex App runs can replenish their own queue once when budget remains instead of stopping just because the backlog got short
 - rolling Codex App runs can pause on budget or decision boundaries without losing the queued backlog
@@ -397,6 +412,7 @@ Campfire is early, but it is now concrete enough to install and test:
 - task framing and course correction as first-class skills
 - explicit task evaluation as a first-class skill
 - durable task-state scaffolding
+- optional worktree-aware bootstrapping for git repos
 - lifecycle verifiers for success, blocked retry, course correction, task evaluation, and rolling execution
 - dynamic rolling queue-replenishment coverage so unattended runs do not stop just because the queue empties
 - explicit rolling stop-condition coverage for budget-limit and waiting-on-decision pauses

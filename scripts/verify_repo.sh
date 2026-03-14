@@ -19,12 +19,14 @@ zsh -n \
   "$ROOT_DIR/scripts/resume_task.sh" \
   "$ROOT_DIR/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/bootstrap_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/resume_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_execution.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_reframe.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_budget_limit.sh" \
@@ -83,6 +85,9 @@ echo "== Course correction verifier =="
 
 echo "== Task evaluation verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh"
+
+echo "== Worktree bootstrap verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh"
 
 echo "== Rolling execution verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_execution.sh"

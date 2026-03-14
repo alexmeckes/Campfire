@@ -3,9 +3,9 @@
 ## Current Status
 
 - Status: ready
-- Current milestone: milestone-015 - add a worktree-aware task bootstrap helper for git repos
-- Next slice: implement the worktree-aware bootstrap helper, then verify deterministic non-git fallback behavior
-- Stop reason: course_corrected
+- Current milestone: milestone-018 - add a reusable automation-pattern reference for recurring Codex App runs
+- Next slice: add the automation-pattern reference, then cover automation-ready prompts and workspace guidance deterministically
+- Stop reason: auto_reframed
 
 ## Resume Prompt
 

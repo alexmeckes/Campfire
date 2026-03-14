@@ -136,3 +136,33 @@
 - Validation: reviewed the roadmap and repo priorities, then confirmed the new three-milestone backlog is dependency-safe and keeps Campfire generic for both git and non-git workspaces.
 - Blockers: none.
 - Next slice: implement a worktree-aware task bootstrap helper for git repos, then verify deterministic fallback behavior for non-git workspaces.
+
+## 2026-03-14 milestone-015
+
+- Changed: added `skills/task-handoff-state/scripts/bootstrap_task.sh` and updated `scripts/new_task.sh` so Campfire can bootstrap a task in a dedicated git worktree when requested.
+- Changed: recorded workspace strategy metadata in `checkpoints.json` and surfaced it in `resume_task.sh`.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh successfully after adding the bootstrap path and workspace metadata.
+- Blockers: none.
+- Next slice: wire the new bootstrap verifier into repo verification and document when to use the worktree path.
+
+## 2026-03-14 milestone-016
+
+- Changed: added `skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh` to cover both git worktree bootstrap and deterministic non-git fallback behavior.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh successfully.
+- Blockers: none.
+- Next slice: auto-advance into the docs and guidance milestone.
+
+## 2026-03-14 milestone-017
+
+- Changed: wired the worktree bootstrap verifier into `scripts/verify_repo.sh`, documented worktree-aware bootstrapping in `README.md` and `skills/task-handoff-state/SKILL.md`, and updated example guidance in `examples/basic-workspace/AGENTS.md`.
+- Validation: ran ./scripts/verify_repo.sh successfully and recorded the evaluation result in `findings/milestone-017-evaluation.md`.
+- Blockers: none.
+- Next slice: use one bounded reframe to queue the next automation-pattern backlog now that the worktree backlog is complete.
+
+## 2026-03-14 milestone-018 framing
+
+- Auto reframe: queue depth reached zero after the worktree backlog completed, so the run spent one bounded planning slice replenishing the next backlog around recurring Codex App automation patterns.
+- Changed: recorded the next automation backlog in `plan.md`, `handoff.md`, `checkpoints.json`, and `findings/milestone-018-automation-backlog.md`.
+- Validation: reviewed the roadmap and confirmed the new automation backlog is the next best generic Campfire improvement area.
+- Blockers: none.
+- Next slice: add a reusable automation-pattern reference for recurring Codex App runs.

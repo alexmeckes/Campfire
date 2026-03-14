@@ -35,6 +35,12 @@ Create a task in the current workspace:
 ~/.codex/skills/task-handoff-state/scripts/init_task.sh "build the next milestone"
 ```
 
+Bootstrap a task and prefer a git worktree when available:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/bootstrap_task.sh --root /path/to/workspace --worktree "build the next milestone"
+```
+
 Create a task in a specific workspace:
 
 ```bash
@@ -75,6 +81,12 @@ Verify task evaluation handling:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_task_evaluation.sh
+```
+
+Verify worktree-aware bootstrap handling:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh
 ```
 
 Verify rolling execution handling:
@@ -176,6 +188,7 @@ Verify the rolling-mode helper:
 - Keep logs and generated evidence inside the task folder when practical.
 - For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
 - Dynamic rolling runs should usually enable queue replenishment so a run can keep going until budget, blocker, or decision boundary instead of stopping on an empty queue.
+- For git repos, prefer worktree-backed bootstrap only when isolation helps; keep non-git and low-risk tasks on the in-place path.
 
 ## Pairing
 

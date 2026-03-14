@@ -67,6 +67,7 @@ Suggested fields:
 - `current`
 - `execution`
 - `blocker`
+- `workspace`
 - `last_run`
 - `runbook`
 - `artifacts_manifest`
@@ -81,6 +82,17 @@ Machine-readable artifact manifest.
 - type of artifact
 - reason it matters
 - which milestone or validation it supports
+
+### Optional `workspace` metadata
+
+When bootstrap logic chooses between in-place and git-worktree setup, record that choice in `checkpoints.json.workspace`.
+
+Suggested fields:
+
+- `strategy`: `in_place` or `git_worktree`
+- `root`: the active workspace root for the task
+- `git_root`: the parent git repo root when a worktree is used
+- `branch`: the active branch when worktree-backed setup created one
 
 ### `findings/`
 

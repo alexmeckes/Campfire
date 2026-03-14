@@ -211,6 +211,54 @@
       "type": "planning_note",
       "milestone_id": "milestone-015",
       "reason": "Defines the next rolling backlog for optional worktree-aware bootstrapping in git repos."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/bootstrap_task.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-015",
+      "reason": "Bootstraps a Campfire task in place or inside a dedicated git worktree when requested."
+    },
+    {
+      "path": "scripts/new_task.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-015",
+      "reason": "Exposes the worktree-aware bootstrap flow through the repo-local create-task entry point."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/resume_task.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-015",
+      "reason": "Surfaces workspace strategy metadata so worktree-backed tasks resume clearly."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-016",
+      "reason": "Covers both git worktree bootstrap and deterministic non-git fallback behavior."
+    },
+    {
+      "path": "skills/task-handoff-state/SKILL.md",
+      "type": "documentation",
+      "milestone_id": "milestone-017",
+      "reason": "Documents the new worktree-aware bootstrap command and verifier in the generic task-state skill."
+    },
+    {
+      "path": "examples/basic-workspace/AGENTS.md",
+      "type": "documentation",
+      "milestone_id": "milestone-017",
+      "reason": "Shows when worktree-backed bootstrap is appropriate in example project guidance."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-017-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-017",
+      "reason": "Records the independent evaluation of the worktree-aware backlog."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-018-automation-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-018",
+      "reason": "Defines the next automation-pattern backlog after the worktree-aware backlog completed."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

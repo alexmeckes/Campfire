@@ -219,6 +219,10 @@ validation = data.get("validation", [])
 if not isinstance(validation, list):
     validation = []
 
+workspace = data.get("workspace", {})
+if not isinstance(workspace, dict):
+    workspace = {}
+
 normalized = {
     "task_slug": task_slug,
     "objective": data.get("objective", objective),
@@ -255,6 +259,12 @@ normalized = {
         "summary": blocker.get("summary", ""),
         "attempts": blocker.get("attempts", 0),
         "next_action": blocker.get("next_action", ""),
+    },
+    "workspace": {
+        "strategy": workspace.get("strategy", ""),
+        "root": workspace.get("root", ""),
+        "git_root": workspace.get("git_root", ""),
+        "branch": workspace.get("branch", ""),
     },
     "last_run": {
         "started_at": last_run.get("started_at", ""),
