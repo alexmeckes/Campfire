@@ -15,6 +15,7 @@
 - Course-correction verification: ./skills/task-handoff-state/scripts/verify_course_correction.sh
 - Task-evaluation verification: ./skills/task-handoff-state/scripts/verify_task_evaluation.sh
 - Rolling-execution verification: ./skills/task-handoff-state/scripts/verify_rolling_execution.sh
+- Rolling reframe verification: ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
 - Rolling-mode helper verification: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
 - Rolling budget-limit verification: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Rolling waiting-on-decision verification: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
@@ -33,6 +34,7 @@
 - Secondary: ./skills/task-handoff-state/scripts/verify_course_correction.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_task_evaluation.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_rolling_execution.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
@@ -52,4 +54,5 @@
 - Unattended run target: about 2 hours total
 - Planning is allowed, but keep each rolling planning slice to about 10 minutes before shipping code
 - When the queued rolling backlog is exhausted, stop and frame the next backlog instead of inventing one silently
+- If queue replenishment is enabled and queue depth drops below the configured threshold while budget remains, spend one bounded planning slice to refill the queue before stopping
 - A rolling pause on `budget_limit` or `waiting_on_decision` should preserve the active milestone and remaining queued milestones for the next run

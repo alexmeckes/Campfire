@@ -105,6 +105,7 @@ Recommended `last_run.stop_reason` values:
 - `initialized`
 - `milestone_validated`
 - `auto_advanced`
+- `auto_reframed`
 - `course_corrected`
 - `blocked`
 - `waiting_on_decision`
@@ -128,9 +129,13 @@ Suggested fields:
 
 - `mode`: `single_milestone` or `rolling`
 - `auto_advance`: whether a validated milestone should advance to the next queued milestone
+- `auto_reframe`: whether a low queue should trigger one bounded reframe instead of stopping
 - `planning_slice_minutes`: how much planning is allowed before each implementation cycle
 - `runtime_budget_minutes`: total run budget for the current session
 - `max_milestones_per_run`: optional cap on how many milestones may be advanced in one run
+- `reframe_queue_below`: replenish when queued milestones are at or below this count
+- `target_queue_depth`: target queued backlog size after a bounded reframe
+- `max_reframes_per_run`: cap on bounded reframe passes in one run
 - `continue_until`: stop conditions for the current run
 - `queued_milestones`: the next milestone IDs and titles in order
 
@@ -142,6 +147,8 @@ Recommended `continue_until` values:
 - `manual_pause`
 
 When a rolling run stops on `budget_limit` or `waiting_on_decision`, preserve the active milestone and remaining `queued_milestones` so the next run can resume instead of re-framing the backlog.
+
+When `auto_reframe` is enabled and queued milestones fall to or below `reframe_queue_below` while budget remains, spend one bounded planning slice to replenish the backlog toward `target_queue_depth` before stopping.
 
 ## Blocker Tracking
 

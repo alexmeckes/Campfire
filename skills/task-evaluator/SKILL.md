@@ -45,6 +45,7 @@ Do not use it as a replacement for implementation. Use it to judge whether imple
    - otherwise record the missing proof or missing implementation and set the next slice
    - if the milestone itself is wrong, hand off to `$course-corrector`
    - if `execution.mode` is `rolling` and `auto_advance` is enabled, advance to the next queued milestone after recording the evaluation result
+   - if rolling mode is active and the queue has dropped below the configured threshold, replenish it with one bounded framing pass before deciding to stop
 
 ## Minimum Good Output
 
@@ -64,6 +65,7 @@ A good evaluation answers:
 - Keep the evaluation independent from the implementation narrative.
 - Record the evaluation artifact in `artifacts.json`.
 - In rolling mode, validation should normally move the task to the next queued milestone instead of leaving it parked on the one that just passed.
+- In dynamic rolling mode, do not stop on an empty queue until a permitted bounded reframe has either replenished it or failed to find a safe next milestone.
 
 ## Output Style
 

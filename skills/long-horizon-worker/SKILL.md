@@ -58,12 +58,15 @@ follow these extra rules:
 2. Maintain a queued backlog of the next milestones in `execution.queued_milestones`.
 3. After a milestone validates, use `$task-evaluator` logic to confirm it and then advance to the next queued milestone instead of stopping.
 4. Update `checkpoints.json`, `handoff.md`, and `progress.md` at each milestone boundary.
+5. If `auto_reframe` is enabled and the queue depth falls to or below `reframe_queue_below` while run budget remains, spend one bounded planning slice to replenish the backlog toward `target_queue_depth`.
+6. Record queue replenishment in task state and continue execution instead of treating an empty queue as an automatic stop.
 5. Stop only when:
    - a configured `continue_until` condition is hit
    - the runtime budget expires
-   - the queued backlog is empty and no safe next milestone can be chosen
+   - the queued backlog is empty and no safe next milestone can be chosen even after a permitted bounded reframe
 
 In rolling mode, validation is not the default stop condition. It is the trigger for advancing to the next milestone when allowed.
+In dynamic rolling mode, low queue depth is the trigger for one bounded reframe when the execution policy allows it.
 
 ## Loop Contract
 
@@ -121,7 +124,7 @@ Continue until one of these is true:
 If `execution.mode` is `rolling`, replace the first rule with:
 
 - the current milestone is implemented and validated and the run policy says to stop instead of auto-advance
-- or the rolling backlog is exhausted and no safe next milestone can be chosen
+- or the rolling backlog is exhausted and no safe next milestone can be chosen even after a permitted bounded reframe
 
 If the same validation failure repeats twice, stop broadening scope. Fix the failure or report the blocker.
 

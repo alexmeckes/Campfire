@@ -30,6 +30,9 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - [x] Add rolling budget-limit verification coverage
 - [x] Add rolling waiting-on-decision verification coverage
 - [x] Document rolling stop-condition behavior for Codex App runs
+- [x] Add dynamic rolling queue-replenishment policy and helper defaults
+- [x] Add rolling reframe verification coverage
+- [x] Document dynamic rolling queue replenishment for Codex App runs
 - [ ] Choose the next Campfire improvement milestone
 
 ## Notes
@@ -40,3 +43,4 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - Milestones 006 through 008 were completed in one rolling run, so the current backlog is exhausted
 - The next rolling backlog focuses on stop conditions other than success so unattended Codex App runs can pause and resume predictably
 - Milestones 009 through 011 were completed in one rolling run, so the next unattended session should frame a fresh backlog before continuing
+- Milestones 012 through 014 make rolling mode self-replenishing so the next unattended session can keep going when queue depth gets low and budget remains

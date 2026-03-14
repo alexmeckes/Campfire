@@ -5,13 +5,17 @@ ROOT_DIR="$(pwd -P)"
 PLANNING_SLICE_MINUTES=10
 RUNTIME_BUDGET_MINUTES=120
 MAX_MILESTONES_PER_RUN=3
+AUTO_REFRAME=true
+REFRAME_QUEUE_BELOW=1
+TARGET_QUEUE_DEPTH=3
+MAX_REFRAMES_PER_RUN=1
 CONTINUE_UNTIL="blocked,waiting_on_decision,budget_limit,manual_pause"
 NOTE_TEXT=""
 
 usage() {
   cat <<'EOF'
 Usage:
-  enable_rolling_mode.sh [--root /path/to/workspace] [--planning-slice-minutes N] [--runtime-budget-minutes N] [--max-milestones-per-run N] [--continue-until csv] [--note "text"] [--queue "milestone-id:Milestone title"]... <task-slug>
+  enable_rolling_mode.sh [--root /path/to/workspace] [--planning-slice-minutes N] [--runtime-budget-minutes N] [--max-milestones-per-run N] [--auto-reframe true|false] [--reframe-queue-below N] [--target-queue-depth N] [--max-reframes-per-run N] [--continue-until csv] [--note "text"] [--queue "milestone-id:Milestone title"]... <task-slug>
 EOF
 }
 
@@ -33,6 +37,22 @@ while [ "$#" -gt 0 ]; do
       ;;
     --max-milestones-per-run)
       MAX_MILESTONES_PER_RUN="$2"
+      shift 2
+      ;;
+    --auto-reframe)
+      AUTO_REFRAME="$2"
+      shift 2
+      ;;
+    --reframe-queue-below)
+      REFRAME_QUEUE_BELOW="$2"
+      shift 2
+      ;;
+    --target-queue-depth)
+      TARGET_QUEUE_DEPTH="$2"
+      shift 2
+      ;;
+    --max-reframes-per-run)
+      MAX_REFRAMES_PER_RUN="$2"
       shift 2
       ;;
     --continue-until)
@@ -86,7 +106,7 @@ fi
 
 QUEUE_JSON="$(printf '%s\n' "${QUEUE_VALUES[@]}")"
 
-export CHECKPOINT_FILE HANDOFF_FILE TASK_SLUG PLANNING_SLICE_MINUTES RUNTIME_BUDGET_MINUTES MAX_MILESTONES_PER_RUN CONTINUE_UNTIL NOTE_TEXT QUEUE_JSON
+export CHECKPOINT_FILE HANDOFF_FILE TASK_SLUG PLANNING_SLICE_MINUTES RUNTIME_BUDGET_MINUTES MAX_MILESTONES_PER_RUN AUTO_REFRAME REFRAME_QUEUE_BELOW TARGET_QUEUE_DEPTH MAX_REFRAMES_PER_RUN CONTINUE_UNTIL NOTE_TEXT QUEUE_JSON
 
 python3 <<'PY'
 import json
@@ -99,6 +119,10 @@ task_slug = os.environ["TASK_SLUG"]
 planning_slice_minutes = int(os.environ["PLANNING_SLICE_MINUTES"])
 runtime_budget_minutes = int(os.environ["RUNTIME_BUDGET_MINUTES"])
 max_milestones_per_run = int(os.environ["MAX_MILESTONES_PER_RUN"])
+auto_reframe = os.environ["AUTO_REFRAME"].strip().lower() in {"1", "true", "yes", "on"}
+reframe_queue_below = int(os.environ["REFRAME_QUEUE_BELOW"])
+target_queue_depth = int(os.environ["TARGET_QUEUE_DEPTH"])
+max_reframes_per_run = int(os.environ["MAX_REFRAMES_PER_RUN"])
 continue_until = [item.strip() for item in os.environ["CONTINUE_UNTIL"].split(",") if item.strip()]
 note_text = os.environ["NOTE_TEXT"].strip()
 queue_lines = [line.strip() for line in os.environ["QUEUE_JSON"].splitlines() if line.strip()]
@@ -126,9 +150,13 @@ execution.update(
     {
         "mode": "rolling",
         "auto_advance": True,
+        "auto_reframe": auto_reframe,
         "planning_slice_minutes": planning_slice_minutes,
         "runtime_budget_minutes": runtime_budget_minutes,
         "max_milestones_per_run": max_milestones_per_run,
+        "reframe_queue_below": reframe_queue_below,
+        "target_queue_depth": target_queue_depth,
+        "max_reframes_per_run": max_reframes_per_run,
         "continue_until": continue_until,
         "queued_milestones": queued_milestones,
         "notes": note_text or execution.get("notes", ""),
@@ -140,7 +168,8 @@ checkpoint_path.write_text(json.dumps(data, indent=2) + "\n")
 rolling_prompt = (
     f"Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state "
     f"to continue this task from `.autonomous/{task_slug}/`. Keep planning bounded, auto-advance through the "
-    f"queued milestones, and stop only on a real blocker, decision boundary, budget limit, or manual pause."
+    f"queued milestones, replenish the queue when policy allows and budget remains, and stop only on a real blocker, "
+    f"decision boundary, budget limit, or manual pause."
 )
 
 if handoff_path.exists():
@@ -161,4 +190,4 @@ echo "Enabled rolling mode for:"
 echo "  $TASK_DIR"
 echo
 echo "Recommended Codex App prompt:"
-echo "  Use \$task-framer, \$course-corrector, \$long-horizon-worker, \$task-evaluator, and \$task-handoff-state to continue .autonomous/$TASK_SLUG/. Keep planning bounded, auto-advance through queued milestones, and stop only on a real blocker, decision boundary, budget limit, or manual pause."
+echo "  Use \$task-framer, \$course-corrector, \$long-horizon-worker, \$task-evaluator, and \$task-handoff-state to continue .autonomous/$TASK_SLUG/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, and stop only on a real blocker, decision boundary, budget limit, or manual pause."

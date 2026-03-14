@@ -107,3 +107,25 @@
 - Validation: ran ./scripts/verify_repo.sh successfully and recorded the evaluation result in `findings/milestone-011-evaluation.md`.
 - Blockers: none.
 - Next slice: choose the next Campfire improvement milestone.
+
+## 2026-03-14 milestone-012
+
+- Course correction: rolling mode was still backlog-bounded, which meant a run could stop early even when budget remained simply because the queue was empty.
+- Changed: extended the rolling execution contract, helper defaults, and resume output to support bounded queue replenishment with `auto_reframe`, queue-depth thresholds, and per-run reframe caps.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh successfully after adding the new rolling policy fields.
+- Blockers: none.
+- Next slice: add deterministic proof that a rolling run can replenish its own queue before stopping.
+
+## 2026-03-14 milestone-013
+
+- Changed: added `skills/task-handoff-state/scripts/verify_rolling_reframe.sh` to simulate a rolling run that replenishes its own queue when depth falls below the configured threshold.
+- Validation: ran ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh successfully.
+- Blockers: none.
+- Next slice: wire the dynamic rolling behavior into README, example task state, and repo verification.
+
+## 2026-03-14 milestone-014
+
+- Changed: wired `verify_rolling_reframe.sh` into `scripts/verify_repo.sh`, updated the rolling example state, and documented dynamic queue replenishment in `README.md`, `skills/task-handoff-state/SKILL.md`, and `skills/task-handoff-state/references/task-state-contract.md`.
+- Validation: ran ./scripts/verify_repo.sh successfully and recorded the evaluation result in `findings/milestone-014-evaluation.md`.
+- Blockers: none.
+- Next slice: choose the next Campfire improvement milestone.

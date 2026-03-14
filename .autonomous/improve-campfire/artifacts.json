@@ -169,6 +169,42 @@
       "type": "evaluation_note",
       "milestone_id": "milestone-011",
       "reason": "Records the independent evaluation of the stop-condition backlog."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-013",
+      "reason": "Covers the rolling path where a run replenishes its own queue when budget remains and the backlog gets short."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/enable_rolling_mode.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-012",
+      "reason": "Enables dynamic rolling queue replenishment by default for unattended runs."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/resume_task.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-012",
+      "reason": "Surfaces dynamic queue-replenishment policy in resume output and prompt suggestions."
+    },
+    {
+      "path": "examples/basic-workspace/.autonomous/rolling-task/checkpoints.json",
+      "type": "example_state",
+      "milestone_id": "milestone-014",
+      "reason": "Shows dynamic queue-replenishment policy in a concrete rolling task example."
+    },
+    {
+      "path": "README.md",
+      "type": "documentation",
+      "milestone_id": "milestone-014",
+      "reason": "Documents the new dynamic rolling behavior and queue-replenishment verifier."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-014-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-014",
+      "reason": "Records the independent evaluation of the dynamic rolling backlog."
     }
   ],
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."

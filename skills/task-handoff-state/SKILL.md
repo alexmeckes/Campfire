@@ -83,6 +83,12 @@ Verify rolling execution handling:
 ~/.codex/skills/task-handoff-state/scripts/verify_rolling_execution.sh
 ```
 
+Verify rolling queue replenishment handling:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_rolling_reframe.sh
+```
+
 Verify rolling budget-limit handling:
 
 ```bash
@@ -169,6 +175,7 @@ Verify the rolling-mode helper:
 - Record review-relevant outputs in `artifacts.json`.
 - Keep logs and generated evidence inside the task folder when practical.
 - For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
+- Dynamic rolling runs should usually enable queue replenishment so a run can keep going until budget, blocker, or decision boundary instead of stopping on an empty queue.
 
 ## Pairing
 

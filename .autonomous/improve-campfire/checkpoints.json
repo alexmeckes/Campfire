@@ -4,29 +4,33 @@
   "status": "validated",
   "phase": "verification",
   "current": {
-    "milestone_id": "milestone-011",
-    "milestone_title": "Document rolling stop-condition behavior for Codex App runs",
-    "slice_id": "slice-016",
-    "slice_title": "Validate the new stop-condition verifiers and repo/docs wiring",
+    "milestone_id": "milestone-014",
+    "milestone_title": "Document dynamic rolling queue replenishment for Codex App runs",
+    "slice_id": "slice-019",
+    "slice_title": "Validate the dynamic rolling contract, verifier, and docs wiring",
     "acceptance_criteria": [
-      "Campfire includes deterministic budget-limit and waiting-on-decision rolling verifiers",
-      "The repo verification suite runs both new stop-condition verifiers",
-      "README and task-state docs explain that rolling pauses preserve the active milestone and queued backlog"
+      "Campfire supports bounded queue replenishment when a rolling run runs low on queued milestones",
+      "The repo verification suite runs a deterministic rolling reframe verifier",
+      "README, helper output, and example task state describe the dynamic rolling behavior"
     ],
     "dependencies": [
-      "skills/task-handoff-state/scripts/verify_budget_limit.sh",
-      "skills/task-handoff-state/scripts/verify_waiting_on_decision.sh",
+      "skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
+      "skills/task-handoff-state/scripts/enable_rolling_mode.sh",
       "README.md",
       "scripts/verify_repo.sh",
-      ".autonomous/improve-campfire/findings/milestone-011-evaluation.md"
+      ".autonomous/improve-campfire/findings/milestone-014-evaluation.md"
     ]
   },
   "execution": {
     "mode": "rolling",
     "auto_advance": true,
+    "auto_reframe": true,
     "planning_slice_minutes": 10,
     "runtime_budget_minutes": 120,
     "max_milestones_per_run": 3,
+    "reframe_queue_below": 1,
+    "target_queue_depth": 3,
+    "max_reframes_per_run": 1,
     "continue_until": [
       "blocked",
       "waiting_on_decision",
@@ -34,7 +38,7 @@
       "manual_pause"
     ],
     "queued_milestones": [],
-    "notes": "The stop-condition backlog was consumed in this run. Frame the next rolling backlog before the next unattended Codex App session."
+    "notes": "Dynamic queue replenishment is now enabled. If queue depth falls to the configured threshold and budget remains, spend one bounded planning slice to refill the queue before stopping."
   },
   "blocker": {
     "status": "none",
@@ -45,9 +49,9 @@
   },
   "last_run": {
     "started_at": "2026-03-14T19:10:00Z",
-    "ended_at": "2026-03-14T21:05:00Z",
+    "ended_at": "2026-03-14T21:35:00Z",
     "stop_reason": "milestone_validated",
-    "summary": "Added rolling budget-limit and waiting-on-decision verifiers, wired them into repo verification, and documented how rolling pauses preserve the active milestone and queued backlog.",
+    "summary": "Added dynamic rolling queue replenishment, proved it with a deterministic reframe verifier, and documented how a run can extend its own backlog when budget remains.",
     "next_step": "Choose the next Campfire improvement milestone and frame a new rolling backlog before the next unattended run."
   },
   "runbook": "runbook.md",
@@ -77,6 +81,13 @@
     {
       "type": "milestone_evaluation",
       "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
+      "summary": "Rolling reframe verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
       "command": "./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh",
       "artifact": "skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh",
       "summary": "Rolling-mode helper coverage passed."
@@ -90,9 +101,9 @@
     {
       "type": "milestone_evaluation",
       "result": "pass",
-      "command": "review .autonomous/improve-campfire/findings/milestone-011-evaluation.md",
-      "artifact": ".autonomous/improve-campfire/findings/milestone-011-evaluation.md",
-      "summary": "Evaluation note confirms the stop-condition backlog is complete."
+      "command": "review .autonomous/improve-campfire/findings/milestone-014-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-014-evaluation.md",
+      "summary": "Evaluation note confirms the dynamic rolling backlog is complete."
     }
   ],
   "last_updated": "2026-03-14"

@@ -20,9 +20,13 @@
   "execution": {
     "mode": "rolling",
     "auto_advance": true,
+    "auto_reframe": true,
     "planning_slice_minutes": 10,
     "runtime_budget_minutes": 120,
     "max_milestones_per_run": 3,
+    "reframe_queue_below": 1,
+    "target_queue_depth": 3,
+    "max_reframes_per_run": 1,
     "continue_until": [
       "blocked",
       "waiting_on_decision",
@@ -35,7 +39,7 @@
         "milestone_title": "Wrap the rolling run with documentation and final evaluation"
       }
     ],
-    "notes": "This example starts after one validated milestone to show auto-advance."
+    "notes": "This example starts after one validated milestone to show auto-advance and bounded queue replenishment when the queue gets short."
   },
   "blocker": {
     "status": "none",

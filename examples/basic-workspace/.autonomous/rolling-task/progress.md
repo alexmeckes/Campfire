@@ -4,4 +4,5 @@
 
 - Example rolling task created.
 - Milestone-001 is treated as already validated so the task resumes on milestone-002.
+- Queue replenishment is enabled so the example can demonstrate bounded dynamic backlog extension when budget remains.
 - Next slice: implement milestone-002 while the rolling run budget remains.

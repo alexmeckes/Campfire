@@ -26,6 +26,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_execution.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_reframe.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_budget_limit.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_waiting_on_decision.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh" \
@@ -85,6 +86,9 @@ echo "== Task evaluation verifier =="
 
 echo "== Rolling execution verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_execution.sh"
+
+echo "== Rolling reframe verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_rolling_reframe.sh"
 
 echo "== Rolling budget-limit verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_budget_limit.sh"

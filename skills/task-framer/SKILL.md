@@ -63,7 +63,7 @@ A framed task should answer:
 - If setup or validation is unknown, write that explicitly into `runbook.md`.
 - If a major product decision is still unresolved, mark it as a decision boundary instead of inventing certainty.
 - For Codex App background or unattended runs, frame at least the next 2 to 3 milestones and write an `execution` policy into `checkpoints.json`.
-- In rolling mode, set a planning budget, runtime budget, queued milestones, and explicit stop conditions instead of relying on “stop after one validated milestone.”
+- In rolling mode, set a planning budget, runtime budget, queued milestones, queue-replenishment policy, and explicit stop conditions instead of relying on “stop after one validated milestone.”
 
 ## Output Style
 

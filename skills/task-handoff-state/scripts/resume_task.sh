@@ -67,18 +67,26 @@ if not isinstance(execution, dict):
 
 mode = execution.get("mode", "single_milestone")
 auto_advance = execution.get("auto_advance", False)
+auto_reframe = execution.get("auto_reframe", False)
 planning_slice = execution.get("planning_slice_minutes", 15)
 runtime_budget = execution.get("runtime_budget_minutes", 0)
 max_milestones = execution.get("max_milestones_per_run", 1)
+reframe_queue_below = execution.get("reframe_queue_below", 0)
+target_queue_depth = execution.get("target_queue_depth", 0)
+max_reframes_per_run = execution.get("max_reframes_per_run", 0)
 continue_until = execution.get("continue_until", [])
 queued = execution.get("queued_milestones", [])
 notes = execution.get("notes", "")
 
 print(f"  mode: {mode}")
 print(f"  auto_advance: {auto_advance}")
+print(f"  auto_reframe: {auto_reframe}")
 print(f"  planning_slice_minutes: {planning_slice}")
 print(f"  runtime_budget_minutes: {runtime_budget}")
 print(f"  max_milestones_per_run: {max_milestones}")
+print(f"  reframe_queue_below: {reframe_queue_below}")
+print(f"  target_queue_depth: {target_queue_depth}")
+print(f"  max_reframes_per_run: {max_reframes_per_run}")
 print(f"  continue_until: {continue_until}")
 if queued:
     print("  queued_milestones:")
@@ -126,7 +134,7 @@ task_slug = sys.argv[2]
 data = json.loads(path.read_text())
 execution = data.get("execution", {})
 if isinstance(execution, dict) and execution.get("mode") == "rolling":
-    print(f"  Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/{task_slug}/. Keep planning bounded, auto-advance through queued milestones, and stop only on the configured run limits or a real blocker.")
+    print(f"  Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/{task_slug}/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, and stop only on the configured run limits or a real blocker.")
 else:
     print(f"  Use $long-horizon-worker and $task-handoff-state to continue .autonomous/{task_slug}/ from the current handoff and validate the next slice before stopping.")
 PY

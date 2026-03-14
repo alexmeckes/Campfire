@@ -44,6 +44,7 @@ Do not use it just because a task is hard. Use it when the plan itself needs to 
    - blocker state
    - runbook commands
    - execution queue and run budget assumptions
+   - queue-replenishment thresholds when the unattended run should keep going
    - next slice
 5. Update `handoff.md` and `checkpoints.json` so the next run resumes from the corrected plan instead of the stale one.
 
