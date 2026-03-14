@@ -50,6 +50,9 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - [x] Document automation prompt helper usage in README and example guidance
 - [x] Expose automation prompt helper guidance from `resume_task.sh` for rolling tasks
 - [x] Add deterministic verification that `resume_task.sh` surfaces automation-helper guidance correctly
+- [x] Prevent missing continue targets from bootstrapping replacement tasks in the wrong workspace
+- [x] Add deterministic verification for the missing-resume guardrail
+- [x] Document the missing-resume guardrail in README and example guidance
 - [ ] Add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state
 - [ ] Add deterministic verification for automation proposal helper output and task-state selection
 - [ ] Document automation proposal helper usage in README and example guidance
@@ -71,3 +74,4 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - Milestones 021 through 023 strengthened the autonomous rolling floor, so the deferred automation-helper backlog now starts at milestone-024 with a deeper queue
 - The next refinement after the autonomy floor was explicit until-stopped mode, so the self-hosted task now runs without an internal budget or milestone cap while the automation-helper backlog stays queued behind it
 - Milestones 024 through 028 completed the automation-helper backlog, so the next bounded reframe now focuses on automation proposal metadata for Codex App recurring runs
+- The fresh-thread test exposed a more urgent workspace-mismatch bug, so the automation-proposal backlog was deferred behind a missing-resume guardrail before being requeued at milestone-034

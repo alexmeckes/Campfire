@@ -19,6 +19,7 @@
 - Rolling-execution verification: ./skills/task-handoff-state/scripts/verify_rolling_execution.sh
 - Rolling reframe verification: ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
 - Rolling-mode helper verification: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+- Missing-resume guardrail verification: ./skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh
 - Autonomous-floor verification: ./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
 - Until-stopped verification: ./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
 - Rolling budget-limit verification: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
@@ -38,7 +39,10 @@
 - Review autonomy-floor evaluation: .autonomous/improve-campfire/findings/milestone-023-evaluation.md
 - Review automation-helper backlog brief: .autonomous/improve-campfire/findings/milestone-024-automation-helper-backlog.md
 - Review automation-helper evaluation: .autonomous/improve-campfire/findings/milestone-028-evaluation.md
+- Review missing-resume course-correction note: .autonomous/improve-campfire/findings/milestone-029-missing-resume-course-correction.md
+- Review missing-resume evaluation: .autonomous/improve-campfire/findings/milestone-031-evaluation.md
 - Review automation proposal backlog brief: .autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md
+- Review refreshed automation proposal backlog brief: .autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md
 - Review automation patterns reference: skills/task-handoff-state/references/automation-patterns.md
 
 ## Validation
@@ -51,6 +55,7 @@
 - Secondary: ./skills/task-handoff-state/scripts/verify_rolling_execution.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_budget_limit.sh
@@ -81,3 +86,4 @@
 - For autonomous runs, `manual_pause` should be treated as external-only and not chosen before the minimum runtime and milestone floor are met
 - For git repos, prefer optional worktree-backed setup only when it improves long-horizon isolation without weakening non-git portability
 - For recurring Codex App automations, prefer reusable prompt patterns and explicit workspace guidance over project-specific magic
+- For continue/resume requests, treat a missing named task slug as a hard stop and confirm the workspace before creating anything new

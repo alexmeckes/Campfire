@@ -192,3 +192,13 @@ Track blockers in `checkpoints.json` with:
 - `next_action`
 
 This prevents silent thrashing across sessions.
+
+## Missing Resume Targets
+
+If a user asks to continue or resume a specific `.autonomous/<task>/` and that task directory is missing in the current workspace:
+
+- treat it as missing state or a likely workspace mismatch
+- stop and surface the problem
+- do not silently create or bootstrap a replacement task
+
+Only initialize a new task when the user explicitly asks to create or frame one.

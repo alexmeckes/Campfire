@@ -304,3 +304,40 @@
 - Validation: reviewed the completed helper/evaluator artifacts and confirmed the next leverage point is automation proposal metadata rather than more prompt-body duplication.
 - Blockers: none.
 - Next slice: add an automation proposal helper that emits a suggested automation name and task-only prompt from existing Campfire state.
+
+## 2026-03-15 milestone-029 course-correction
+
+- Course correction: a fresh-thread test showed that a missing continue target in the wrong workspace could still be reframed into a brand-new task, which is more urgent than automation proposal metadata.
+- Changed: deferred the automation-proposal backlog, recorded the reason in `findings/milestone-029-missing-resume-course-correction.md`, and rewrote the active backlog around missing-resume guardrails.
+- Validation: reviewed the fresh-thread transcript and confirmed the root issue was not runtime persistence but a missing resume target being treated like a new-task framing opportunity.
+- Blockers: none.
+- Next slice: harden `resume_task.sh` and the core Campfire skills so continue/resume requests stop on missing task state.
+
+## 2026-03-15 milestone-029
+
+- Changed: updated `skills/task-handoff-state/scripts/resume_task.sh`, `skills/task-handoff-state/SKILL.md`, `skills/task-framer/SKILL.md`, `skills/long-horizon-worker/SKILL.md`, and `skills/task-handoff-state/references/task-state-contract.md` so missing continue targets are treated as a hard stop instead of a bootstrap signal.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh` successfully after wiring the new script guidance and stop behavior.
+- Blockers: none.
+- Next slice: wire the new guardrail into repo verification and user-facing docs/example guidance.
+
+## 2026-03-15 milestone-030
+
+- Changed: added `skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh` and wired it into `scripts/verify_repo.sh`.
+- Validation: ran `./scripts/verify_repo.sh` successfully with the new guardrail verifier included.
+- Blockers: none.
+- Next slice: update README and example guidance so missing resume targets are clearly treated as stop conditions.
+
+## 2026-03-15 milestone-031
+
+- Changed: documented the missing-resume guardrail in `README.md`, `examples/basic-workspace/AGENTS.md`, and the task-state skill quick start, then recorded the evaluator note in `findings/milestone-031-evaluation.md`.
+- Validation: reviewed the updated docs and the passing guardrail verifier to confirm the create-vs-resume distinction is now explicit.
+- Blockers: none.
+- Next slice: use one bounded reframe to restore the deferred automation-proposal backlog behind the now-validated guardrail.
+
+## 2026-03-15 milestone-034 framing
+
+- Auto reframe: after the missing-resume guardrail validated, the next bounded planning slice restored the deferred automation-proposal work as the next backlog.
+- Changed: recorded the refreshed backlog in `plan.md`, `runbook.md`, `handoff.md`, `checkpoints.json`, and `findings/milestone-034-automation-proposal-backlog.md`.
+- Validation: reviewed the guardrail evaluation and confirmed the automation-proposal backlog is still the next safe generic improvement area.
+- Blockers: none.
+- Next slice: add an automation proposal helper that emits a suggested automation name and task-only prompt from existing Campfire state.

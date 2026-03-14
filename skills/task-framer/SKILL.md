@@ -24,6 +24,7 @@ Use this skill for:
 - preparing a task for automation or background continuation
 
 Do not use it when the task is already well-framed and the next slice is obvious.
+Do not use it to silently recover a missing resume target when the user explicitly asked to continue an existing `.autonomous/<task>/`.
 
 ## Framing Workflow
 
@@ -66,6 +67,7 @@ A framed task should answer:
 - In rolling mode, set a planning budget, runtime budget, minimum runtime, minimum milestone floor, queued milestones, queue-replenishment policy, and explicit stop conditions instead of relying on “stop after one validated milestone.”
 - For autonomous runs, do not treat `manual_pause` as a normal internal stop condition. Reserve it for explicit user pauses or external interruptions.
 - If the user wants the run to keep going until they manually stop it, set `run_style: until_stopped`, remove internal budget/cap stop conditions, and keep queue replenishment enabled.
+- If the user asked to continue or resume a specific task slug and that `.autonomous/<task>/` directory is missing, treat that as missing context or a likely workspace mismatch. Stop and ask for the correct workspace/task instead of bootstrapping a replacement task.
 
 ## Output Style
 

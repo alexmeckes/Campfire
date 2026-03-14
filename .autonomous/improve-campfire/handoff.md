@@ -3,7 +3,7 @@
 ## Current Status
 
 - Status: ready
-- Current milestone: milestone-029 - add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state
+- Current milestone: milestone-034 - add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state
 - Next slice: add a helper under `skills/task-handoff-state/scripts/` that prints a suggested automation name plus task-only prompt proposal fields for an existing task slug without embedding schedule or workspace settings
 - Stop reason: manual_pause
 

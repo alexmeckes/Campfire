@@ -4,9 +4,9 @@
   "status": "ready",
   "phase": "execution",
   "current": {
-    "milestone_id": "milestone-029",
+    "milestone_id": "milestone-034",
     "milestone_title": "Add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state",
-    "slice_id": "slice-029",
+    "slice_id": "slice-034",
     "slice_title": "Add a helper under skills/task-handoff-state/scripts that prints a suggested automation name plus task-only prompt proposal fields for an existing task slug without embedding schedule or workspace settings",
     "acceptance_criteria": [
       "Campfire provides a reusable helper that emits a short suggested automation name and task-only prompt proposal fields from existing task state",
@@ -19,7 +19,7 @@
       "skills/task-handoff-state/scripts/automation_prompt_helper.sh",
       "README.md",
       "scripts/verify_repo.sh",
-      ".autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md"
+      ".autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md"
     ]
   },
   "execution": {
@@ -40,23 +40,23 @@
     ],
     "queued_milestones": [
       {
-        "milestone_id": "milestone-030",
+        "milestone_id": "milestone-035",
         "milestone_title": "Add deterministic verification for automation proposal helper output and task-state selection"
       },
       {
-        "milestone_id": "milestone-031",
+        "milestone_id": "milestone-036",
         "milestone_title": "Document automation proposal helper usage in README and example guidance"
       },
       {
-        "milestone_id": "milestone-032",
+        "milestone_id": "milestone-037",
         "milestone_title": "Expose automation proposal helper guidance from resume_task.sh for rolling tasks"
       },
       {
-        "milestone_id": "milestone-033",
+        "milestone_id": "milestone-038",
         "milestone_title": "Add deterministic verification that resume_task.sh surfaces automation proposal guidance correctly"
       }
     ],
-    "notes": "The self-hosted task is configured for manual-stop autonomous runs with no internal budget or milestone cap. The completed automation-helper backlog now hands off to automation proposal metadata for recurring Codex App runs.",
+    "notes": "The self-hosted task is configured for manual-stop autonomous runs with no internal budget or milestone cap. The missing-resume guardrail now prevents continue requests from silently bootstrapping replacement tasks, and the deferred automation-proposal backlog has been restored behind that fix.",
     "run_style": "until_stopped"
   },
   "blocker": {
@@ -67,12 +67,13 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-15T01:05:00Z",
-    "ended_at": "2026-03-15T01:35:00Z",
+    "started_at": "2026-03-15T02:00:00Z",
+    "ended_at": "2026-03-15T02:20:00Z",
     "stop_reason": "manual_pause",
-    "summary": "Completed the automation-helper backlog, added deterministic helper and resume-guidance verification, and then reframed the next queue around automation proposal metadata for recurring Codex App runs.",
+    "summary": "Course-corrected the queue around a missing-resume guardrail, validated the new resume-stop behavior and documentation, and then restored the deferred automation-proposal backlog as the next queue.",
     "next_step": "Add the automation proposal helper, then verify it, document it, and expose it through resume guidance.",
     "events": [
+      "course_corrected",
       "auto_advanced",
       "auto_reframed"
     ]
@@ -104,9 +105,16 @@
     {
       "type": "plan_review",
       "result": "pass",
-      "command": "review .autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md",
-      "artifact": ".autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md",
-      "summary": "Reframed the next queue around automation proposal metadata once the automation-helper backlog validated."
+      "command": "review .autonomous/improve-campfire/findings/milestone-029-missing-resume-course-correction.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-029-missing-resume-course-correction.md",
+      "summary": "Recorded why the automation-proposal backlog was deferred behind the more urgent missing-resume guardrail."
+    },
+    {
+      "type": "plan_review",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md",
+      "summary": "Restored the deferred automation-proposal backlog once the missing-resume guardrail validated."
     },
     {
       "type": "plan_review",
@@ -139,6 +147,13 @@
     {
       "type": "milestone_evaluation",
       "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh",
+      "summary": "Missing-resume guardrail verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
       "command": "./skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh",
       "artifact": "skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh",
       "summary": "Automation prompt helper verifier passed."
@@ -149,6 +164,13 @@
       "command": "./skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh",
       "artifact": "skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh",
       "summary": "Resume automation-guidance verifier passed."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-031-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-031-evaluation.md",
+      "summary": "Evaluation note confirms the missing-resume guardrail backlog is complete."
     },
     {
       "type": "milestone_evaluation",
@@ -217,7 +239,7 @@
       "type": "repo_verification",
       "result": "pass",
       "command": "./scripts/verify_repo.sh",
-      "summary": "Repo verification passed after the automation helper, resume integration, and verifier updates."
+      "summary": "Repo verification passed after the missing-resume guardrail, verifier, and documentation updates."
     },
     {
       "type": "milestone_evaluation",

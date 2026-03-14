@@ -32,6 +32,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_budget_limit.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_waiting_on_decision.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_autonomous_floor.sh" \
@@ -110,6 +111,9 @@ echo "== Rolling waiting-on-decision verifier =="
 
 echo "== Rolling mode helper verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh"
+
+echo "== Missing resume guardrail verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh"
 
 echo "== Automation pattern verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh"

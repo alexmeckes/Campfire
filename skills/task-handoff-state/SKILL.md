@@ -55,6 +55,8 @@ Inspect and resume a task:
 ~/.codex/skills/task-handoff-state/scripts/resume_task.sh build-the-next-milestone
 ```
 
+If `resume_task.sh` reports that the task is missing, treat that as a stop condition for resume/continue requests. Confirm the workspace root and task slug before creating anything new.
+
 Switch an existing task into rolling mode:
 
 ```bash
@@ -131,6 +133,12 @@ Verify the rolling-mode helper:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+```
+
+Verify the missing-resume guardrail:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh
 ```
 
 Verify recurring automation-pattern coverage:
@@ -230,6 +238,7 @@ Verify that `resume_task.sh` surfaces automation prompt guidance for rolling tas
 - Keep `runbook.md` current when setup, validation, or observability changes.
 - Record review-relevant outputs in `artifacts.json`.
 - Keep logs and generated evidence inside the task folder when practical.
+- If a user asks to continue or resume a specific `.autonomous/<task>/` and that task directory is missing, stop and report the missing state. Do not silently create or bootstrap a replacement task.
 - For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
 - Use `automation_prompt_helper.sh` when you want task-only automation prompts generated from existing Campfire state instead of copying examples by hand.
 - Dynamic rolling runs should usually enable queue replenishment so a run can keep going until budget, blocker, or decision boundary instead of stopping on an empty queue.

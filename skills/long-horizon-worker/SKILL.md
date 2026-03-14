@@ -27,12 +27,15 @@ Use this skill for:
 - prompts like `keep going`, `continue until validated`, or `work through the backlog`
 
 Do not use it for one-shot factual questions or tasks that depend on repeated human taste decisions.
+Do not reinterpret a missing continue target as permission to create a new task in the current workspace.
 
 ## Quick Start
 
 1. Confirm the active workspace.
 2. Read `AGENTS.md` if present.
-3. If `.autonomous/<task>/` does not exist, use `$task-handoff-state` or run the companion task-state initializer.
+3. If `.autonomous/<task>/` does not exist:
+   - for a new task request, use `$task-handoff-state` or run the companion task-state initializer
+   - for a continue or resume request against a named task, stop and report the missing task state instead of initializing a replacement
 4. Read the task state:
    - `plan.md`
    - `runbook.md`

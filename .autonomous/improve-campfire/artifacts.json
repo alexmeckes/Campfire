@@ -375,6 +375,30 @@
       "reason": "Defines the next queue around automation proposal metadata for recurring Codex App runs."
     },
     {
+      "path": ".autonomous/improve-campfire/findings/milestone-029-missing-resume-course-correction.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-029",
+      "reason": "Explains why the automation-proposal backlog was deferred behind the more urgent missing-resume guardrail."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-030",
+      "reason": "Proves that a missing continue target is treated as a hard stop rather than a bootstrap signal."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-031-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-031",
+      "reason": "Records the independent evaluation of the missing-resume guardrail backlog."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-034",
+      "reason": "Restores the deferred automation-proposal backlog after the missing-resume guardrail validated."
+    },
+    {
       "path": "examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md",
       "type": "documentation",
       "milestone_id": "milestone-026",

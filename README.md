@@ -266,6 +266,7 @@ This checks:
 - the rolling budget-limit verifier passes
 - the rolling waiting-on-decision verifier passes
 - the rolling-mode helper verifier passes
+- the missing-resume guardrail verifier passes
 - the automation-pattern verifier passes
 - the autonomous-floor verifier passes
 
@@ -327,6 +328,12 @@ And the rolling-mode helper verifier:
 
 ```bash
 ./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
+```
+
+And the missing-resume guardrail verifier:
+
+```bash
+./skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh
 ```
 
 And the automation-pattern verifier:
@@ -414,6 +421,8 @@ Use $task-framer and $task-handoff-state to turn this objective into a concrete 
 Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and keep working until the current milestone is validated.
 ```
 
+If `resume_task.sh` says the task is missing during a continue/resume request, stop and confirm the workspace plus task slug instead of bootstrapping a replacement task.
+
 6. If the plan changes mid-run, prompt:
 
 ```text
@@ -442,7 +451,7 @@ Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and 
 
 Campfire is meant to be testable, not just described.
 
-The prototype currently uses sixteen kinds of checks:
+The prototype currently uses seventeen kinds of checks:
 
 - harness smoke tests for scaffold and resume behavior
 - lifecycle tests that simulate a validated milestone update end to end
@@ -455,6 +464,7 @@ The prototype currently uses sixteen kinds of checks:
 - rolling budget-limit tests that simulate a paused run with queued work still preserved
 - rolling waiting-on-decision tests that simulate a paused run at a real decision boundary
 - rolling-mode helper tests that simulate converting an existing task into a queued rolling run
+- missing-resume guardrail tests that keep continue/resume requests from silently bootstrapping replacement tasks
 - automation-pattern tests that keep recurring automation references and example guidance aligned
 - automation prompt helper tests that keep task-only recurring prompt variants aligned with Campfire state
 - autonomous-floor tests that keep the stronger unattended-run defaults and external-only manual pause semantics aligned

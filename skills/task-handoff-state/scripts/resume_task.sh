@@ -41,6 +41,8 @@ TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
 
 if [ ! -d "$TASK_DIR" ]; then
   echo "Task not found: $TASK_DIR" >&2
+  echo "If you intended to continue an existing task, stop and confirm the workspace root plus task slug." >&2
+  echo "Do not bootstrap a replacement task from a resume request unless the user explicitly asked to create a new task." >&2
   exit 1
 fi
 

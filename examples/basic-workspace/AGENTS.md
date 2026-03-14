@@ -7,6 +7,7 @@
 - For unattended Codex App runs, prefer a rolling backlog with explicit stop conditions instead of one milestone at a time.
 - For recurring Codex App automations, keep prompts task-only and let the automation own schedule plus workspace selection.
 - Generate recurring task-only prompts from existing state with `~/.codex/skills/task-handoff-state/scripts/automation_prompt_helper.sh <task-slug>` instead of copying examples by hand.
+- If a named `.autonomous/<task>/` is missing during a continue request, stop and confirm the workspace instead of creating a replacement task.
 - If this example lives inside a git repo and you need isolation, prefer worktree-backed bootstrap for risky long runs.
 - Keep durable task state under `.autonomous/<task>/`.
 - Put project-specific rules here instead of into the global skills.
