@@ -19,7 +19,7 @@ expect_file() {
 expect_contains() {
   local path="$1"
   local pattern="$2"
-  if ! /usr/bin/grep -q "$pattern" "$path"; then
+  if ! /usr/bin/grep -Fq -- "$pattern" "$path"; then
     fail "Expected pattern '$pattern' in $path"
   fi
 }
@@ -45,7 +45,8 @@ cat > "$TASK_DIR/findings/rolling-reframe.md" <<'EOF'
 
 - Queue depth dropped to the configured threshold while budget remained.
 - The run spent one bounded planning slice replenishing the queue with milestone-003 and milestone-004.
-- Execution should continue from milestone-002 instead of stopping just because the prior queue was nearly empty.
+- Execution continued from milestone-002 instead of stopping just because the prior queue was nearly empty.
+- The run then paused for a manual checkpoint with the replenished queue preserved.
 EOF
 
 cat >> "$TASK_DIR/progress.md" <<'EOF'
@@ -53,6 +54,7 @@ cat >> "$TASK_DIR/progress.md" <<'EOF'
 ## 2026-03-14 rolling-reframe
 
 - Changed: simulated a rolling run that replenished its own backlog when queue depth dropped below the configured threshold.
+- Changed: recorded the bounded reframe as a run event while leaving the terminal stop reason as a manual pause.
 - Validation: recorded the replenishment in `findings/rolling-reframe.md` and added new queued milestones to `checkpoints.json`.
 - Blockers: none.
 - Next slice: continue milestone-002 with the replenished queue still available.
@@ -66,7 +68,7 @@ cat > "$TASK_DIR/handoff.md" <<'EOF'
 - Status: ready
 - Current milestone: milestone-002 - Continue after queue replenishment
 - Next slice: continue milestone-002 while the replenished queue remains available
-- Stop reason: auto_reframed
+- Stop reason: manual_pause
 
 ## Resume Prompt
 
@@ -127,9 +129,10 @@ checkpoint["execution"] = {
 checkpoint["last_run"] = {
     "started_at": "2026-03-14T22:00:00Z",
     "ended_at": "2026-03-14T22:08:00Z",
-    "stop_reason": "auto_reframed",
-    "summary": "The rolling run replenished its own backlog when queue depth fell to the configured threshold and then continued from the same active milestone.",
-    "next_step": "Continue milestone-002 with the replenished queue still available."
+    "stop_reason": "manual_pause",
+    "summary": "The rolling run replenished its own backlog when queue depth fell to the configured threshold, continued from the same active milestone, and then paused with the replenished queue preserved.",
+    "next_step": "Continue milestone-002 with the replenished queue still available.",
+    "events": ["auto_reframed"]
 }
 checkpoint["validation"] = [
     {
@@ -137,7 +140,7 @@ checkpoint["validation"] = [
         "result": "pass",
         "command": "review findings/rolling-reframe.md",
         "artifact": "findings/rolling-reframe.md",
-        "summary": "The reframe note proves queue replenishment happened before the run stopped."
+        "summary": "The reframe note proves queue replenishment happened and execution stayed on the active milestone before the run paused."
     }
 ]
 checkpoint_path.write_text(json.dumps(checkpoint, indent=2) + "\n")
@@ -160,14 +163,18 @@ expect_contains "$TASK_DIR/checkpoints.json" '"auto_reframe": true'
 expect_contains "$TASK_DIR/checkpoints.json" '"reframe_queue_below": 1'
 expect_contains "$TASK_DIR/checkpoints.json" '"target_queue_depth": 3'
 expect_contains "$TASK_DIR/checkpoints.json" '"max_reframes_per_run": 1'
-expect_contains "$TASK_DIR/checkpoints.json" '"stop_reason": "auto_reframed"'
+expect_contains "$TASK_DIR/checkpoints.json" '"stop_reason": "manual_pause"'
+expect_contains "$TASK_DIR/checkpoints.json" '"events": ['
+expect_contains "$TASK_DIR/checkpoints.json" '"auto_reframed"'
 expect_contains "$TASK_DIR/checkpoints.json" '"milestone_id": "milestone-003"'
 expect_contains "$TASK_DIR/checkpoints.json" '"milestone_id": "milestone-004"'
-expect_contains "$TASK_DIR/handoff.md" 'Stop reason: auto_reframed'
+expect_contains "$TASK_DIR/handoff.md" 'Stop reason: manual_pause'
 expect_contains /tmp/campfire_reframe_resume.out 'auto_reframe: True'
 expect_contains /tmp/campfire_reframe_resume.out 'reframe_queue_below: 1'
 expect_contains /tmp/campfire_reframe_resume.out 'target_queue_depth: 3'
 expect_contains /tmp/campfire_reframe_resume.out 'max_reframes_per_run: 1'
+expect_contains /tmp/campfire_reframe_resume.out 'stop_reason: manual_pause'
+expect_contains /tmp/campfire_reframe_resume.out 'events:'
 expect_contains /tmp/campfire_reframe_resume.out 'auto_reframed'
 expect_contains /tmp/campfire_reframe_resume.out 'milestone-004: Wrap the dynamically extended run with evaluation evidence'
 

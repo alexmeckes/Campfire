@@ -51,9 +51,12 @@
   "last_run": {
     "started_at": "2026-03-14T20:00:00Z",
     "ended_at": "2026-03-14T20:05:00Z",
-    "stop_reason": "auto_advanced",
-    "summary": "The example task validated its first milestone and advanced into the second one.",
-    "next_step": "Implement milestone-002 while the rolling run budget remains."
+    "stop_reason": "manual_pause",
+    "summary": "The example task validated its first milestone, auto-advanced into the second one, and then paused with the remaining queue preserved.",
+    "next_step": "Implement milestone-002 while the rolling run budget remains.",
+    "events": [
+      "auto_advanced"
+    ]
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",

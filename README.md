@@ -75,10 +75,11 @@ In rolling mode:
 
 - planning stays bounded
 - the task keeps a machine-readable queued backlog
-- evaluation can auto-advance to the next milestone
-- low queue depth can trigger one bounded queue replenishment pass when budget remains
+- evaluation can auto-advance to the next milestone and record that as a run event
+- low queue depth can trigger one bounded queue replenishment pass when budget remains, then continue from the replenished backlog
 - the run stops on blockers, decision boundaries, budget limits, or an empty safe backlog
 - a budget or decision pause keeps the active milestone and queued backlog intact for the next run
+- `last_run.stop_reason` stays reserved for the actual terminal pause reason, while `last_run.events` records mid-run transitions such as `auto_advanced` and `auto_reframed`
 
 ### 7. Project rules
 
@@ -112,6 +113,7 @@ Each task lives under:
 - `progress.md`: append-only log of changes, validation, blockers, next slice
 - `handoff.md`: concise resume note with current status and stop reason
 - `checkpoints.json`: machine-readable task state for resumption and automation
+- `last_run.events`: machine-readable mid-run transitions like auto-advance or bounded reframe
 - `checkpoints.json.execution`: machine-readable run policy for single-milestone or rolling runs
 - `artifacts.json`: manifest of outputs that matter for review or proof
 

@@ -214,6 +214,9 @@ if not isinstance(blocker, dict):
 last_run = data.get("last_run", {})
 if not isinstance(last_run, dict):
     last_run = {}
+last_run_events = last_run.get("events", [])
+if not isinstance(last_run_events, list):
+    last_run_events = []
 
 validation = data.get("validation", [])
 if not isinstance(validation, list):
@@ -272,6 +275,7 @@ normalized = {
         "stop_reason": last_run.get("stop_reason") or ("initialized" if status == "ready" else ""),
         "summary": last_run.get("summary") or ("Task scaffold created or normalized." if status == "ready" else ""),
         "next_step": last_run.get("next_step") or ("Define the first milestone and validation target." if status == "ready" else ""),
+        "events": last_run_events,
     },
     "runbook": "runbook.md",
     "artifacts_manifest": "artifacts.json",

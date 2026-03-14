@@ -2,7 +2,7 @@
   "task_slug": "improve-campfire",
   "objective": "dogfood Campfire on itself and harden lifecycle verification coverage",
   "status": "ready",
-  "phase": "planning",
+  "phase": "execution",
   "current": {
     "milestone_id": "milestone-018",
     "milestone_title": "Add a reusable automation-pattern reference for recurring Codex App runs",
@@ -57,11 +57,12 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-14T19:10:00Z",
-    "ended_at": "2026-03-14T22:15:00Z",
-    "stop_reason": "auto_reframed",
-    "summary": "Completed the worktree-aware bootstrap backlog, then used one bounded reframe to queue the next automation-pattern backlog when the rolling queue emptied.",
-    "next_step": "Add the automation-pattern reference, then cover automation-ready prompts and workspace guidance."
+    "started_at": "2026-03-14T22:20:00Z",
+    "ended_at": "2026-03-14T22:35:00Z",
+    "stop_reason": "manual_pause",
+    "summary": "Corrected rolling semantics so auto-advance and bounded reframe are recorded as run events instead of terminal stop reasons, then paused with milestone-018 still active.",
+    "next_step": "Add the automation-pattern reference, then cover automation-ready prompts and workspace guidance.",
+    "events": []
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
@@ -72,6 +73,13 @@
       "command": "review .autonomous/improve-campfire/findings/milestone-018-automation-backlog.md",
       "artifact": ".autonomous/improve-campfire/findings/milestone-018-automation-backlog.md",
       "summary": "Replenished the rolling queue with the next automation-pattern backlog."
+    },
+    {
+      "type": "plan_review",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-018-rolling-events-fix.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-018-rolling-events-fix.md",
+      "summary": "Recorded the rolling stop-reason fix so auto-advance and bounded reframe remain mid-run events."
     },
     {
       "type": "plan_review",
@@ -104,9 +112,16 @@
     {
       "type": "milestone_evaluation",
       "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_rolling_execution.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_rolling_execution.sh",
+      "summary": "Rolling execution verifier now treats auto-advance as a run event and pauses for a real terminal reason."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
       "command": "./skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
       "artifact": "skills/task-handoff-state/scripts/verify_rolling_reframe.sh",
-      "summary": "Rolling reframe verifier passed."
+      "summary": "Rolling reframe verifier now treats bounded reframe as a run event and preserves the replenished queue."
     },
     {
       "type": "milestone_evaluation",
@@ -119,7 +134,7 @@
       "type": "repo_verification",
       "result": "pass",
       "command": "./scripts/verify_repo.sh",
-      "summary": "Repo verification passed after the stop-condition verifier and docs updates."
+      "summary": "Repo verification passed after the rolling stop-reason semantics fix."
     },
     {
       "type": "milestone_evaluation",

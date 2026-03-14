@@ -160,7 +160,7 @@ Verify the rolling-mode helper:
 - milestone metadata
 - execution policy metadata
 - blocker metadata
-- last run summary and stop reason
+- last run summary, stop reason, and run events
 - last updated date
 - validation evidence list
 
@@ -188,6 +188,7 @@ Verify the rolling-mode helper:
 - Keep logs and generated evidence inside the task folder when practical.
 - For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
 - Dynamic rolling runs should usually enable queue replenishment so a run can keep going until budget, blocker, or decision boundary instead of stopping on an empty queue.
+- In rolling mode, record `auto_advanced` and `auto_reframed` in `last_run.events` and keep `last_run.stop_reason` for the real terminal pause reason.
 - For git repos, prefer worktree-backed bootstrap only when isolation helps; keep non-git and low-risk tasks on the in-place path.
 
 ## Pairing

@@ -69,6 +69,7 @@ Suggested fields:
 - `blocker`
 - `workspace`
 - `last_run`
+- `last_run.events`
 - `runbook`
 - `artifacts_manifest`
 - `validation`
@@ -116,14 +117,18 @@ Recommended `last_run.stop_reason` values:
 
 - `initialized`
 - `milestone_validated`
-- `auto_advanced`
-- `auto_reframed`
 - `course_corrected`
 - `blocked`
 - `waiting_on_decision`
 - `environment_failure`
 - `budget_limit`
 - `manual_pause`
+
+Recommended `last_run.events` values:
+
+- `auto_advanced`
+- `auto_reframed`
+- `course_corrected`
 
 Recommended `validation.type` values:
 
@@ -160,7 +165,11 @@ Recommended `continue_until` values:
 
 When a rolling run stops on `budget_limit` or `waiting_on_decision`, preserve the active milestone and remaining `queued_milestones` so the next run can resume instead of re-framing the backlog.
 
-When `auto_reframe` is enabled and queued milestones fall to or below `reframe_queue_below` while budget remains, spend one bounded planning slice to replenish the backlog toward `target_queue_depth` before stopping.
+When `auto_advance` is enabled and a milestone validates during a rolling run, record `auto_advanced` in `last_run.events`, advance to the next safe queued milestone, and keep going until a real terminal stop condition is hit.
+
+When `auto_reframe` is enabled and queued milestones fall to or below `reframe_queue_below` while budget remains, spend one bounded planning slice to replenish the backlog toward `target_queue_depth`, record `auto_reframed` in `last_run.events`, and continue from the active or newly chosen safe milestone instead of stopping just because the queue was low.
+
+In rolling mode, reserve `last_run.stop_reason` for the real terminal pause reason such as `budget_limit`, `manual_pause`, `blocked`, or `waiting_on_decision`. Do not use `auto_advanced` or `auto_reframed` as terminal stop reasons when the run continued afterward.
 
 ## Blocker Tracking
 

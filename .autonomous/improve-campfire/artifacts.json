@@ -177,6 +177,12 @@
       "reason": "Covers the rolling path where a run replenishes its own queue when budget remains and the backlog gets short."
     },
     {
+      "path": ".autonomous/improve-campfire/findings/milestone-018-rolling-events-fix.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-018",
+      "reason": "Explains why rolling runs now record auto-advance and bounded reframe as mid-run events instead of terminal stop reasons."
+    },
+    {
       "path": "skills/task-handoff-state/scripts/enable_rolling_mode.sh",
       "type": "workflow_script",
       "milestone_id": "milestone-012",

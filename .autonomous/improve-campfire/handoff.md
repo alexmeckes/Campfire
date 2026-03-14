@@ -5,7 +5,7 @@
 - Status: ready
 - Current milestone: milestone-018 - add a reusable automation-pattern reference for recurring Codex App runs
 - Next slice: add the automation-pattern reference, then cover automation-ready prompts and workspace guidance deterministically
-- Stop reason: auto_reframed
+- Stop reason: manual_pause
 
 ## Resume Prompt
 

@@ -166,3 +166,11 @@
 - Validation: reviewed the roadmap and confirmed the new automation backlog is the next best generic Campfire improvement area.
 - Blockers: none.
 - Next slice: add a reusable automation-pattern reference for recurring Codex App runs.
+
+## 2026-03-14 rolling-semantics-fix
+
+- Changed: updated the rolling contract, worker/evaluator docs, and resume output so `auto_advanced` and `auto_reframed` are stored as `last_run.events` instead of terminal stop reasons.
+- Changed: updated the rolling execution and rolling reframe verifiers plus the example rolling task to stop for a real reason like `manual_pause` after the mid-run transition is recorded.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_rolling_execution.sh`, `./skills/task-handoff-state/scripts/verify_rolling_reframe.sh`, `./scripts/verify_repo.sh`, and `./scripts/resume_task.sh improve-campfire`.
+- Blockers: none.
+- Next slice: continue milestone-018 by adding the automation-pattern reference and automation-ready guidance backlog.

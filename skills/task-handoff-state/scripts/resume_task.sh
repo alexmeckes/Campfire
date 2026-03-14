@@ -100,6 +100,39 @@ PY
 fi
 
 if [ -f "$TASK_DIR/checkpoints.json" ]; then
+  echo "Last run:"
+  python3 - "$TASK_DIR/checkpoints.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+data = json.loads(path.read_text())
+last_run = data.get("last_run", {})
+if not isinstance(last_run, dict):
+    last_run = {}
+
+stop_reason = last_run.get("stop_reason", "")
+summary = last_run.get("summary", "")
+next_step = last_run.get("next_step", "")
+events = last_run.get("events", [])
+if not isinstance(events, list):
+    events = []
+
+print(f"  stop_reason: {stop_reason or 'unknown'}")
+if events:
+    print("  events:")
+    for event in events:
+        print(f"    - {event}")
+if summary:
+    print(f"  summary: {summary}")
+if next_step:
+    print(f"  next_step: {next_step}")
+PY
+  echo
+fi
+
+if [ -f "$TASK_DIR/checkpoints.json" ]; then
   echo "Workspace strategy:"
   python3 - "$TASK_DIR/checkpoints.json" <<'PY'
 import json

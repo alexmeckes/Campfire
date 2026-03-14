@@ -44,8 +44,8 @@ Do not use it as a replacement for implementation. Use it to judge whether imple
    - mark the milestone `validated` only if the evidence is real and sufficient
    - otherwise record the missing proof or missing implementation and set the next slice
    - if the milestone itself is wrong, hand off to `$course-corrector`
-   - if `execution.mode` is `rolling` and `auto_advance` is enabled, advance to the next queued milestone after recording the evaluation result
-   - if rolling mode is active and the queue has dropped below the configured threshold, replenish it with one bounded framing pass before deciding to stop
+   - if `execution.mode` is `rolling` and `auto_advance` is enabled, record `auto_advanced` in `last_run.events`, advance to the next queued milestone, and continue
+   - if rolling mode is active and the queue has dropped below the configured threshold, replenish it with one bounded framing pass, record `auto_reframed` in `last_run.events`, and continue unless a real stop condition is hit
 
 ## Minimum Good Output
 
@@ -66,6 +66,7 @@ A good evaluation answers:
 - Record the evaluation artifact in `artifacts.json`.
 - In rolling mode, validation should normally move the task to the next queued milestone instead of leaving it parked on the one that just passed.
 - In dynamic rolling mode, do not stop on an empty queue until a permitted bounded reframe has either replenished it or failed to find a safe next milestone.
+- In rolling mode, keep `last_run.stop_reason` for the actual terminal pause reason. Treat `auto_advanced` and `auto_reframed` as run events.
 
 ## Output Style
 

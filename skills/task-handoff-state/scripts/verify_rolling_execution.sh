@@ -19,7 +19,7 @@ expect_file() {
 expect_contains() {
   local path="$1"
   local pattern="$2"
-  if ! /usr/bin/grep -q "$pattern" "$path"; then
+  if ! /usr/bin/grep -Fq -- "$pattern" "$path"; then
     fail "Expected pattern '$pattern' in $path"
   fi
 }
@@ -45,6 +45,7 @@ cat > "$TASK_DIR/findings/rolling-transition.md" <<'EOF'
 
 - Validated milestone-001.
 - Auto-advanced into milestone-002 because rolling execution is enabled.
+- The run then paused for a manual checkpoint while milestone-002 remained active.
 - Remaining queued milestone: milestone-003.
 EOF
 
@@ -53,6 +54,7 @@ cat >> "$TASK_DIR/progress.md" <<'EOF'
 ## 2026-03-14 rolling-transition
 
 - Changed: simulated a rolling run that validated milestone-001 and auto-advanced into milestone-002.
+- Changed: recorded the auto-advance as a run event while leaving the terminal stop reason as a manual pause.
 - Validation: recorded the transition in `findings/rolling-transition.md`.
 - Blockers: none.
 - Next slice: implement milestone-002 while the runtime budget remains.
@@ -66,7 +68,7 @@ cat > "$TASK_DIR/handoff.md" <<'EOF'
 - Status: ready
 - Current milestone: milestone-002 - Continue after auto-advance
 - Next slice: implement milestone-002 while the runtime budget remains
-- Stop reason: auto_advanced
+- Stop reason: manual_pause
 
 ## Resume Prompt
 
@@ -118,9 +120,10 @@ checkpoint["execution"] = {
 checkpoint["last_run"] = {
     "started_at": "2026-03-14T19:00:00Z",
     "ended_at": "2026-03-14T19:05:00Z",
-    "stop_reason": "auto_advanced",
-    "summary": "Validated milestone-001 and advanced directly into milestone-002 because rolling execution is enabled.",
-    "next_step": "Implement milestone-002 while the runtime budget remains."
+    "stop_reason": "manual_pause",
+    "summary": "Validated milestone-001, auto-advanced directly into milestone-002, then paused with the remaining queue preserved.",
+    "next_step": "Implement milestone-002 while the runtime budget remains.",
+    "events": ["auto_advanced"]
 }
 checkpoint["validation"] = [
     {
@@ -148,13 +151,19 @@ PY
 "$RESUME_SCRIPT" --root "$TEMP_WORKSPACE" "$TASK_SLUG" >/tmp/campfire_rolling_resume.out
 
 expect_contains "$TASK_DIR/checkpoints.json" '"mode": "rolling"'
-expect_contains "$TASK_DIR/checkpoints.json" '"stop_reason": "auto_advanced"'
+expect_contains "$TASK_DIR/checkpoints.json" '"stop_reason": "manual_pause"'
+expect_contains "$TASK_DIR/checkpoints.json" '"events": ['
+expect_contains "$TASK_DIR/checkpoints.json" '"auto_advanced"'
 expect_contains "$TASK_DIR/checkpoints.json" '"milestone_title": "Continue after auto-advance"'
 expect_contains "$TASK_DIR/checkpoints.json" '"milestone_id": "milestone-003"'
 expect_contains "$TASK_DIR/handoff.md" 'Current milestone: milestone-002 - Continue after auto-advance'
+expect_contains "$TASK_DIR/handoff.md" 'Stop reason: manual_pause'
 expect_contains /tmp/campfire_rolling_resume.out 'mode: rolling'
 expect_contains /tmp/campfire_rolling_resume.out 'auto_advance: True'
 expect_contains /tmp/campfire_rolling_resume.out 'queued_milestones:'
+expect_contains /tmp/campfire_rolling_resume.out 'stop_reason: manual_pause'
+expect_contains /tmp/campfire_rolling_resume.out 'events:'
+expect_contains /tmp/campfire_rolling_resume.out 'auto_advanced'
 expect_contains /tmp/campfire_rolling_resume.out 'auto-advance through queued milestones'
 
 echo "PASS: Rolling execution verification completed."

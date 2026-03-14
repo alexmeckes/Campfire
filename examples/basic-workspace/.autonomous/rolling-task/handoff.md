@@ -5,7 +5,7 @@
 - Status: ready
 - Current milestone: milestone-002 - Continue after the first auto-advance
 - Next slice: implement milestone-002 while the rolling run budget remains
-- Stop reason: auto_advanced
+- Stop reason: manual_pause
 
 ## Resume Prompt
 
