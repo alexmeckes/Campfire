@@ -1,0 +1,298 @@
+:root {
+  color-scheme: light;
+  --bg: #f6efe6;
+  --shell: rgba(255, 251, 246, 0.96);
+  --surface: rgba(148, 109, 69, 0.08);
+  --line: rgba(103, 73, 49, 0.1);
+  --text: #372618;
+  --text-dim: #7b624c;
+  --accent: #b86a2d;
+  --moss: #7b9972;
+  --warning: #c89549;
+  --blocked: #c46f60;
+  --shadow: 0 14px 28px rgba(119, 91, 63, 0.12);
+  font-family: "Google Sans", "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top right, rgba(232, 174, 99, 0.18), transparent 22%),
+    radial-gradient(circle at top left, rgba(196, 111, 93, 0.08), transparent 18%),
+    linear-gradient(180deg, #fffaf5 0%, #f6efe6 100%);
+  color: var(--text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+.widget-shell {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.topbar,
+.lane,
+.detail-tray {
+  background: var(--shell);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  -webkit-app-region: drag;
+}
+
+.brand-row,
+.topbar-actions,
+.card-top,
+.tray-main,
+.tray-meta,
+.tray-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.34rem 0.68rem;
+  border-radius: 999px;
+  background: rgba(184, 106, 45, 0.12);
+  color: var(--accent);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.live-dot,
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.live-dot {
+  background: var(--text-dim);
+}
+
+.live-dot-live {
+  background: var(--moss);
+  box-shadow: 0 0 12px var(--moss);
+}
+
+.live-dot-syncing,
+.live-dot-reconnecting {
+  background: var(--warning);
+  box-shadow: 0 0 12px var(--warning);
+}
+
+.control {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.46rem 0.68rem;
+  outline: none;
+  -webkit-app-region: no-drag;
+}
+
+.compact-select {
+  min-width: 118px;
+}
+
+.subtle-button {
+  cursor: pointer;
+}
+
+.pin-toggle {
+  min-width: 48px;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.pin-toggle-active {
+  background: rgba(184, 106, 45, 0.14);
+  border-color: rgba(184, 106, 45, 0.22);
+  color: var(--accent);
+}
+
+.banner {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: rgba(196, 111, 93, 0.12);
+  border: 1px solid rgba(196, 111, 93, 0.2);
+}
+
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.lane {
+  padding: 8px;
+  min-height: 220px;
+}
+
+.lane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 2px 2px 0;
+}
+
+.lane-header span {
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.lane-header strong {
+  font-size: 0.8rem;
+}
+
+.lane-body {
+  display: grid;
+  gap: 6px;
+}
+
+.card,
+.empty-card {
+  min-height: 62px;
+  border-radius: 18px;
+}
+
+.card {
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  background: rgba(184, 106, 45, 0.03);
+  border: 1px solid transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.card:hover,
+.card-selected {
+  border-color: rgba(184, 106, 45, 0.16);
+  background: rgba(184, 106, 45, 0.08);
+}
+
+.card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.card-milestone {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+}
+
+.status-dot-healthy {
+  background: var(--moss);
+}
+
+.status-dot-warning,
+.status-dot-waiting {
+  background: var(--warning);
+}
+
+.status-dot-blocked {
+  background: var(--blocked);
+}
+
+.status-dot-done {
+  background: var(--accent);
+}
+
+.empty-card {
+  border: 1px dashed var(--line);
+  background: transparent;
+}
+
+.detail-tray {
+  margin-top: 8px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.tray-main {
+  justify-content: space-between;
+  align-items: start;
+}
+
+.tray-main strong {
+  display: block;
+  font-weight: 500;
+}
+
+.tray-main span,
+.tray-meta span,
+.tray-link {
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  -webkit-app-region: no-drag;
+}
+
+.tray-meta {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.tray-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .widget-shell {
+    padding: 8px;
+  }
+
+  .kanban {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tray-main {
+    flex-direction: column;
+  }
+
+  .tray-meta {
+    justify-content: flex-start;
+  }
+}

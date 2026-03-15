@@ -130,6 +130,62 @@ Campfire is designed for Codex App usage:
 - each long task gets a durable `.autonomous/<task>/` directory
 - Codex App prompts stay short because the state is on disk
 
+## Campfire Board
+
+Campfire task state is structured enough to support a visual dashboard on top of `.autonomous/<task>/`.
+
+The current board proposal lives at [docs/campfire-board-spec.md](docs/campfire-board-spec.md).
+
+The recommended first version is a local file-backed board:
+
+- parse `checkpoints.json` as the primary source
+- show queued, active, blocked, waiting, and validated tasks
+- surface `handoff.md`, `progress.md`, and `artifacts.json` in a detail drawer
+- defer Codex App Server integration until the board needs live thread and approval visibility
+
+The first scaffold now lives in [apps/campfire-board](/Users/alexmeckes/Downloads/Campfire/apps/campfire-board).
+
+Run it locally:
+
+```bash
+cd apps/campfire-board
+npm install
+npm run dev
+```
+
+Run it as a small Electron desktop window:
+
+```bash
+cd apps/campfire-board
+npm install
+npm run dev:desktop
+```
+
+Or run the built frontend/server in the desktop shell:
+
+```bash
+cd apps/campfire-board
+npm install
+npm run build
+npm run desktop
+```
+
+Run the Electron smoke test:
+
+```bash
+cd apps/campfire-board
+npm install
+npm run test:smoke
+```
+
+By default the board reads Campfire state from this repo and the example workspace. To point it at other repos, set:
+
+```bash
+CAMPFIRE_BOARD_REPOS=/abs/repo-one,/abs/repo-two npm run dev
+```
+
+The frontend runs on `http://127.0.0.1:4173` and the API runs on `http://127.0.0.1:4319`.
+
 ## Codex App Launch Patterns
 
 Campfire supports two Codex App launch patterns for rolling runs.
