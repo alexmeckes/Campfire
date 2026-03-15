@@ -12,6 +12,10 @@ This skill standardizes a task directory at `.autonomous/<task>/` inside the act
 Read [references/task-state-contract.md](references/task-state-contract.md) when you need the full file contract and schema conventions.
 Read [references/automation-patterns.md](references/automation-patterns.md) when the task should drive a recurring Codex App automation instead of a one-off run.
 Use [scripts/automation_prompt_helper.sh](scripts/automation_prompt_helper.sh) when you want task-only automation prompt variants emitted from existing Campfire state.
+Use [scripts/start_slice.sh](scripts/start_slice.sh) to move a task into an active implementation slice before touching project files.
+Use [scripts/complete_slice.sh](scripts/complete_slice.sh) to close a slice mechanically and update handoff state, heartbeat, and registry.
+Use [scripts/touch_heartbeat.sh](scripts/touch_heartbeat.sh) when you need to refresh task liveness without re-writing the whole handoff.
+Use [scripts/refresh_registry.sh](scripts/refresh_registry.sh) to rebuild the repo-local task registry under `.campfire/registry.json`.
 
 ## What It Creates
 
@@ -23,6 +27,7 @@ Each task directory contains:
 - `handoff.md`
 - `checkpoints.json`
 - `artifacts.json`
+- `heartbeat.json`
 - `logs/`
 - `artifacts/`
 - `findings/`
@@ -73,6 +78,18 @@ Print task-only automation prompt variants for an existing task:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/automation_prompt_helper.sh build-the-next-milestone
+```
+
+Activate the next implementation slice before editing project files:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/start_slice.sh --from-next --slice-title "Implement the next safe slice" build-the-next-milestone
+```
+
+Complete a slice and park the task cleanly:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/complete_slice.sh --summary "Validated the current milestone." --next-step "Choose the next milestone." build-the-next-milestone
 ```
 
 Verify the task-state lifecycle:
@@ -139,6 +156,24 @@ Verify the missing-resume guardrail:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh
+```
+
+Verify deterministic slice activation:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_start_slice.sh
+```
+
+Verify deterministic slice completion:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_complete_slice.sh
+```
+
+Verify registry refresh:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_registry_refresh.sh
 ```
 
 Verify recurring automation-pattern coverage:
@@ -223,6 +258,14 @@ Verify that `resume_task.sh` surfaces automation prompt guidance for rolling tas
 - why each artifact matters
 - related milestone or validation
 
+### `heartbeat.json`
+
+- current liveness state for the task
+- last seen timestamp
+- current milestone and slice
+- short summary of the active or most recent work
+- append-only updates mirrored into `logs/session.log`
+
 ### `findings/`
 
 - evaluation notes
@@ -234,10 +277,13 @@ Verify that `resume_task.sh` surfaces automation prompt guidance for rolling tas
 - Keep one stable objective per task slug.
 - Do not rename the slug mid-task.
 - If the task changes materially, create a new task directory.
+- Before implementation edits for a new slice, use `start_slice.sh` or an equivalent deterministic update so `checkpoints.json`, `handoff.md`, and `progress.md` reflect the active work.
+- Close validated, blocked, or waiting slices with `complete_slice.sh` so `checkpoints.json`, `handoff.md`, `progress.md`, `heartbeat.json`, and `.campfire/registry.json` stay synchronized.
 - Update `handoff.md` and `checkpoints.json` at the end of every meaningful run.
 - Keep `runbook.md` current when setup, validation, or observability changes.
 - Record review-relevant outputs in `artifacts.json`.
 - Keep logs and generated evidence inside the task folder when practical.
+- Refresh `.campfire/registry.json` whenever task state changes materially so boards and watchdogs can read one repo-local summary file.
 - If a user asks to continue or resume a specific `.autonomous/<task>/` and that task directory is missing, stop and report the missing state. Do not silently create or bootstrap a replacement task.
 - For unattended Codex App runs, store the rolling execution policy in `checkpoints.json.execution`.
 - Use `automation_prompt_helper.sh` when you want task-only automation prompts generated from existing Campfire state instead of copying examples by hand.

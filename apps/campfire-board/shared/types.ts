@@ -3,7 +3,8 @@ export type TaskStatus =
   | "in_progress"
   | "blocked"
   | "waiting_on_decision"
-  | "validated";
+  | "validated"
+  | "completed";
 
 export type BoardColumn =
   | "Queued"
@@ -30,6 +31,14 @@ export type ArtifactRecord = {
   kind: string;
   reason: string;
   milestoneId?: string;
+};
+
+export type HeartbeatRecord = {
+  state: string | null;
+  lastSeenAt: string | null;
+  sessionStartedAt: string | null;
+  summary: string | null;
+  touchedPath: string | null;
 };
 
 export type FileLinkSet = {
@@ -90,6 +99,7 @@ export type TaskBoardItem = {
   planMarkdown: string;
   runbookMarkdown: string;
   artifacts: ArtifactRecord[];
+  heartbeat: HeartbeatRecord | null;
   findings: {
     title: string;
     absolutePath: string;
@@ -111,4 +121,3 @@ export type BoardPayload = {
   repos: RepoInfo[];
   tasks: TaskBoardItem[];
 };
-

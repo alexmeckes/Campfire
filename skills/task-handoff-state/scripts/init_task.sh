@@ -50,6 +50,9 @@ ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
 TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
 TODAY="$(date +%Y-%m-%d)"
 NOW_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TOUCH_HEARTBEAT_SCRIPT="$SCRIPT_DIR/touch_heartbeat.sh"
+REFRESH_REGISTRY_SCRIPT="$SCRIPT_DIR/refresh_registry.sh"
 
 mkdir -p "$TASK_DIR/logs" "$TASK_DIR/artifacts" "$TASK_DIR/findings"
 
@@ -288,6 +291,14 @@ normalized = {
 
 path.write_text(json.dumps(normalized, indent=2) + "\n")
 PY
+
+if [ -x "$TOUCH_HEARTBEAT_SCRIPT" ]; then
+  "$TOUCH_HEARTBEAT_SCRIPT" --root "$ROOT_DIR" --state idle --source "init_task.sh" --summary "Task initialized." "$TASK_SLUG" >/dev/null
+fi
+
+if [ -x "$REFRESH_REGISTRY_SCRIPT" ]; then
+  "$REFRESH_REGISTRY_SCRIPT" --root "$ROOT_DIR" >/dev/null
+fi
 
 echo "Created or reused task directory:"
 echo "  $TASK_DIR"

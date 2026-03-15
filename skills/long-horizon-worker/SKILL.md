@@ -90,10 +90,11 @@ For each iteration:
 
 1. Restate the current milestone in one sentence.
 2. Choose exactly one concrete slice.
-3. Inspect only the files and docs needed for that slice.
-4. Make the smallest meaningful change set.
-5. Validate immediately with the strongest available evidence.
-6. Update task state before broadening scope.
+3. Before implementation edits, move task state to the active slice by updating `checkpoints.json.status` to `in_progress` and setting `current` / `handoff` to the milestone and slice you are about to execute. Prefer a deterministic helper such as `start_slice.sh` when the task-state skill provides one.
+4. Inspect only the files and docs needed for that slice.
+5. Make the smallest meaningful change set.
+6. Validate immediately with the strongest available evidence.
+7. Update task state before broadening scope.
 
 ## Validation Ladder
 

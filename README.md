@@ -104,6 +104,7 @@ Each task lives under:
   handoff.md
   checkpoints.json
   artifacts.json
+  heartbeat.json
   logs/
   artifacts/
   findings/
@@ -119,6 +120,19 @@ Each task lives under:
 - `last_run.events`: machine-readable mid-run transitions like auto-advance or bounded reframe
 - `checkpoints.json.execution`: machine-readable run policy for single-milestone or rolling runs
 - `artifacts.json`: manifest of outputs that matter for review or proof
+- `heartbeat.json`: current liveness, last seen time, and active slice summary for the task
+- `.campfire/registry.json`: repo-local task registry generated from all `.autonomous/<task>/` directories
+
+## Lightweight Control Plane
+
+Campfire stays single-agent, but it now borrows a few control-plane ideas from heavier systems:
+
+- `start_slice.sh` moves a task into a concrete active slice before project edits
+- `complete_slice.sh` closes a slice mechanically instead of relying on prose-only handoffs
+- `heartbeat.json` plus `logs/session.log` expose task liveness and a durable activity trail
+- `.campfire/registry.json` gives boards and watchdogs one repo-local summary file to read
+
+This is intentionally lighter than a multi-agent orchestrator. The goal is to keep sessions disposable while task identity, status, and liveness stay durable on disk.
 
 ## Codex App Fit
 
@@ -177,6 +191,8 @@ cd apps/campfire-board
 npm install
 npm run test:smoke
 ```
+
+The board now watches both `.autonomous/` and `.campfire/`, so active slices and registry refreshes show up without a full rescan.
 
 By default the board reads Campfire state from this repo and the example workspace. To point it at other repos, set:
 
@@ -427,15 +443,35 @@ And the resume automation-guidance verifier:
 The example workspace under `examples/basic-workspace/` shows two minimal project-side patterns:
 
 - `AGENTS.md`
+- `README.md`
+- `scripts/new_task.sh`
+- `scripts/resume_task.sh`
+- `scripts/enable_rolling_mode.sh`
+- `scripts/automation_prompt_helper.sh`
+- `scripts/verify_harness.sh`
 - `.autonomous/example-task/`
 - `.autonomous/rolling-task/`
 
-Use it as a reference, not as a template you must copy verbatim.
+Use it as a reference and copy-adapt template for consumer repos that want thin local wrapper commands on top of the installed Campfire skills.
+
+The wrapper template is intentionally small:
+
+- local scripts still delegate to the generic Campfire skills
+- the repo can print workspace-specific prompts and follow-ups without forking Campfire core
+- the example verifier proves the wrapper flow in a temp workspace instead of mutating committed example state
+
+Inside this repo, run the example verifier with the bundled skills:
+
+```bash
+CAMPFIRE_SKILLS_ROOT=/abs/path/to/Campfire/skills ./examples/basic-workspace/scripts/verify_harness.sh
+```
 
 ## Quick Start In A Real Project
 
 1. Install the Campfire skills from this repo.
 2. Add an `AGENTS.md` file to your project.
+
+If you want local project commands instead of invoking global skill paths directly, copy and adapt the wrapper scripts from `examples/basic-workspace/scripts/`.
 3. Create or scaffold a task:
 
 ```bash

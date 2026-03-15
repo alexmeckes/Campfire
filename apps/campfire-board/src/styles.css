@@ -89,6 +89,12 @@ select {
   text-transform: uppercase;
 }
 
+.live-label {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
 .live-dot,
 .status-dot {
   width: 9px;
@@ -209,6 +215,12 @@ select {
   background: rgba(184, 106, 45, 0.08);
 }
 
+.card-activity {
+  border-color: rgba(184, 106, 45, 0.22);
+  box-shadow: 0 0 0 1px rgba(184, 106, 45, 0.08);
+  animation: card-pulse 1.2s ease-out 2;
+}
+
 .card strong {
   display: block;
   margin-top: 8px;
@@ -261,6 +273,14 @@ select {
   font-weight: 500;
 }
 
+.tray-progress {
+  margin: 8px 0 0;
+  max-width: 26ch;
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
 .tray-main span,
 .tray-meta span,
 .tray-link {
@@ -277,6 +297,23 @@ select {
 .tray-actions {
   justify-content: flex-start;
   flex-wrap: wrap;
+}
+
+@keyframes card-pulse {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 0 0 0 rgba(184, 106, 45, 0.18);
+  }
+
+  50% {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 6px rgba(184, 106, 45, 0);
+  }
+
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 0 0 0 rgba(184, 106, 45, 0);
+  }
 }
 
 @media (max-width: 640px) {

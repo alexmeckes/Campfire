@@ -10,6 +10,8 @@
 - Keep durable task state under `.autonomous/<task>/`.
 - Create a task with `./scripts/new_task.sh "<objective>"`.
 - Resume a task with `./scripts/resume_task.sh <task-slug>`.
+- Start a new implementation slice with `./scripts/start_slice.sh ...` before touching project files.
+- Close a slice with `./scripts/complete_slice.sh ...` so status, heartbeat, and registry stay synchronized.
 
 ## Repo Scope
 
@@ -20,6 +22,7 @@
 ## Validation Rules
 
 - Update task state as you go: `progress.md`, `handoff.md`, `checkpoints.json`, and `artifacts.json`.
+- Keep heartbeat and registry current through the lifecycle helpers instead of hand-editing them.
 - Prefer explicit shell-based verification over vague claims.
 - Keep verifier scripts deterministic and workspace-local when practical.
 

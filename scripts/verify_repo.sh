@@ -18,11 +18,26 @@ zsh -n \
   "$ROOT_DIR/scripts/new_task.sh" \
   "$ROOT_DIR/scripts/resume_task.sh" \
   "$ROOT_DIR/scripts/enable_rolling_mode.sh" \
+  "$ROOT_DIR/scripts/start_slice.sh" \
+  "$ROOT_DIR/scripts/complete_slice.sh" \
+  "$ROOT_DIR/scripts/refresh_registry.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/automation_prompt_helper.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/bootstrap_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/resume_task.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/start_slice.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/complete_slice.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/touch_heartbeat.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/refresh_registry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_start_slice.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_complete_slice.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_registry_refresh.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
@@ -59,6 +74,12 @@ expect_file "$ROOT_DIR/skills/task-evaluator/references/evaluation-checklist.md"
 
 echo "== Example workspace presence =="
 expect_file "$ROOT_DIR/examples/basic-workspace/AGENTS.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/README.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/automation_prompt_helper.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/plan.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/runbook.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/progress.md"
@@ -74,6 +95,9 @@ expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/artifac
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/findings/rolling-queue.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md"
 
+echo "== Example workspace wrapper verifier =="
+CAMPFIRE_SKILLS_ROOT="$ROOT_DIR/skills" "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
+
 echo "== Installer dry run in temp CODEX_HOME =="
 TEMP_CODEX_HOME="$(mktemp -d)"
 trap 'rm -rf "$TEMP_CODEX_HOME"' EXIT
@@ -84,6 +108,15 @@ expect_file "$TEMP_CODEX_HOME/skills/task-evaluator"
 
 echo "== Lifecycle verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_lifecycle.sh"
+
+echo "== Start-slice verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_start_slice.sh"
+
+echo "== Complete-slice verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_complete_slice.sh"
+
+echo "== Registry refresh verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_registry_refresh.sh"
 
 echo "== Blocked retry verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh"

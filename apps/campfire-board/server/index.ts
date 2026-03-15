@@ -107,7 +107,10 @@ for (const clientBuildDir of clientBuildCandidates) {
   }
 }
 
-const watchTargets = repoRoots.map((root) => path.join(root, ".autonomous"));
+const watchTargets = repoRoots.flatMap((root) => [
+  path.join(root, ".autonomous"),
+  path.join(root, ".campfire"),
+]);
 const watcher = chokidar.watch(watchTargets, {
   ignoreInitial: true,
   awaitWriteFinish: {

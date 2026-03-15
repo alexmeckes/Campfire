@@ -1,4 +1,4 @@
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import type { TaskBoardItem } from "../shared/types";
 
 type Lane = "Now" | "Next" | "Blocked" | "Done";
@@ -13,26 +13,26 @@ function copyText(value: string | null) {
 }
 
 function laneForTask(task: TaskBoardItem): Lane {
-  if (task.status === "blocked" || task.status === "waiting_on_decision") {
+  if (task.column === "Blocked" || task.column === "Waiting") {
     return "Blocked";
   }
-  if (task.status === "validated") {
+  if (task.column === "Validated") {
     return "Done";
   }
-  if (task.status === "in_progress") {
+  if (task.column === "Active") {
     return "Now";
   }
   return "Next";
 }
 
 function toneForTask(task: TaskBoardItem) {
-  if (task.status === "blocked") {
+  if (task.column === "Blocked" && task.status === "blocked") {
     return "blocked";
   }
-  if (task.status === "waiting_on_decision") {
+  if (task.column === "Blocked" && task.status === "waiting_on_decision") {
     return "waiting";
   }
-  if (task.status === "validated") {
+  if (task.column === "Validated") {
     return "done";
   }
   if (task.health === "Needs Reframe") {
@@ -45,6 +45,60 @@ function milestoneId(task: TaskBoardItem) {
   return task.currentMilestone?.id || laneForTask(task);
 }
 
+function latestProgressLine(markdown: string) {
+  const lines = markdown
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    const line = lines[index];
+    if (line.startsWith("- ")) {
+      return line.slice(2).trim();
+    }
+    if (!line.startsWith("#")) {
+      return line;
+    }
+  }
+
+  return null;
+}
+
+function formatLiveLabel(liveState: string, lastSyncAt: string | null) {
+  const labels: Record<string, string> = {
+    connecting: "Connecting",
+    live: "Live",
+    syncing: "Syncing",
+    reconnecting: "Reconnecting",
+  };
+
+  const base = labels[liveState] || "Live";
+  if (!lastSyncAt) {
+    return base;
+  }
+
+  const time = new Intl.DateTimeFormat([], {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(lastSyncAt));
+
+  return `${base} ${time}`;
+}
+
+function formatHeartbeatLabel(value: string | null) {
+  if (!value) {
+    return "no heartbeat";
+  }
+
+  const date = new Date(value);
+  const time = new Intl.DateTimeFormat([], {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+
+  return `heartbeat ${time}`;
+}
+
 export default function App() {
   const [payload, setPayload] = useState<{
     repos: { root: string; name: string }[];
@@ -54,7 +108,11 @@ export default function App() {
   const [activeRepo, setActiveRepo] = useState("all");
   const [error, setError] = useState<string | null>(null);
   const [liveState, setLiveState] = useState("connecting");
+  const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
+  const [recentTaskIds, setRecentTaskIds] = useState<string[]>([]);
+  const tasksRef = useRef<TaskBoardItem[]>([]);
+  const clearTimersRef = useRef<Record<string, number>>({});
 
   async function loadBoard() {
     try {
@@ -78,8 +136,29 @@ export default function App() {
           return nextPayload.tasks[0]?.id ?? null;
         });
       });
+      tasksRef.current = nextPayload.tasks;
     } catch (nextError) {
       setError(nextError instanceof Error ? nextError.message : "Unable to load board.");
+    }
+  }
+
+  function markRecentTaskIds(taskIds: string[]) {
+    if (taskIds.length === 0) {
+      return;
+    }
+
+    setRecentTaskIds((current) => [...new Set([...current, ...taskIds])]);
+
+    for (const taskId of taskIds) {
+      const existingTimer = clearTimersRef.current[taskId];
+      if (existingTimer) {
+        window.clearTimeout(existingTimer);
+      }
+
+      clearTimersRef.current[taskId] = window.setTimeout(() => {
+        setRecentTaskIds((current) => current.filter((entry) => entry !== taskId));
+        delete clearTimersRef.current[taskId];
+      }, 3200);
     }
   }
 
@@ -93,10 +172,38 @@ export default function App() {
     const eventSource = new EventSource("/api/events");
     eventSource.addEventListener("ready", () => {
       setLiveState("live");
+      setLastSyncAt(new Date().toISOString());
     });
-    eventSource.addEventListener("tasks-changed", () => {
+    eventSource.addEventListener("tasks-changed", (event) => {
       setLiveState("syncing");
-      void loadBoard().finally(() => setLiveState("live"));
+
+      let changedPath = "";
+      if ("data" in event && typeof event.data === "string") {
+        try {
+          const payload = JSON.parse(event.data) as { changedPath?: string };
+          changedPath = payload.changedPath || "";
+        } catch {
+          changedPath = "";
+        }
+      }
+
+      const changedTasks = changedPath
+        ? tasksRef.current
+            .filter((task) => {
+              if (changedPath.startsWith(task.files.taskDir)) {
+                return true;
+              }
+
+              return changedPath === `${task.repoRoot}/.campfire/registry.json`;
+            })
+            .map((task) => task.id)
+        : [];
+      markRecentTaskIds(changedTasks);
+
+      void loadBoard().finally(() => {
+        setLiveState("live");
+        setLastSyncAt(new Date().toISOString());
+      });
     });
     eventSource.onerror = () => {
       setLiveState("reconnecting");
@@ -104,6 +211,11 @@ export default function App() {
 
     return () => {
       eventSource.close();
+
+      for (const timer of Object.values(clearTimersRef.current)) {
+        window.clearTimeout(timer);
+      }
+      clearTimersRef.current = {};
     };
   }, []);
 
@@ -129,6 +241,7 @@ export default function App() {
   );
 
   const showRepoPicker = (payload?.repos.length ?? 0) > 1;
+  const liveLabel = formatLiveLabel(liveState, lastSyncAt);
 
   async function toggleAlwaysOnTop() {
     const nextValue = await window.campfireBoardDesktop?.setAlwaysOnTop?.(!alwaysOnTop);
@@ -143,6 +256,7 @@ export default function App() {
         <div className="brand-row">
           <span className="brand-mark">Campfire</span>
           <span className={`live-dot live-dot-${liveState}`} />
+          <span className="live-label">{liveLabel}</span>
         </div>
 
         <div className="topbar-actions">
@@ -190,8 +304,10 @@ export default function App() {
               {tasks.map((task) => (
                 <button
                   key={task.id}
-                  className={`card ${selectedTask?.id === task.id ? "card-selected" : ""}`}
+                  className={`card ${selectedTask?.id === task.id ? "card-selected" : ""} ${recentTaskIds.includes(task.id) ? "card-activity" : ""}`}
                   onClick={() => setSelectedTaskId(task.id)}
+                  data-task-id={task.id}
+                  data-task-slug={task.taskSlug}
                 >
                   <div className="card-top">
                     <span className={`status-dot status-dot-${toneForTask(task)}`} />
@@ -213,11 +329,18 @@ export default function App() {
             <div>
               <strong>{selectedTask.taskSlug}</strong>
               <span>{selectedTask.currentMilestone?.id || laneForTask(selectedTask)}</span>
+              <p className="tray-progress">
+                {latestProgressLine(selectedTask.progressMarkdown) ||
+                  selectedTask.lastRun.nextStep ||
+                  selectedTask.handoff.nextSlice ||
+                  "No recent progress note."}
+              </p>
             </div>
             <div className="tray-meta">
               <span>{selectedTask.queuedMilestones.length} queued</span>
               <span>{selectedTask.validation?.type || "no proof"}</span>
               <span>{selectedTask.lastRun.stopReason || "running"}</span>
+              <span>{formatHeartbeatLabel(selectedTask.heartbeat?.lastSeenAt || null)}</span>
             </div>
           </div>
 

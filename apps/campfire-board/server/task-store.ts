@@ -63,6 +63,29 @@ type ArtifactsManifestShape = {
   }>;
 };
 
+type HeartbeatShape = {
+  state?: string;
+  session_started_at?: string;
+  last_seen_at?: string;
+  milestone_id?: string;
+  milestone_title?: string;
+  slice_id?: string;
+  slice_title?: string;
+  summary?: string;
+  touched_path?: string;
+  source?: string;
+};
+
+type RegistryShape = {
+  generated_at?: string;
+  root?: string;
+  task_count?: number;
+  tasks?: Array<{
+    task_slug?: string;
+    task_dir?: string;
+  }>;
+};
+
 const REQUIRED_FILES = [
   "checkpoints.json",
   "handoff.md",
@@ -112,7 +135,7 @@ function extractBulletValue(markdown: string, label: string): string | null {
   return match?.[1]?.trim() ?? null;
 }
 
-function mapColumn(status: TaskStatus): BoardColumn {
+function mapColumn(status: TaskStatus, queuedCount: number): BoardColumn {
   switch (status) {
     case "in_progress":
       return "Active";
@@ -120,8 +143,10 @@ function mapColumn(status: TaskStatus): BoardColumn {
       return "Blocked";
     case "waiting_on_decision":
       return "Waiting";
-    case "validated":
+    case "completed":
       return "Validated";
+    case "validated":
+      return queuedCount > 0 ? "Queued" : "Validated";
     case "ready":
     default:
       return "Queued";
@@ -132,13 +157,24 @@ function mapHealth(
   status: TaskStatus,
   blockerStatus: string | undefined,
   queuedCount: number,
-  lastUpdated: string | undefined
+  lastUpdated: string | undefined,
+  heartbeatLastSeen: string | undefined
 ): TaskHealth {
+  if (status === "completed") {
+    return "Healthy";
+  }
   if (status === "blocked" || (blockerStatus && blockerStatus !== "none")) {
     return "Blocked";
   }
   if (status === "waiting_on_decision") {
     return "Waiting on Decision";
+  }
+  if (status === "in_progress" && heartbeatLastSeen) {
+    const minutesOld =
+      (Date.now() - new Date(heartbeatLastSeen).getTime()) / (1000 * 60);
+    if (minutesOld > 15) {
+      return "Stale";
+    }
   }
   if (lastUpdated) {
     const daysOld =
@@ -153,12 +189,28 @@ function mapHealth(
   return "Healthy";
 }
 
+function normalizeStatus(value: string | undefined): TaskStatus {
+  switch (value) {
+    case "in_progress":
+    case "blocked":
+    case "waiting_on_decision":
+    case "validated":
+    case "completed":
+      return value;
+    case "done":
+      return "completed";
+    case "ready":
+    default:
+      return "ready";
+  }
+}
+
 function toMilestoneRefs(
   queue:
     | Array<{
         milestone_id?: string;
         milestone_title?: string;
-      }>
+      } | string>
     | undefined
 ): MilestoneRef[] {
   if (!Array.isArray(queue)) {
@@ -166,10 +218,23 @@ function toMilestoneRefs(
   }
 
   return queue
-    .map((entry) => ({
-      id: entry?.milestone_id || "unknown-milestone",
-      title: entry?.milestone_title || "Untitled milestone",
-    }))
+    .map((entry) => {
+      if (typeof entry === "string") {
+        const [id, ...titleParts] = entry.split(":");
+        const cleanId = id.trim();
+        const cleanTitle = titleParts.join(":").trim();
+
+        return {
+          id: cleanId || "unknown-milestone",
+          title: cleanTitle || cleanId || "Untitled milestone",
+        };
+      }
+
+      return {
+        id: entry?.milestone_id || "unknown-milestone",
+        title: entry?.milestone_title || "Untitled milestone",
+      };
+    })
     .filter((entry) => entry.id || entry.title);
 }
 
@@ -228,6 +293,7 @@ async function loadTask(
     plan: path.join(taskDir, "plan.md"),
     runbook: path.join(taskDir, "runbook.md"),
     artifactsManifest: path.join(taskDir, "artifacts.json"),
+    heartbeat: path.join(taskDir, "heartbeat.json"),
   };
 
   const parseWarnings: string[] = [];
@@ -273,6 +339,17 @@ async function loadTask(
     );
   }
 
+  let heartbeat: HeartbeatShape | null = null;
+  try {
+    heartbeat = (await exists(files.heartbeat))
+      ? await readJson<HeartbeatShape>(files.heartbeat)
+      : null;
+  } catch (error) {
+    parseWarnings.push(
+      `Unable to parse heartbeat.json: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+
   const currentMilestone =
     checkpoints.current?.milestone_id || checkpoints.current?.milestone_title
       ? {
@@ -287,7 +364,11 @@ async function loadTask(
   const queuedMilestones = toMilestoneRefs(
     checkpoints.execution?.queued_milestones
   );
-  const status = checkpoints.status || "ready";
+  const status = normalizeStatus(checkpoints.status);
+  const displayMilestone =
+    status === "validated" && queuedMilestones.length > 0
+      ? queuedMilestones[0]
+      : currentMilestone;
   const lastValidation =
     checkpoints.validation && checkpoints.validation.length > 0
       ? checkpoints.validation[checkpoints.validation.length - 1]
@@ -303,14 +384,15 @@ async function loadTask(
       extractBulletValue(planMarkdown, "Objective") ||
       "No objective recorded yet.",
     status,
-    column: mapColumn(status),
+    column: mapColumn(status, queuedMilestones.length),
     health: mapHealth(
       status,
       checkpoints.blocker?.status,
       queuedMilestones.length,
-      checkpoints.last_updated
+      checkpoints.last_updated,
+      heartbeat?.last_seen_at
     ),
-    currentMilestone,
+    currentMilestone: displayMilestone,
     queuedMilestones,
     execution: {
       mode: checkpoints.execution?.mode || "single_milestone",
@@ -362,11 +444,29 @@ async function loadTask(
     planMarkdown,
     runbookMarkdown,
     artifacts: normaliseArtifacts(repoRoot, taskDir, artifactsManifest),
+    heartbeat: heartbeat
+      ? {
+          state: heartbeat.state ?? null,
+          lastSeenAt: heartbeat.last_seen_at ?? null,
+          sessionStartedAt: heartbeat.session_started_at ?? null,
+          summary: heartbeat.summary ?? null,
+          touchedPath: heartbeat.touched_path ?? null,
+        }
+      : null,
     findings: await loadFindings(taskDir),
     files,
     parseWarnings,
     lastUpdated: checkpoints.last_updated ?? null,
   };
+}
+
+function shouldHideTask(task: TaskBoardItem): boolean {
+  const noMilestone = !task.currentMilestone;
+  const noQueue = task.queuedMilestones.length === 0;
+  const initializedOnly =
+    task.lastRun.stopReason === "initialized" && task.validation?.totalCount === 0;
+
+  return task.status === "ready" && noMilestone && noQueue && initializedOnly;
 }
 
 export async function discoverRepoRoots(explicitRoots?: string[]): Promise<string[]> {
@@ -409,6 +509,7 @@ export async function loadBoardPayload(repoRoots: string[]): Promise<BoardPayloa
 
   for (const repoRoot of repoRoots) {
     const autonomousRoot = path.join(repoRoot, ".autonomous");
+    const registryPath = path.join(repoRoot, ".campfire", "registry.json");
     if (!(await exists(autonomousRoot))) {
       repos.push({
         root: repoRoot,
@@ -418,15 +519,30 @@ export async function loadBoardPayload(repoRoots: string[]): Promise<BoardPayloa
       continue;
     }
 
+    const taskDirSet = new Set<string>();
+    if (await exists(registryPath)) {
+      try {
+        const registry = await readJson<RegistryShape>(registryPath);
+        for (const entry of registry.tasks ?? []) {
+          const taskDir = entry.task_dir || "";
+          if (taskDir) {
+            taskDirSet.add(path.resolve(taskDir));
+          }
+        }
+      } catch {
+        taskDirSet.clear();
+      }
+    }
+
     const entries = await fs.readdir(autonomousRoot, { withFileTypes: true });
-    const taskDirs = entries
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => path.join(autonomousRoot, entry.name))
-      .sort((a, b) => a.localeCompare(b));
+    for (const entry of entries.filter((item) => item.isDirectory())) {
+      taskDirSet.add(path.join(autonomousRoot, entry.name));
+    }
+    const taskDirs = Array.from(taskDirSet).sort((a, b) => a.localeCompare(b));
 
     for (const taskDir of taskDirs) {
       const task = await loadTask(repoRoot, taskDir);
-      if (task) {
+      if (task && !shouldHideTask(task)) {
         tasks.push(task);
       }
     }

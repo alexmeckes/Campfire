@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(pwd -P)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 AUTOMATION_HELPER_SCRIPT="$SCRIPT_DIR/automation_prompt_helper.sh"
+START_SLICE_SCRIPT="$SCRIPT_DIR/start_slice.sh"
+COMPLETE_SLICE_SCRIPT="$SCRIPT_DIR/complete_slice.sh"
 
 usage() {
   cat <<'EOF'
@@ -217,6 +219,75 @@ if isinstance(execution, dict) and execution.get("mode") == "rolling":
 else:
     print(f"  Use $long-horizon-worker and $task-handoff-state to continue .autonomous/{task_slug}/ from the current handoff and validate the next slice before stopping.")
 PY
+
+echo
+echo "Pre-edit slice activation:"
+python3 - "$TASK_DIR/checkpoints.json" "$TASK_SLUG" "$ROOT_DIR" "$START_SLICE_SCRIPT" <<'PY'
+import json
+import os
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+task_slug = sys.argv[2]
+root_dir = sys.argv[3]
+start_slice_script = sys.argv[4]
+data = json.loads(path.read_text())
+status = data.get("status", "")
+current = data.get("current", {})
+execution = data.get("execution", {})
+
+def normalize_queue(raw_queue):
+    if not isinstance(raw_queue, list):
+        return []
+    normalized = []
+    for item in raw_queue:
+        if isinstance(item, dict):
+            milestone_id = str(item.get("milestone_id", "")).strip()
+            milestone_title = str(item.get("milestone_title", "")).strip()
+        elif isinstance(item, str):
+            text = item.strip()
+            if ":" in text:
+                milestone_id, milestone_title = text.split(":", 1)
+                milestone_id = milestone_id.strip()
+                milestone_title = milestone_title.strip()
+            else:
+                milestone_id = text
+                milestone_title = text
+        else:
+            continue
+        if milestone_id:
+            normalized.append((milestone_id, milestone_title))
+    return normalized
+
+queue = normalize_queue(execution.get("queued_milestones", []))
+if status == "in_progress":
+    milestone_id = str(current.get("milestone_id", "")).strip() or "current"
+    slice_id = str(current.get("slice_id", "")).strip() or "current-slice"
+    slice_title = str(current.get("slice_title", "")).strip() or "Describe the current slice"
+    print(f"  Task already active on `{milestone_id}` / `{slice_id}`.")
+    print(f"  Continue using the persisted slice: {slice_title}")
+elif queue:
+    print(
+        f"  {start_slice_script} --root {root_dir} --from-next "
+        f"--slice-title \"Describe the next concrete slice\" {task_slug}"
+    )
+else:
+    milestone_id = str(current.get("milestone_id", "")).strip()
+    milestone_title = str(current.get("milestone_title", "")).strip() or milestone_id
+    if milestone_id:
+        print(
+            f"  {start_slice_script} --root {root_dir} "
+            f"--milestone-id {milestone_id} --milestone-title \"{milestone_title}\" "
+            f"--slice-title \"Describe the next concrete slice\" {task_slug}"
+        )
+    else:
+        print("  No active or queued milestone is available yet. Frame one before implementation.")
+PY
+
+echo
+echo "Post-slice completion:"
+echo "  $COMPLETE_SLICE_SCRIPT --root $ROOT_DIR --summary \"Describe what validated.\" --next-step \"Describe the next step.\" $TASK_SLUG"
 
 if [ -f "$TASK_DIR/checkpoints.json" ] && [ -x "$AUTOMATION_HELPER_SCRIPT" ]; then
   TASK_MODE="$(python3 - "$TASK_DIR/checkpoints.json" <<'PY'

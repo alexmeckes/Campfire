@@ -2,7 +2,7 @@
 
 This reference defines the durable file contract for `.autonomous/<task>/`.
 
-## Required Files
+## Core Files
 
 - `plan.md`
 - `runbook.md`
@@ -13,6 +13,13 @@ This reference defines the durable file contract for `.autonomous/<task>/`.
 - `logs/`
 - `artifacts/`
 - `findings/`
+
+## Runtime-Managed Files
+
+- `heartbeat.json`
+- `logs/session.log`
+
+`heartbeat.json` and `logs/session.log` should exist after the task passes through `init_task.sh`, `start_slice.sh`, or `complete_slice.sh`. Older or fixture tasks may be missing them until they are normalized through the current lifecycle helpers.
 
 ## Purpose
 
@@ -43,6 +50,9 @@ Append-only run history.
 - what passed or failed
 - blockers and retries
 - next slice
+
+When a run starts a new implementation slice, update `checkpoints.json.status` to `in_progress`, advance `current` to the active milestone/slice, and mirror that slice in `handoff.md` before touching project files. This keeps boards and resumptions aligned with the real work in flight.
+Use a deterministic helper such as `start_slice.sh` when possible so this transition does not depend on the model remembering to do it manually.
 
 ### `handoff.md`
 
@@ -84,6 +94,44 @@ Machine-readable artifact manifest.
 - reason it matters
 - which milestone or validation it supports
 
+### `heartbeat.json`
+
+Machine-readable liveness for the active task session.
+
+- `state`
+- `session_started_at`
+- `last_seen_at`
+- `milestone_id`
+- `milestone_title`
+- `slice_id`
+- `slice_title`
+- `summary`
+- `touched_path`
+- `source`
+
+Recommended `state` values:
+
+- `active`
+- `idle`
+- `blocked`
+- `waiting_on_decision`
+- `completed`
+
+Mirror each heartbeat update into `logs/session.log` as one JSON line so operators can inspect a single append-only activity trail.
+
+### Repo-local registry
+
+Maintain `.campfire/registry.json` at the repo root as the lightweight control-plane summary.
+
+- one entry per `.autonomous/<task>/`
+- current status and phase
+- current milestone and slice
+- queued count
+- last run summary
+- heartbeat state and last seen timestamp
+
+Boards and watchdogs should prefer this registry when it exists instead of rediscovering task state from scratch.
+
 ### Optional `workspace` metadata
 
 When bootstrap logic chooses between in-place and git-worktree setup, record that choice in `checkpoints.json.workspace`.
@@ -112,6 +160,7 @@ Recommended `status` values:
 - `blocked`
 - `waiting_on_decision`
 - `validated`
+- `completed`
 
 Recommended `last_run.stop_reason` values:
 
@@ -129,6 +178,8 @@ Recommended `last_run.events` values:
 - `auto_advanced`
 - `auto_reframed`
 - `course_corrected`
+- `slice_started`
+- `slice_completed`
 
 Recommended `validation.type` values:
 
@@ -137,6 +188,7 @@ Recommended `validation.type` values:
 - `milestone_evaluation`
 - `retry_attempt`
 - `plan_review`
+- `registry_refresh`
 
 ## Execution Policy
 

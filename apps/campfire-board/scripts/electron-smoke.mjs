@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { promises as fs } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
@@ -11,6 +12,8 @@ const __dirname = path.dirname(__filename);
 const appRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(appRoot, "../..");
 const exampleRoot = path.join(repoRoot, "examples/basic-workspace");
+const exampleTaskDir = path.join(exampleRoot, ".autonomous/example-task");
+const smokeTouchPath = path.join(exampleTaskDir, ".smoke-touch");
 const apiPort = Number(process.env.CAMPFIRE_BOARD_SMOKE_PORT || 4329);
 const apiUrl = `http://127.0.0.1:${apiPort}`;
 const serverEntry = path.join(appRoot, "dist/server/server/index.js");
@@ -122,11 +125,20 @@ try {
   const appWindow = await electronApp.firstWindow();
   await appWindow.waitForSelector(".topbar");
   await appWindow.waitForSelector(".card");
+  await waitForCondition(
+    async () => ((await appWindow.locator(".live-label").textContent()) || "").includes("Live"),
+    "live sync label"
+  );
 
   assert.equal(await appWindow.locator(".lane").count(), 4, "Expected four widget lanes.");
   assert(
     (await appWindow.locator(".card").count()) > 0,
     "Expected at least one task card in the widget."
+  );
+  assert.match(
+    ((await appWindow.locator(".live-label").textContent()) || "").trim(),
+    /^Live\s+\d/,
+    "Expected a visible live label with a sync time."
   );
 
   const topbarRegion = await appWindow.locator(".topbar").evaluate((element) => {
@@ -172,6 +184,26 @@ try {
     "Electron window should report normal stacking after unpinning."
   );
 
+  const exampleTaskCard = appWindow.locator('.card[data-task-slug="example-task"]').first();
+  await exampleTaskCard.click();
+  await waitForCondition(
+    async () => (await appWindow.locator(".tray-progress").textContent())?.trim().length > 0,
+    "tray progress summary"
+  );
+  assert(
+    ((await appWindow.locator(".tray-progress").textContent()) || "").trim().length > 0,
+    "Expected the detail tray to show a recent progress note."
+  );
+
+  await fs.writeFile(smokeTouchPath, `${Date.now()}\n`, "utf8");
+  await waitForCondition(
+    async () =>
+      (await appWindow.locator('.card[data-task-slug="example-task"].card-activity').count()) >
+      0,
+    "activity pulse on changed task"
+  );
+  await fs.rm(smokeTouchPath, { force: true });
+
   const repoPicker = appWindow.locator("select");
   assert.equal(await repoPicker.count(), 1, "Expected repo picker when multiple roots are present.");
 
@@ -206,6 +238,7 @@ try {
 
   console.log("Campfire Board Electron smoke test passed.");
 } finally {
+  await fs.rm(smokeTouchPath, { force: true }).catch(() => {});
   await electronApp?.close().catch(() => {});
   await stopChild(server);
 }
