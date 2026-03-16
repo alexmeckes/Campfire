@@ -308,6 +308,13 @@ When retrospection identifies a skill-worthy issue, it should write:
 
 Default behavior should stop at candidate creation, not automatic promotion.
 
+Campfire can now store candidates mechanically with:
+
+- `record_improvement_candidate.sh`
+- `promote_improvement.sh`
+
+Use those helpers to keep the improvement backlog queryable instead of leaving it only in markdown.
+
 ## Suggested Future Control-Plane Support
 
 Later Campfire versions can add:
@@ -317,7 +324,7 @@ Later Campfire versions can add:
 - `campfire generated-skill draft`
 - benchmark linkage from candidate ID to benchmark scenario IDs
 
-Campfire does not need those commands yet to adopt the policy.
+Campfire now has the first part of that loop through the SQL-backed `improvement_candidates` table and the helper scripts above. It does not yet auto-draft `SKILL.md` files or auto-promote candidates to core.
 
 ## Recommended First Policy
 

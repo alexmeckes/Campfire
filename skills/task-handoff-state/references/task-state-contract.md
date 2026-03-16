@@ -132,6 +132,17 @@ Maintain `.campfire/registry.json` at the repo root as the lightweight control-p
 
 Boards and watchdogs should prefer this registry when it exists instead of rediscovering task state from scratch.
 
+### Improvement backlog
+
+Maintain `.campfire/improvement_backlog.json` at the repo root as the projected improvement queue.
+
+- one entry per structured improvement candidate
+- benchmark, verifier, skill, control-plane, or repo-lesson category
+- promotion state and next action
+- evidence and optional promoted task slug
+
+Retrospectives should prefer structured candidate output over prose-only "remember this later" notes.
+
 ### Generated context files
 
 Render machine-readable context snapshots from the control plane to reduce markdown-only resume flows.
@@ -139,7 +150,7 @@ Render machine-readable context snapshots from the control plane to reduce markd
 - `.campfire/project_context.json`
 - `.autonomous/<task>/task_context.json`
 
-These files should summarize the repo/task defaults, recommended skills, current milestone and slice, queue, heartbeat, last run, and recent validation evidence. They are generated views, not hand-edited source files.
+These files should summarize the repo/task defaults, recommended skills, current milestone and slice, queue, heartbeat, last run, recent validation evidence, and recent improvement candidates when relevant. They are generated views, not hand-edited source files.
 
 ### Repo-local SQLite control plane
 
@@ -169,6 +180,7 @@ Stable human-readable notes that should survive across runs.
 - milestone evaluation notes
 - investigation summaries
 - verifier findings that should not live only in chat
+- structured retrospective outputs such as `*-improvement-candidates.json` or `skill_candidate.json`
 
 ## Status and Stop Reason Conventions
 

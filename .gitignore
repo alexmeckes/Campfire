@@ -3,6 +3,7 @@ dist/
 .DS_Store
 .campfire/registry.json
 .campfire/project_context.json
+.campfire/improvement_backlog.json
 .campfire/campfire.db
 .campfire/campfire.db-*
 .autonomous/*/heartbeat.json

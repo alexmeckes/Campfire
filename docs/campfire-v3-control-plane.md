@@ -81,6 +81,7 @@ Those are better solved later, if needed, than built into v3 by default.
 - `.autonomous/<task>/progress.md`
 - `.autonomous/<task>/checkpoints.json`
 - `.campfire/registry.json`
+- `.campfire/improvement_backlog.json`
 - optional `.autonomous/<task>/task_context.json`
 - optional `.campfire/project_context.json`
 
@@ -338,6 +339,35 @@ Indexed outputs that matter to operators and evaluators.
 - `reason`
 - `created_at`
 
+#### `improvement_candidates`
+
+Structured improvement work produced by retrospection or benchmark failures.
+
+- `id`
+- `project_id`
+- `task_id`
+- `candidate_id`
+- `source_type`
+- `source_task_slug`
+- `source_milestone_key`
+- `source_run_id`
+- `title`
+- `category`
+- `scope`
+- `promotion_state`
+- `problem`
+- `why_not_script`
+- `evidence_json`
+- `trigger_pattern_json`
+- `proposed_skill_name`
+- `proposed_skill_purpose`
+- `confidence`
+- `next_action`
+- `promoted_task_slug`
+- `output_path`
+- `created_at`
+- `updated_at`
+
 #### `blockers`
 
 - `id`
@@ -417,6 +447,8 @@ It can begin as shell scripts plus `sqlite3`, then later become a tiny CLI if ne
 - `campfire render foo`
 - `campfire registry refresh`
 - `campfire board snapshot`
+- `campfire improvement record`
+- `campfire improvement promote`
 
 ## Command Semantics
 
@@ -489,6 +521,12 @@ It should be rendered from DB, not edited directly.
 Board-facing projection across all tasks in a repo.
 
 It should be rendered from DB, not rebuilt by scanning task directories for runtime truth.
+
+### `.campfire/improvement_backlog.json`
+
+Improvement-facing projection across benchmark, verifier, skill, control-plane, and repo-local follow-up candidates.
+
+It should be rendered from DB, not maintained by hand.
 
 ## Skill Integration
 

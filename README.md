@@ -27,6 +27,7 @@ Campfire now has a lightweight local control plane:
 - `.autonomous/<task>/` remains the operator-facing task directory
 - `.campfire/campfire.db` stores SQL-backed runtime state
 - `.campfire/registry.json` provides a repo-wide task summary
+- `.campfire/improvement_backlog.json` provides a repo-wide improvement queue
 - `.campfire/project_context.json` and `.autonomous/<task>/task_context.json` provide structured resume context
 
 This is intentionally still single-agent and local-first. The skills stay as the Codex behavior layer; the control plane makes the workflow more mechanical and less prompt-dependent.
@@ -101,6 +102,18 @@ Check consistency:
 
 ```bash
 ./scripts/doctor_task.sh <task-slug>
+```
+
+Record a structured improvement candidate from a retrospective:
+
+```bash
+./scripts/record_improvement_candidate.sh --task-slug <task-slug> --category skill_candidate --scope repo_local --title "Title" --problem "Problem" --next-action "Next action"
+```
+
+Promote a reviewed candidate into a real follow-up task:
+
+```bash
+./scripts/promote_improvement.sh <candidate-id>
 ```
 
 For long unattended runs, switch the task into rolling mode:

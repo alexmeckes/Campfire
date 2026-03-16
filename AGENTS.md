@@ -15,6 +15,8 @@
 - Start a new implementation slice with `./scripts/start_slice.sh ...` before touching project files.
 - Close a slice with `./scripts/complete_slice.sh ...` so status, heartbeat, and registry stay synchronized.
 - Run `./scripts/doctor_task.sh <task-slug>` when you need a quick consistency check between task files and the SQL control plane.
+- Use `./scripts/record_improvement_candidate.sh ...` to convert a reusable retrospective lesson into a structured improvement candidate.
+- Use `./scripts/promote_improvement.sh <candidate-id>` to turn a reviewed improvement candidate into a real follow-up task.
 
 ## Repo Scope
 

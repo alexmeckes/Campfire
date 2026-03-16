@@ -17,6 +17,8 @@ Pair it with:
 
 Read [references/retrospective-checklist.md](references/retrospective-checklist.md) when you need the retrospective checklist and output rules.
 Read [/Users/alexmeckes/Downloads/Campfire/docs/campfire-generated-skills.md](/Users/alexmeckes/Downloads/Campfire/docs/campfire-generated-skills.md) when a retrospective should propose a generated micro-skill instead of a verifier, benchmark, or control-plane change.
+Use [/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/record_improvement_candidate.sh](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/record_improvement_candidate.sh) when you want the retrospective result stored mechanically in the SQL improvement backlog instead of only in prose.
+Use [/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/promote_improvement.sh](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/promote_improvement.sh) when a reviewed candidate should become a real follow-up task.
 
 ## When To Use
 
@@ -58,7 +60,7 @@ Do not use it for normal implementation. Use it after a task or benchmark run ha
    - wrapper/control-plane change
    - repo-specific lesson
 5. Write a short retrospective note under `findings/`, usually `findings/<task-slug>-retrospective.md` or `findings/<milestone-id>-retrospective.md`.
-6. If useful, write a machine-readable companion such as `findings/<name>-improvement-candidates.json`.
+6. If useful, write a machine-readable companion such as `findings/<name>-improvement-candidates.json` and mirror the same candidate into the SQL improvement backlog with `record_improvement_candidate.sh`.
 7. Update task state only if the retrospective materially changes the next queued work.
 
 For `skill_candidate` outputs, prefer candidate creation over immediate promotion. Task-local or repo-local drafts are the default; Campfire-core promotion should remain benchmark-backed and explicit.

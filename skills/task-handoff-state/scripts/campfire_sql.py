@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sqlite3
 import sys
 from datetime import datetime, timezone
@@ -49,6 +50,10 @@ def project_context_path(root_dir: Path) -> Path:
     return root_dir / ".campfire" / "project_context.json"
 
 
+def improvement_backlog_path(root_dir: Path) -> Path:
+    return root_dir / ".campfire" / "improvement_backlog.json"
+
+
 def extract_plan_objective(plan_path: Path) -> str:
     if not plan_path.exists():
         return ""
@@ -93,6 +98,16 @@ def normalize_queue(raw_queue: Any) -> list[dict[str, str]]:
                 }
             )
     return entries
+
+
+def slugify(value: str, fallback: str) -> str:
+    cleaned = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    cleaned = re.sub(r"-{2,}", "-", cleaned)
+    return cleaned or fallback
+
+
+def improvement_candidate_output_path(root_dir: Path, task_root: str, task_slug: str, candidate_id: str) -> Path:
+    return root_dir / task_root / task_slug / "findings" / f"{candidate_id}.json"
 
 
 def status_to_milestone_status(task_status: str, is_current: bool) -> str:
@@ -276,6 +291,34 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
           reason TEXT NOT NULL DEFAULT '',
           created_at TEXT NOT NULL,
           UNIQUE(task_id, path)
+        );
+
+        CREATE TABLE IF NOT EXISTS improvement_candidates (
+          id INTEGER PRIMARY KEY,
+          project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+          task_id INTEGER REFERENCES tasks(id) ON DELETE SET NULL,
+          candidate_id TEXT NOT NULL,
+          source_type TEXT NOT NULL DEFAULT '',
+          source_task_slug TEXT NOT NULL DEFAULT '',
+          source_milestone_key TEXT NOT NULL DEFAULT '',
+          source_run_id TEXT NOT NULL DEFAULT '',
+          title TEXT NOT NULL,
+          category TEXT NOT NULL,
+          scope TEXT NOT NULL,
+          promotion_state TEXT NOT NULL DEFAULT 'proposed',
+          problem TEXT NOT NULL DEFAULT '',
+          why_not_script TEXT NOT NULL DEFAULT '',
+          evidence_json TEXT NOT NULL DEFAULT '[]',
+          trigger_pattern_json TEXT NOT NULL DEFAULT '[]',
+          proposed_skill_name TEXT NOT NULL DEFAULT '',
+          proposed_skill_purpose TEXT NOT NULL DEFAULT '',
+          confidence TEXT NOT NULL DEFAULT '',
+          next_action TEXT NOT NULL DEFAULT '',
+          promoted_task_slug TEXT NOT NULL DEFAULT '',
+          output_path TEXT NOT NULL DEFAULT '',
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          UNIQUE(project_id, candidate_id)
         );
 
         PRAGMA user_version = 1;
@@ -665,6 +708,272 @@ def sync_all(conn: sqlite3.Connection, root_dir: Path) -> list[dict[str, Any]]:
     return payloads
 
 
+def lookup_task_row(
+    conn: sqlite3.Connection,
+    project_id: int,
+    task_slug: str,
+) -> sqlite3.Row | None:
+    return conn.execute(
+        """
+        SELECT id, slug, current_milestone_key, current_slice_key, status
+        FROM tasks
+        WHERE project_id = ? AND slug = ?
+        """,
+        (project_id, task_slug),
+    ).fetchone()
+
+
+def parse_json_array(value: str) -> list[Any]:
+    try:
+        payload = json.loads(value)
+    except Exception:
+        return []
+    return payload if isinstance(payload, list) else []
+
+
+def upsert_improvement_candidate(
+    conn: sqlite3.Connection,
+    root_dir: Path,
+    *,
+    task_slug: str,
+    candidate_id: str,
+    source_type: str,
+    source_milestone_key: str,
+    source_run_id: str,
+    title: str,
+    category: str,
+    scope: str,
+    promotion_state: str,
+    problem: str,
+    why_not_script: str,
+    evidence: list[str],
+    trigger_pattern: list[str],
+    proposed_skill_name: str,
+    proposed_skill_purpose: str,
+    confidence: str,
+    next_action: str,
+    promoted_task_slug: str,
+    output_path: str,
+) -> dict[str, Any]:
+    project = ensure_project(conn, root_dir)
+    task_root = str(project["task_root"])
+    task_row: sqlite3.Row | None = None
+    if task_slug:
+        task_path = root_dir / task_root / task_slug / "checkpoints.json"
+        if task_path.exists():
+            sync_task(conn, root_dir, task_slug)
+        task_row = lookup_task_row(conn, int(project["id"]), task_slug)
+        if task_row is None:
+            raise SystemExit(f"Task not present in DB: {task_slug}")
+
+    now = now_utc()
+    if not candidate_id:
+        candidate_id = f"{today_utc()}-{slugify(title, 'candidate')}"
+    if not output_path and task_slug:
+        output_path = str(
+            improvement_candidate_output_path(
+                root_dir,
+                task_root,
+                task_slug,
+                candidate_id,
+            )
+        )
+
+    conn.execute(
+        """
+        INSERT INTO improvement_candidates(
+          project_id, task_id, candidate_id, source_type, source_task_slug,
+          source_milestone_key, source_run_id, title, category, scope, promotion_state,
+          problem, why_not_script, evidence_json, trigger_pattern_json,
+          proposed_skill_name, proposed_skill_purpose, confidence, next_action,
+          promoted_task_slug, output_path, created_at, updated_at
+        )
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(project_id, candidate_id) DO UPDATE SET
+          task_id = excluded.task_id,
+          source_type = excluded.source_type,
+          source_task_slug = excluded.source_task_slug,
+          source_milestone_key = excluded.source_milestone_key,
+          source_run_id = excluded.source_run_id,
+          title = excluded.title,
+          category = excluded.category,
+          scope = excluded.scope,
+          promotion_state = excluded.promotion_state,
+          problem = excluded.problem,
+          why_not_script = excluded.why_not_script,
+          evidence_json = excluded.evidence_json,
+          trigger_pattern_json = excluded.trigger_pattern_json,
+          proposed_skill_name = excluded.proposed_skill_name,
+          proposed_skill_purpose = excluded.proposed_skill_purpose,
+          confidence = excluded.confidence,
+          next_action = excluded.next_action,
+          promoted_task_slug = excluded.promoted_task_slug,
+          output_path = excluded.output_path,
+          updated_at = excluded.updated_at
+        """,
+        (
+            int(project["id"]),
+            int(task_row["id"]) if task_row else None,
+            candidate_id,
+            source_type,
+            task_slug,
+            source_milestone_key,
+            source_run_id,
+            title,
+            category,
+            scope,
+            promotion_state,
+            problem,
+            why_not_script,
+            json.dumps(evidence),
+            json.dumps(trigger_pattern),
+            proposed_skill_name,
+            proposed_skill_purpose,
+            confidence,
+            next_action,
+            promoted_task_slug,
+            output_path,
+            now,
+            now,
+        ),
+    )
+    conn.commit()
+
+    row = conn.execute(
+        """
+        SELECT *
+        FROM improvement_candidates
+        WHERE project_id = ? AND candidate_id = ?
+        """,
+        (int(project["id"]), candidate_id),
+    ).fetchone()
+    if row is None:  # pragma: no cover
+        raise RuntimeError(f"Improvement candidate upsert failed: {candidate_id}")
+
+    payload = improvement_candidate_payload(row)
+    if output_path:
+        dump_json(Path(output_path), payload)
+    return payload
+
+
+def improvement_candidate_payload(row: sqlite3.Row) -> dict[str, Any]:
+    return {
+        "candidate_id": row["candidate_id"],
+        "source": {
+            "type": row["source_type"],
+            "task_slug": row["source_task_slug"],
+            "milestone_id": row["source_milestone_key"],
+            "run_id": row["source_run_id"],
+        },
+        "title": row["title"],
+        "category": row["category"],
+        "scope": row["scope"],
+        "promotion_state": row["promotion_state"],
+        "problem": row["problem"],
+        "why_not_script": row["why_not_script"],
+        "evidence": parse_json_array(row["evidence_json"]),
+        "trigger_pattern": parse_json_array(row["trigger_pattern_json"]),
+        "proposed_skill": {
+            "name": row["proposed_skill_name"],
+            "purpose": row["proposed_skill_purpose"],
+        },
+        "confidence": row["confidence"],
+        "next_action": row["next_action"],
+        "promoted_task_slug": row["promoted_task_slug"],
+        "output_path": row["output_path"],
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+    }
+
+
+def build_improvement_backlog(conn: sqlite3.Connection, root_dir: Path) -> dict[str, Any]:
+    project = ensure_project(conn, root_dir)
+    rows = conn.execute(
+        """
+        SELECT *
+        FROM improvement_candidates
+        WHERE project_id = ?
+        ORDER BY updated_at DESC, candidate_id ASC
+        """,
+        (int(project["id"]),),
+    ).fetchall()
+    candidates = [improvement_candidate_payload(row) for row in rows]
+    state_counts: dict[str, int] = {}
+    category_counts: dict[str, int] = {}
+    for candidate in candidates:
+        promotion_state = str(candidate["promotion_state"])
+        category = str(candidate["category"])
+        state_counts[promotion_state] = state_counts.get(promotion_state, 0) + 1
+        category_counts[category] = category_counts.get(category, 0) + 1
+    return {
+        "generated_at": now_utc(),
+        "root": str(root_dir),
+        "db_path": str(db_path_for_root(root_dir)),
+        "candidate_count": len(candidates),
+        "counts": {
+            "by_promotion_state": state_counts,
+            "by_category": category_counts,
+        },
+        "candidates": candidates,
+    }
+
+
+def render_improvement_backlog(
+    conn: sqlite3.Connection,
+    root_dir: Path,
+    output_path: Path | None = None,
+) -> Path:
+    if output_path is None:
+        output_path = improvement_backlog_path(root_dir)
+    dump_json(output_path, build_improvement_backlog(conn, root_dir))
+    return output_path
+
+
+def update_improvement_candidate_promotion(
+    conn: sqlite3.Connection,
+    root_dir: Path,
+    candidate_id: str,
+    promotion_state: str,
+    promoted_task_slug: str,
+) -> dict[str, Any]:
+    project = ensure_project(conn, root_dir)
+    now = now_utc()
+    cursor = conn.execute(
+        """
+        UPDATE improvement_candidates
+        SET promotion_state = ?,
+            promoted_task_slug = ?,
+            updated_at = ?
+        WHERE project_id = ? AND candidate_id = ?
+        """,
+        (
+            promotion_state,
+            promoted_task_slug,
+            now,
+            int(project["id"]),
+            candidate_id,
+        ),
+    )
+    if cursor.rowcount == 0:
+        raise SystemExit(f"Improvement candidate not found: {candidate_id}")
+    conn.commit()
+    row = conn.execute(
+        """
+        SELECT *
+        FROM improvement_candidates
+        WHERE project_id = ? AND candidate_id = ?
+        """,
+        (int(project["id"]), candidate_id),
+    ).fetchone()
+    if row is None:  # pragma: no cover
+        raise RuntimeError(f"Improvement candidate lookup failed: {candidate_id}")
+    payload = improvement_candidate_payload(row)
+    output_path = str(row["output_path"]).strip()
+    if output_path:
+        dump_json(Path(output_path), payload)
+    return payload
+
+
 def build_project_context(conn: sqlite3.Connection, root_dir: Path) -> dict[str, Any]:
     project = ensure_project(conn, root_dir)
     config = load_config(root_dir)
@@ -678,6 +987,19 @@ def build_project_context(conn: sqlite3.Connection, root_dir: Path) -> dict[str,
         (int(project["id"]),),
     ).fetchall()
     status_counts = {str(row["status"]): int(row["count"]) for row in task_rows}
+    improvement_rows = conn.execute(
+        """
+        SELECT promotion_state, COUNT(*) AS count
+        FROM improvement_candidates
+        WHERE project_id = ?
+        GROUP BY promotion_state
+        """,
+        (int(project["id"]),),
+    ).fetchall()
+    improvement_counts = {
+        str(row["promotion_state"]): int(row["count"])
+        for row in improvement_rows
+    }
     validators = config.get("validators", [])
     return {
         "generated_at": now_utc(),
@@ -685,6 +1007,7 @@ def build_project_context(conn: sqlite3.Connection, root_dir: Path) -> dict[str,
         "project_name": str(project["name"]),
         "task_root": str(project["task_root"]),
         "db_path": str(db_path_for_root(root_dir)),
+        "improvement_backlog_path": str(improvement_backlog_path(root_dir)),
         "source_docs": list(config.get("source_docs", {}).get("priority", []))
         if isinstance(config.get("source_docs"), dict)
         else [],
@@ -703,6 +1026,10 @@ def build_project_context(conn: sqlite3.Connection, root_dir: Path) -> dict[str,
         "task_counts": {
             "total": sum(status_counts.values()),
             "by_status": status_counts,
+        },
+        "improvement_counts": {
+            "total": sum(improvement_counts.values()),
+            "by_promotion_state": improvement_counts,
         },
         "task_defaults": config.get("task_defaults", {})
         if isinstance(config.get("task_defaults"), dict)
@@ -788,6 +1115,16 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
         """,
         (int(row["id"]),),
     ).fetchall()
+    improvement_rows = conn.execute(
+        """
+        SELECT *
+        FROM improvement_candidates
+        WHERE project_id = ? AND source_task_slug = ?
+        ORDER BY updated_at DESC
+        LIMIT 5
+        """,
+        (int(project["id"]), task_slug),
+    ).fetchall()
 
     return {
         "generated_at": now_utc(),
@@ -853,6 +1190,10 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
                 "timestamp": artifact_row["created_at"],
             }
             for artifact_row in artifact_rows
+        ],
+        "recent_improvement_candidates": [
+            improvement_candidate_payload(improvement_row)
+            for improvement_row in improvement_rows
         ],
         "task_files": {
             "task_dir": str(root_dir / task_root / task_slug),
@@ -955,6 +1296,7 @@ def render_registry(conn: sqlite3.Connection, root_dir: Path, output_path: Path 
         "tasks": tasks,
     }
     dump_json(output_path, payload)
+    render_improvement_backlog(conn, root_dir)
     dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
     for task in tasks:
         dump_json(
@@ -1027,6 +1369,9 @@ def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> Non
     project_context_file = project_context_path(root_dir)
     if not project_context_file.exists():
         failures.append("project_context.json is missing")
+    improvement_backlog_file = improvement_backlog_path(root_dir)
+    if not improvement_backlog_file.exists():
+        failures.append("improvement_backlog.json is missing")
 
     if task_context_file.exists():
         task_context = load_json(task_context_file)
@@ -1044,6 +1389,8 @@ def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> Non
         project_context = load_json(project_context_file)
         if str(project_context.get("db_path", "")).strip() != str(db_path_for_root(root_dir)):
             failures.append("project_context db_path mismatch")
+        if str(project_context.get("improvement_backlog_path", "")).strip() != str(improvement_backlog_file):
+            failures.append("project_context improvement_backlog_path mismatch")
 
     if failures:
         message = "\n".join(f"- {item}" for item in failures)
@@ -1100,6 +1447,109 @@ def command_doctor_task(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_record_improvement_candidate(args: argparse.Namespace) -> int:
+    root_dir = Path(args.root).resolve()
+    conn = connect_db(root_dir)
+    try:
+        payload = upsert_improvement_candidate(
+            conn,
+            root_dir,
+            task_slug=args.task_slug or "",
+            candidate_id=args.candidate_id or "",
+            source_type=args.source_type,
+            source_milestone_key=args.source_milestone_id or "",
+            source_run_id=args.source_run_id or "",
+            title=args.title,
+            category=args.category,
+            scope=args.scope,
+            promotion_state=args.promotion_state,
+            problem=args.problem,
+            why_not_script=args.why_not_script or "",
+            evidence=list(args.evidence or []),
+            trigger_pattern=list(args.trigger_pattern or []),
+            proposed_skill_name=args.proposed_skill_name or "",
+            proposed_skill_purpose=args.proposed_skill_purpose or "",
+            confidence=args.confidence or "",
+            next_action=args.next_action,
+            promoted_task_slug=args.promoted_task_slug or "",
+            output_path=args.output_path or "",
+        )
+        render_improvement_backlog(conn, root_dir)
+        dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
+        if args.task_slug:
+            dump_json(
+                task_context_path(root_dir, str(ensure_project(conn, root_dir)["task_root"]), args.task_slug),
+                build_task_context(conn, root_dir, args.task_slug),
+            )
+    finally:
+        conn.close()
+    print(json.dumps(payload, indent=2))
+    return 0
+
+
+def command_show_improvement_candidate(args: argparse.Namespace) -> int:
+    root_dir = Path(args.root).resolve()
+    conn = connect_db(root_dir)
+    try:
+        project = ensure_project(conn, root_dir)
+        row = conn.execute(
+            """
+            SELECT *
+            FROM improvement_candidates
+            WHERE project_id = ? AND candidate_id = ?
+            """,
+            (int(project["id"]), args.candidate_id),
+        ).fetchone()
+        if row is None:
+            raise SystemExit(f"Improvement candidate not found: {args.candidate_id}")
+        payload = improvement_candidate_payload(row)
+    finally:
+        conn.close()
+    print(json.dumps(payload, indent=2))
+    return 0
+
+
+def command_render_improvement_backlog(args: argparse.Namespace) -> int:
+    root_dir = Path(args.root).resolve()
+    conn = connect_db(root_dir)
+    try:
+        output_path = render_improvement_backlog(conn, root_dir)
+        dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
+    finally:
+        conn.close()
+    print(f"Improvement backlog rendered: {output_path}")
+    return 0
+
+
+def command_promote_improvement_candidate(args: argparse.Namespace) -> int:
+    root_dir = Path(args.root).resolve()
+    conn = connect_db(root_dir)
+    try:
+        payload = update_improvement_candidate_promotion(
+            conn,
+            root_dir,
+            args.candidate_id,
+            args.promotion_state,
+            args.promoted_task_slug,
+        )
+        render_improvement_backlog(conn, root_dir)
+        dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
+        if payload["source"]["task_slug"]:
+            project = ensure_project(conn, root_dir)
+            dump_json(
+                task_context_path(
+                    root_dir,
+                    str(project["task_root"]),
+                    str(payload["source"]["task_slug"]),
+                ),
+                build_task_context(conn, root_dir, str(payload["source"]["task_slug"])),
+            )
+    finally:
+        conn.close()
+    print(json.dumps(payload, indent=2))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Campfire SQLite control plane helper")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -1109,11 +1559,41 @@ def build_parser() -> argparse.ArgumentParser:
         "sync-all": command_sync_all,
         "render-registry": command_render_registry,
         "doctor-task": command_doctor_task,
+        "record-improvement-candidate": command_record_improvement_candidate,
+        "show-improvement-candidate": command_show_improvement_candidate,
+        "render-improvement-backlog": command_render_improvement_backlog,
+        "promote-improvement-candidate": command_promote_improvement_candidate,
     }.items():
         subparser = subparsers.add_parser(name)
         subparser.add_argument("--root", required=True)
         if name in {"sync-task", "doctor-task"}:
             subparser.add_argument("task_slug")
+        if name == "record-improvement-candidate":
+            subparser.add_argument("--task-slug")
+            subparser.add_argument("--candidate-id")
+            subparser.add_argument("--source-type", default="task_run")
+            subparser.add_argument("--source-milestone-id")
+            subparser.add_argument("--source-run-id")
+            subparser.add_argument("--category", required=True)
+            subparser.add_argument("--scope", required=True)
+            subparser.add_argument("--promotion-state", default="proposed")
+            subparser.add_argument("--title", required=True)
+            subparser.add_argument("--problem", required=True)
+            subparser.add_argument("--why-not-script")
+            subparser.add_argument("--evidence", action="append", default=[])
+            subparser.add_argument("--trigger-pattern", action="append", default=[])
+            subparser.add_argument("--proposed-skill-name")
+            subparser.add_argument("--proposed-skill-purpose")
+            subparser.add_argument("--confidence")
+            subparser.add_argument("--next-action", required=True)
+            subparser.add_argument("--promoted-task-slug")
+            subparser.add_argument("--output-path")
+        if name == "show-improvement-candidate":
+            subparser.add_argument("candidate_id")
+        if name == "promote-improvement-candidate":
+            subparser.add_argument("--promotion-state", required=True)
+            subparser.add_argument("--promoted-task-slug", required=True)
+            subparser.add_argument("candidate_id")
         subparser.set_defaults(func=handler)
     return parser
 

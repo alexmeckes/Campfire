@@ -3,6 +3,7 @@
 Use this checklist when turning a Campfire run into reusable improvements.
 
 For the generated micro-skill policy, promotion states, and candidate schema, see [Campfire generated skills](/Users/alexmeckes/Downloads/Campfire/docs/campfire-generated-skills.md).
+Use [record_improvement_candidate.sh](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/record_improvement_candidate.sh) when the retrospective should land in the SQL improvement backlog instead of staying prose-only.
 
 ## Inputs
 
@@ -82,3 +83,5 @@ Keep them short and explicit:
 - one sentence for why it matters
 - one line naming the exact follow-up category
 - one line naming the next concrete action
+
+If the lesson is reusable, mirror it into a structured improvement candidate so it can be promoted into a real follow-up task later.

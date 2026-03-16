@@ -8,6 +8,8 @@ RESUME_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/resume_task.sh"
 ENABLE_ROLLING_SCRIPT="$EXAMPLE_ROOT/scripts/enable_rolling_mode.sh"
 AUTOMATION_PROMPTS_SCRIPT="$EXAMPLE_ROOT/scripts/automation_prompt_helper.sh"
 DOCTOR_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/doctor_task.sh"
+RECORD_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/record_improvement_candidate.sh"
+PROMOTE_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/promote_improvement.sh"
 TASK_SLUG="verify-example-wrapper-flow"
 
 fail() {
@@ -29,7 +31,7 @@ expect_contains() {
 }
 
 echo "== Syntax checks =="
-zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
+zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
 
 echo "== Skill presence =="
 expect_file "$SKILLS_ROOT/task-handoff-state/SKILL.md"
@@ -44,6 +46,7 @@ trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_examp
 mkdir -p "$TEMP_WORKSPACE/scripts"
 cp "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$DOCTOR_TASK_SCRIPT" "$TEMP_WORKSPACE/scripts/"
+cp "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 chmod +x "$TEMP_WORKSPACE"/scripts/*.sh
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/new_task.sh" --slug "$TASK_SLUG" "verify example wrapper flow" >/tmp/campfire_example_new.out
@@ -60,6 +63,7 @@ expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/artifacts.json"
 expect_file "$TEMP_WORKSPACE/.campfire/campfire.db"
 expect_file "$TEMP_WORKSPACE/.campfire/registry.json"
 expect_file "$TEMP_WORKSPACE/.campfire/project_context.json"
+expect_file "$TEMP_WORKSPACE/.campfire/improvement_backlog.json"
 expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/task_context.json"
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/checkpoints.json" '"mode": "rolling"'
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/checkpoints.json" '"run_style": "until_stopped"'
@@ -75,5 +79,13 @@ expect_contains /tmp/campfire_example_resume.out 'Use $task-framer, $course-corr
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/doctor_task.sh" "$TASK_SLUG" >/tmp/campfire_example_doctor.out
 expect_contains /tmp/campfire_example_doctor.out 'Doctor passed:'
+
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/record_improvement_candidate.sh" --task-slug "$TASK_SLUG" --candidate-id "example-flow-candidate" --category verifier_candidate --scope repo_local --title "Catch stale state earlier" --problem "Wrapper flow should prove improvement candidates can be stored mechanically." --next-action "Promote the candidate if the wrapper flow stays healthy." >/tmp/campfire_example_candidate.out
+expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/findings/example-flow-candidate.json"
+expect_contains "$TEMP_WORKSPACE/.campfire/improvement_backlog.json" 'example-flow-candidate'
+
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/promote_improvement.sh" --task-slug "improve-example-flow-candidate" "example-flow-candidate" >/tmp/campfire_example_promote.out
+expect_file "$TEMP_WORKSPACE/.autonomous/improve-example-flow-candidate/plan.md"
+expect_contains /tmp/campfire_example_promote.out 'Promoted improvement candidate:'
 
 echo "PASS: Example workspace wrapper verification completed."

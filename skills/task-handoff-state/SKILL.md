@@ -17,6 +17,8 @@ Use [scripts/complete_slice.sh](scripts/complete_slice.sh) to close a slice mech
 Use [scripts/touch_heartbeat.sh](scripts/touch_heartbeat.sh) when you need to refresh task liveness without re-writing the whole handoff.
 Use [scripts/refresh_registry.sh](scripts/refresh_registry.sh) to rebuild the repo-local task registry under `.campfire/registry.json`.
 Use [scripts/doctor_task.sh](scripts/doctor_task.sh) to compare task files against the SQL control plane and catch drift.
+Use [scripts/record_improvement_candidate.sh](scripts/record_improvement_candidate.sh) to turn a retrospective finding into a structured improvement candidate and append it to the SQL-backed improvement backlog.
+Use [scripts/promote_improvement.sh](scripts/promote_improvement.sh) to convert a structured improvement candidate into a real follow-up task without hand-editing the backlog.
 
 ## What It Creates
 
@@ -36,6 +38,7 @@ Each task directory contains:
 Use the bundled scripts to create or inspect that state.
 
 Campfire now also maintains a lightweight SQLite control plane at `.campfire/campfire.db`. The markdown and JSON files remain compatible operator surfaces, but lifecycle helpers sync them into SQL so widgets, doctors, and future commands can query one transactional source. The same sync pass also renders `.campfire/project_context.json` and `.autonomous/<task>/task_context.json` so resume flows can load structured context before falling back to markdown.
+Retrospection can also append structured improvement work to `.campfire/improvement_backlog.json` so benchmark, verifier, skill, and control-plane follow-ups stop living only in prose.
 
 ## Quick Start
 
@@ -93,6 +96,18 @@ Complete a slice and park the task cleanly:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/complete_slice.sh --summary "Validated the current milestone." --next-step "Choose the next milestone." build-the-next-milestone
+```
+
+Record a structured improvement candidate from a retrospective:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/record_improvement_candidate.sh --task-slug build-the-next-milestone --category skill_candidate --scope repo_local --title "Strengthen slice-start discipline" --problem "Workers sometimes edit before task state is active." --next-action "Draft a repo-local micro-skill and benchmark it."
+```
+
+Promote an improvement candidate into a real follow-up task:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/promote_improvement.sh slice-start-guard
 ```
 
 Verify the task-state lifecycle:
@@ -183,6 +198,12 @@ Verify SQL control-plane syncing:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_sql_control_plane.sh
+```
+
+Verify the structured improvement-candidate flow:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_improvement_flow.sh
 ```
 
 Verify recurring automation-pattern coverage:

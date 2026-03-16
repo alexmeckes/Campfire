@@ -20,6 +20,8 @@ zsh -n \
   "$ROOT_DIR/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/scripts/verify_benchmark.sh" \
   "$ROOT_DIR/scripts/doctor_task.sh" \
+  "$ROOT_DIR/scripts/record_improvement_candidate.sh" \
+  "$ROOT_DIR/scripts/promote_improvement.sh" \
   "$ROOT_DIR/scripts/start_slice.sh" \
   "$ROOT_DIR/scripts/complete_slice.sh" \
   "$ROOT_DIR/scripts/refresh_registry.sh" \
@@ -28,12 +30,16 @@ zsh -n \
   "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/automation_prompt_helper.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/record_improvement_candidate.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/promote_improvement.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/bootstrap_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/resume_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/doctor_task.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/record_improvement_candidate.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/promote_improvement.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/start_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/complete_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/touch_heartbeat.sh" \
@@ -43,6 +49,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_complete_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_registry_refresh.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_sql_control_plane.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_improvement_flow.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
@@ -90,6 +97,8 @@ expect_file "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/automation_prompt_helper.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/record_improvement_candidate.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/promote_improvement.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/plan.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/runbook.md"
@@ -114,6 +123,7 @@ expect_file "$ROOT_DIR/benchmarks/campfire-bench/scenarios/repo-medium-validatio
 expect_file "$ROOT_DIR/benchmarks/campfire-bench/fixtures/results/sample-resume-after-interrupt.json"
 expect_file "$ROOT_DIR/scripts/run_campfire_bench.py"
 expect_file "$ROOT_DIR/docs/campfire-bench.md"
+expect_file "$ROOT_DIR/docs/campfire-generated-skills.md"
 
 echo "== Example workspace wrapper verifier =="
 CAMPFIRE_SKILLS_ROOT="$ROOT_DIR/skills" "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
@@ -140,6 +150,9 @@ echo "== Registry refresh verifier =="
 
 echo "== SQL control-plane verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_sql_control_plane.sh"
+
+echo "== Improvement flow verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_improvement_flow.sh"
 
 echo "== Benchmark verifier =="
 "$ROOT_DIR/scripts/verify_benchmark.sh"
