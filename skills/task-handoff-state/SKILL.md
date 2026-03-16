@@ -16,6 +16,7 @@ Use [scripts/start_slice.sh](scripts/start_slice.sh) to move a task into an acti
 Use [scripts/complete_slice.sh](scripts/complete_slice.sh) to close a slice mechanically and update handoff state, heartbeat, and registry.
 Use [scripts/touch_heartbeat.sh](scripts/touch_heartbeat.sh) when you need to refresh task liveness without re-writing the whole handoff.
 Use [scripts/refresh_registry.sh](scripts/refresh_registry.sh) to rebuild the repo-local task registry under `.campfire/registry.json`.
+Use [scripts/doctor_task.sh](scripts/doctor_task.sh) to compare task files against the SQL control plane and catch drift.
 
 ## What It Creates
 
@@ -33,6 +34,8 @@ Each task directory contains:
 - `findings/`
 
 Use the bundled scripts to create or inspect that state.
+
+Campfire now also maintains a lightweight SQLite control plane at `.campfire/campfire.db`. The markdown and JSON files remain compatible operator surfaces, but lifecycle helpers sync them into SQL so widgets, doctors, and future commands can query one transactional source. The same sync pass also renders `.campfire/project_context.json` and `.autonomous/<task>/task_context.json` so resume flows can load structured context before falling back to markdown.
 
 ## Quick Start
 
@@ -174,6 +177,12 @@ Verify registry refresh:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_registry_refresh.sh
+```
+
+Verify SQL control-plane syncing:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_sql_control_plane.sh
 ```
 
 Verify recurring automation-pattern coverage:

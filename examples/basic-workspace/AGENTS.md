@@ -5,6 +5,7 @@
 - Create a task with `./scripts/new_task.sh "<objective>"`.
 - Resume a task with `./scripts/resume_task.sh <task-slug>`.
 - For rolling Codex App runs, switch a task with `./scripts/enable_rolling_mode.sh <task-slug> ...`.
+- Run `./scripts/doctor_task.sh <task-slug>` when you want to confirm the task files and SQL control plane still agree.
 - Print rolling automation prompt variants with `./scripts/automation_prompt_helper.sh <task-slug>`.
 - Use `$long-horizon-worker` with `$task-handoff-state` for long-running multi-step work.
 - Use `$task-evaluator` before treating a milestone as fully complete.
@@ -21,6 +22,7 @@
 - Keep one stable objective per task slug.
 - Work one dependency-safe slice at a time.
 - Update `progress.md`, `handoff.md`, `checkpoints.json`, and `artifacts.json` after each meaningful run.
+- Let the lifecycle helpers maintain `.campfire/campfire.db`; do not hand-edit the control plane.
 - Stop on validation, real blocker, or a user decision boundary.
 
 ## Validation Rules

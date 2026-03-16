@@ -132,6 +132,25 @@ Maintain `.campfire/registry.json` at the repo root as the lightweight control-p
 
 Boards and watchdogs should prefer this registry when it exists instead of rediscovering task state from scratch.
 
+### Generated context files
+
+Render machine-readable context snapshots from the control plane to reduce markdown-only resume flows.
+
+- `.campfire/project_context.json`
+- `.autonomous/<task>/task_context.json`
+
+These files should summarize the repo/task defaults, recommended skills, current milestone and slice, queue, heartbeat, last run, and recent validation evidence. They are generated views, not hand-edited source files.
+
+### Repo-local SQLite control plane
+
+Maintain `.campfire/campfire.db` at the repo root as the durable SQL-backed control plane.
+
+- stores task, milestone, slice, session, heartbeat, queue, validation, and artifact index state
+- is updated by lifecycle helpers such as `init_task.sh`, `start_slice.sh`, `complete_slice.sh`, and `refresh_registry.sh`
+- should be treated as the future runtime source of truth even while markdown and JSON projections remain for compatibility
+
+`doctor_task.sh` should compare task files against this database and fail when the projections drift.
+
 ### Optional `workspace` metadata
 
 When bootstrap logic chooses between in-place and git-worktree setup, record that choice in `checkpoints.json.workspace`.

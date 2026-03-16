@@ -1,190 +1,52 @@
 # Campfire
 
-Campfire is a small, reusable harness for long-horizon Codex work.
+Campfire is a lightweight long-horizon Codex harness.
 
-The core idea is:
+It keeps the workflow generic, keeps project rules local to each repo, and gives Codex durable task state outside chat history.
 
-- keep the workflow generic
-- keep task state on disk
-- let project rules live in the project
-- make resumption and verification first-class
+## Model
 
-Instead of one giant project-specific skill, Campfire uses a small stack:
+Campfire uses a small stack:
 
 - `task-framer`
 - `course-corrector`
 - `long-horizon-worker`
 - `task-evaluator`
 - `task-handoff-state`
-- `AGENTS.md` in each repo
-- `.autonomous/<task>/` as the durable task directory
 
-This repo now contains the actual generic skill files, bundled scripts, an installer, and an example workspace.
+Each repo supplies its own `AGENTS.md`, docs, validators, and local wrappers.  
+Each task lives under `.autonomous/<task>/`.
 
-## Why
+## Control Plane
 
-Long-running Codex work usually fails for predictable reasons:
+Campfire now has a lightweight local control plane:
 
-- the objective drifts
-- prior decisions disappear into chat history
-- validation is vague
-- resumption is manual and lossy
-- project-specific rules get mixed into generic workflow logic
+- `.autonomous/<task>/` remains the operator-facing task directory
+- `.campfire/campfire.db` stores SQL-backed runtime state
+- `.campfire/registry.json` provides a repo-wide task summary
+- `.campfire/project_context.json` and `.autonomous/<task>/task_context.json` provide structured resume context
 
-Campfire separates those concerns.
+This is intentionally still single-agent and local-first. The skills stay as the Codex behavior layer; the control plane makes the workflow more mechanical and less prompt-dependent.
 
-The skills define how work should proceed.
-The repo defines what matters for that project.
-The task directory records the current state in a form that survives restarts, background runs, handoffs, and automation.
+## Install
 
-## Model
-
-Campfire treats a long-running task as a small harness, not a giant prompt.
-
-### 1. Generic execution skill
-
-`long-horizon-worker` owns the loop:
-
-- pick one dependency-safe slice
-- make the smallest useful change
-- validate immediately
-- update task state
-- stop only on validation, blocker, or real decision boundary
-
-### 2. Generic task-state skill
-
-`task-handoff-state` owns the durable file contract under `.autonomous/<task>/`.
-
-### 3. Generic framing skill
-
-`task-framer` turns vague objectives into real Campfire tasks with milestones, acceptance criteria, runbook commands, and the first safe slice.
-
-### 4. Generic course-correction skill
-
-`course-corrector` adjusts the plan when new facts, blockers, or better sequencing emerge during execution.
-
-### 5. Generic evaluator skill
-
-`task-evaluator` checks whether the current milestone is actually complete, records the evaluation result, and either validates the task or sends it back for one more narrow slice.
-
-### 6. Rolling execution policy
-
-Campfire can also run in a rolling mode for Codex App sessions that should keep going while you are away.
-
-In rolling mode:
-
-- planning stays bounded
-- the task keeps a machine-readable queued backlog
-- evaluation can auto-advance to the next milestone and record that as a run event
-- low queue depth can trigger one bounded queue replenishment pass when budget remains, or no internal budget is configured, then continue from the replenished backlog
-- autonomous runs can set a minimum runtime and milestone floor so they do not self-pause after a tiny validated batch
-- autonomous runs can also switch to `run_style: until_stopped`, which removes the internal runtime budget and milestone cap
-- bounded runs stop on blockers, decision boundaries, budget limits, or an empty safe backlog
-- a budget or decision pause keeps the active milestone and queued backlog intact for the next run
-- `last_run.stop_reason` stays reserved for the actual terminal pause reason, while `last_run.events` records mid-run transitions such as `auto_advanced` and `auto_reframed`
-- `manual_pause` should be treated as an explicit user or external interruption, not the normal autonomous stop path
-
-### 7. Project rules
-
-Project-specific guidance belongs in:
-
-- `AGENTS.md`
-- project docs
-- task-local notes in `runbook.md`
-
-## Task State Contract
-
-Each task lives under:
-
-```text
-.autonomous/<task>/
-  plan.md
-  runbook.md
-  progress.md
-  handoff.md
-  checkpoints.json
-  artifacts.json
-  heartbeat.json
-  logs/
-  artifacts/
-  findings/
-```
-
-### File purposes
-
-- `plan.md`: stable objective, source docs, milestones, assumptions
-- `runbook.md`: setup, boot, validation, observability, required tools
-- `progress.md`: append-only log of changes, validation, blockers, next slice
-- `handoff.md`: concise resume note with current status and stop reason
-- `checkpoints.json`: machine-readable task state for resumption and automation
-- `last_run.events`: machine-readable mid-run transitions like auto-advance or bounded reframe
-- `checkpoints.json.execution`: machine-readable run policy for single-milestone or rolling runs
-- `artifacts.json`: manifest of outputs that matter for review or proof
-- `heartbeat.json`: current liveness, last seen time, and active slice summary for the task
-- `.campfire/registry.json`: repo-local task registry generated from all `.autonomous/<task>/` directories
-
-## Lightweight Control Plane
-
-Campfire stays single-agent, but it now borrows a few control-plane ideas from heavier systems:
-
-- `start_slice.sh` moves a task into a concrete active slice before project edits
-- `complete_slice.sh` closes a slice mechanically instead of relying on prose-only handoffs
-- `heartbeat.json` plus `logs/session.log` expose task liveness and a durable activity trail
-- `.campfire/registry.json` gives boards and watchdogs one repo-local summary file to read
-
-This is intentionally lighter than a multi-agent orchestrator. The goal is to keep sessions disposable while task identity, status, and liveness stay durable on disk.
-
-## Codex App Fit
-
-Campfire is designed for Codex App usage:
-
-- the generic skills can be installed globally from this repo
-- framing and course-correction can stay generic while project rules stay local
-- each repo keeps its own `AGENTS.md`
-- each long task gets a durable `.autonomous/<task>/` directory
-- Codex App prompts stay short because the state is on disk
-
-## Campfire Board
-
-Campfire task state is structured enough to support a visual dashboard on top of `.autonomous/<task>/`.
-
-The current board proposal lives at [docs/campfire-board-spec.md](docs/campfire-board-spec.md).
-
-The recommended first version is a local file-backed board:
-
-- parse `checkpoints.json` as the primary source
-- show queued, active, blocked, waiting, and validated tasks
-- surface `handoff.md`, `progress.md`, and `artifacts.json` in a detail drawer
-- defer Codex App Server integration until the board needs live thread and approval visibility
-
-The first scaffold now lives in [apps/campfire-board](/Users/alexmeckes/Downloads/Campfire/apps/campfire-board).
-
-Run it locally:
+Install the skills into `~/.codex/skills`:
 
 ```bash
-cd apps/campfire-board
-npm install
-npm run dev
+./scripts/install_skills.sh
 ```
 
-Run it as a small Electron desktop window:
+Restart Codex App after installation so the skill list refreshes.
+
+## Verify
+
+Run the main repo verification:
 
 ```bash
-cd apps/campfire-board
-npm install
-npm run dev:desktop
+./scripts/verify_repo.sh
 ```
 
-Or run the built frontend/server in the desktop shell:
-
-```bash
-cd apps/campfire-board
-npm install
-npm run build
-npm run desktop
-```
-
-Run the Electron smoke test:
+Run the board smoke test:
 
 ```bash
 cd apps/campfire-board
@@ -192,428 +54,112 @@ npm install
 npm run test:smoke
 ```
 
-The board now watches both `.autonomous/` and `.campfire/`, so active slices and registry refreshes show up without a full rescan.
+## Quick Start
 
-By default the board reads Campfire state from this repo and the example workspace. To point it at other repos, set:
-
-```bash
-CAMPFIRE_BOARD_REPOS=/abs/repo-one,/abs/repo-two npm run dev
-```
-
-The frontend runs on `http://127.0.0.1:4173` and the API runs on `http://127.0.0.1:4319`.
-
-## Codex App Launch Patterns
-
-Campfire supports two Codex App launch patterns for rolling runs.
-
-### Live Thread
-
-Use this when you want the work to keep moving in the active Codex App conversation.
-
-- Launch the rolling prompt in the current thread
-- Keep the app open and the machine awake
-- Codex will keep going until it hits a configured stop condition
-
-### Background Task
-
-Use this when you want the Codex App to run the same rolling task in the background.
-
-- Launch the same rolling prompt as a background task in the app
-- Keep the same `.autonomous/<task>/` state and stop conditions
-- Use this for “keep going until I get back,” not for recurring schedules
-
-Automations are optional and only matter when you want recurring runs. They are not required for a one-off rolling Codex App task.
-
-Typical prompt:
-
-```text
-Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and keep working until the current milestone is validated.
-```
-
-Typical framing prompt:
-
-```text
-Use $task-framer and $task-handoff-state to turn this objective into a concrete Campfire task.
-```
-
-Typical course-correction prompt:
-
-```text
-Use $course-corrector and $task-handoff-state to update this Campfire task after new information changed the best path.
-```
-
-Typical evaluation prompt:
-
-```text
-Use $task-evaluator and $task-handoff-state to evaluate whether the current Campfire milestone is actually complete.
-```
-
-Typical rolling-run prompt:
-
-```text
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on blockers, real decision boundaries, or the configured run budget.
-```
-
-## Recurring Automation Patterns
-
-Automations are best when the task already has stable Campfire state and a known task slug.
-
-- Keep the automation prompt task-only. Let the automation configuration own schedule and workspace.
-- Point the automation at one workspace root and one stable `.autonomous/<task>/` directory.
-- Reuse the rolling execution contract so recurring runs preserve backlog, stop reasons, and findings.
-- Require updates to `progress.md`, `handoff.md`, `checkpoints.json`, and `artifacts.json` on every meaningful run.
-
-See [skills/task-handoff-state/references/automation-patterns.md](skills/task-handoff-state/references/automation-patterns.md) for the reusable reference.
-
-Useful recurring patterns:
-
-- Nightly rolling resume: continue the active rolling task with bounded planning and explicit stop conditions.
-- Verifier sweep: re-run the strongest existing validation for a task and refresh its evaluation state without broad implementation.
-- Weekly backlog refresh: tighten the next queued milestones and execution policy when the plan has gone stale.
-
-If you already have Campfire state and want task-only prompt bodies without copying the examples by hand, generate them directly:
-
-```bash
-~/.codex/skills/task-handoff-state/scripts/automation_prompt_helper.sh --root /path/to/project <task-slug>
-```
-
-## Repo Layout
-
-```text
-Campfire/
-  skills/
-    task-framer/
-    course-corrector/
-    long-horizon-worker/
-    task-evaluator/
-    task-handoff-state/
-  scripts/
-    enable_rolling_mode.sh
-    install_skills.sh
-    verify_repo.sh
-  examples/
-    basic-workspace/
-```
-
-## Install
-
-Install the Campfire skills into `~/.codex/skills`:
-
-```bash
-./scripts/install_skills.sh
-```
-
-That script symlinks:
-
-- `skills/task-framer`
-- `skills/course-corrector`
-- `skills/long-horizon-worker`
-- `skills/task-evaluator`
-- `skills/task-handoff-state`
-
-into your Codex skills directory and backs up conflicting existing skill folders.
-
-Restart Codex App after installation so the skill list refreshes.
-
-## Verify
-
-Verify the repo itself:
-
-```bash
-./scripts/verify_repo.sh
-```
-
-This checks:
-
-- skill files and metadata exist
-- shell scripts parse
-- the example workspace exists
-- the generic lifecycle verifier passes
-- the blocked/retry verifier passes
-- the course-correction verifier passes
-- the task-evaluation verifier passes
-- the worktree bootstrap verifier passes
-- the rolling-execution verifier passes
-- the rolling reframe verifier passes
-- the rolling budget-limit verifier passes
-- the rolling waiting-on-decision verifier passes
-- the rolling-mode helper verifier passes
-- the missing-resume guardrail verifier passes
-- the automation-pattern verifier passes
-- the autonomous-floor verifier passes
-
-You can also run the lifecycle verifier directly:
-
-```bash
-./skills/task-handoff-state/scripts/verify_task_lifecycle.sh
-```
-
-And the blocked/retry verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_blocked_retry.sh
-```
-
-And the course-correction verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_course_correction.sh
-```
-
-And the task-evaluation verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_task_evaluation.sh
-```
-
-And the worktree bootstrap verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_worktree_bootstrap.sh
-```
-
-And the rolling-execution verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_rolling_execution.sh
-```
-
-And the rolling reframe verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_rolling_reframe.sh
-```
-
-And the rolling budget-limit verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_budget_limit.sh
-```
-
-And the rolling waiting-on-decision verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_waiting_on_decision.sh
-```
-
-And the rolling-mode helper verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh
-```
-
-And the missing-resume guardrail verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh
-```
-
-And the automation-pattern verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_automation_patterns.sh
-```
-
-And the automation prompt helper verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh
-```
-
-And the autonomous-floor verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_autonomous_floor.sh
-```
-
-And the until-stopped verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_until_stopped_mode.sh
-```
-
-And the resume automation-guidance verifier:
-
-```bash
-./skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh
-```
-
-## Example Workspace
-
-The example workspace under `examples/basic-workspace/` shows two minimal project-side patterns:
-
-- `AGENTS.md`
-- `README.md`
-- `scripts/new_task.sh`
-- `scripts/resume_task.sh`
-- `scripts/enable_rolling_mode.sh`
-- `scripts/automation_prompt_helper.sh`
-- `scripts/verify_harness.sh`
-- `.autonomous/example-task/`
-- `.autonomous/rolling-task/`
-
-Use it as a reference and copy-adapt template for consumer repos that want thin local wrapper commands on top of the installed Campfire skills.
-
-The wrapper template is intentionally small:
-
-- local scripts still delegate to the generic Campfire skills
-- the repo can print workspace-specific prompts and follow-ups without forking Campfire core
-- the example verifier proves the wrapper flow in a temp workspace instead of mutating committed example state
-
-Inside this repo, run the example verifier with the bundled skills:
-
-```bash
-CAMPFIRE_SKILLS_ROOT=/abs/path/to/Campfire/skills ./examples/basic-workspace/scripts/verify_harness.sh
-```
-
-## Quick Start In A Real Project
-
-1. Install the Campfire skills from this repo.
-2. Add an `AGENTS.md` file to your project.
-
-If you want local project commands instead of invoking global skill paths directly, copy and adapt the wrapper scripts from `examples/basic-workspace/scripts/`.
-3. Create or scaffold a task:
+Create a task:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/init_task.sh --root /path/to/project "your objective"
 ```
 
-If the project is a git repo and you want isolation for risky or long-lived work, bootstrap the task in a dedicated worktree instead:
-
-```bash
-~/.codex/skills/task-handoff-state/scripts/bootstrap_task.sh --root /path/to/project --worktree "your objective"
-```
-
-If you want the task to keep moving while you are away, switch it into rolling mode:
-
-```bash
-~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --root /path/to/project your-task-slug --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
-```
-
-By default, rolling mode also enables bounded queue replenishment so a long run can frame one more small backlog slice when the queue gets low and budget remains.
-By default, the rolling helper now also sets an autonomy floor: `60` minutes minimum runtime, `5` milestone transitions target, `8` milestone cap, queue depth `5`, and up to `3` bounded reframes before budget or a real blocker should stop the run.
-
-If you want the run to keep going until you manually stop it, use the manual-stop rolling style instead:
-
-```bash
-~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --root /path/to/project --until-stopped your-task-slug --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
-```
-
-That style removes the internal runtime budget and milestone cap, keeps queue replenishment enabled, and stops only on a real blocker, a user decision boundary, safe-work exhaustion, or an external manual pause.
-
-4. If the task is still vague, prompt:
+Frame it if needed:
 
 ```text
 Use $task-framer and $task-handoff-state to turn this objective into a concrete Campfire task.
 ```
 
-5. Open the project in Codex App and prompt:
+Start a slice before editing project files:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/start_slice.sh --root /path/to/project --from-next --slice-title "Implement the next safe slice" your-task-slug
+```
+
+Resume in Codex App:
 
 ```text
-Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and keep working until the current milestone is validated.
+Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and validate the next slice before stopping.
 ```
 
 If `resume_task.sh` says the task is missing during a continue/resume request, stop and confirm the workspace plus task slug instead of bootstrapping a replacement task.
 
-6. If the plan changes mid-run, prompt:
+Complete the slice mechanically:
 
-```text
-Use $course-corrector and $task-handoff-state to update this task after new facts changed the best path.
+```bash
+~/.codex/skills/task-handoff-state/scripts/complete_slice.sh --root /path/to/project --summary "Describe what validated." --next-step "Describe the next step." your-task-slug
 ```
 
-7. When the milestone seems done, prompt:
+Check consistency:
 
-```text
-Use $task-evaluator and $task-handoff-state to evaluate whether the current milestone is actually complete.
+```bash
+./scripts/doctor_task.sh <task-slug>
 ```
 
-8. If you want the Codex app run to keep going while you are away, switch the task to rolling mode and prompt:
+For long unattended runs, switch the task into rolling mode:
 
-```text
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on blockers, decision boundaries, or the configured run budget.
+```bash
+~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --root /path/to/project your-task-slug --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
 ```
 
-For a manual-stop run instead:
+For a manual-stop rolling run, use `--until-stopped`.
 
-```text
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows, and keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause appears. Do not impose an internal runtime budget or milestone cap.
+## Recurring Automation Patterns
+
+Automations are optional. When you do want recurring runs, keep the automation prompt task-only and let the automation configuration own schedule and workspace.
+Automations are best when the task already has stable Campfire state and a known task slug.
+
+For the reusable patterns and prompt guidance, see [Automation patterns](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/automation-patterns.md).
+
+## Campfire Board
+
+Run the board locally:
+
+```bash
+cd apps/campfire-board
+npm install
+npm run dev
 ```
 
-## Verification
+Run it as a small Electron window:
 
-Campfire is meant to be testable, not just described.
+```bash
+cd apps/campfire-board
+npm install
+npm run dev:desktop
+```
 
-The prototype currently uses seventeen kinds of checks:
+Point it at specific repos:
 
-- harness smoke tests for scaffold and resume behavior
-- lifecycle tests that simulate a validated milestone update end to end
-- blocked and retry tests that simulate escalation after repeated failures
-- course-correction tests that simulate a real re-plan and verify the new milestone becomes the resume target
-- task-evaluation tests that simulate an independent milestone evaluation and validated handoff
-- worktree bootstrap tests that simulate a git worktree path and a deterministic non-git fallback path
-- rolling-execution tests that simulate a validated milestone auto-advancing into the next queued milestone
-- rolling reframe tests that simulate a low queue triggering one bounded queue-replenishment pass
-- rolling budget-limit tests that simulate a paused run with queued work still preserved
-- rolling waiting-on-decision tests that simulate a paused run at a real decision boundary
-- rolling-mode helper tests that simulate converting an existing task into a queued rolling run
-- missing-resume guardrail tests that keep continue/resume requests from silently bootstrapping replacement tasks
-- automation-pattern tests that keep recurring automation references and example guidance aligned
-- automation prompt helper tests that keep task-only recurring prompt variants aligned with Campfire state
-- autonomous-floor tests that keep the stronger unattended-run defaults and external-only manual pause semantics aligned
-- until-stopped tests that keep manual-stop rolling runs free of internal runtime budgets and milestone caps
-- resume automation-guidance tests that keep rolling resume output aligned with the automation prompt helper
+```bash
+CAMPFIRE_BOARD_REPOS=/abs/repo-one,/abs/repo-two npm run dev
+```
 
-The goal is for every Campfire implementation to prove:
+The board reads `.autonomous/` plus `.campfire/`, so active slices, registry refreshes, heartbeats, and SQL-derived context can all show up without a full rescan.
 
-- task scaffolding works
-- task state upgrades cleanly
-- resume output matches on-disk state
-- milestone validation can be recorded and surfaced correctly
-- blocked and retry state can be surfaced without silent thrashing
-- course corrections can update task state without losing continuity
-- milestone evaluation can be recorded independently from worker execution
-- worktree-backed setup can be bootstrapped for git repos without breaking non-git projects
-- rolling Codex App runs can advance across multiple milestones without manual restarts
-- rolling Codex App runs can replenish their own queue once when budget remains instead of stopping just because the backlog got short
-- rolling Codex App runs can pause on budget or decision boundaries without losing the queued backlog
+## Example Workspace
+
+`examples/basic-workspace/` is the consumer-repo template. It shows:
+
+- `AGENTS.md`
+- `campfire.toml`
+- thin local wrapper scripts
+- minimal example task state
+- a wrapper verifier
+
+Use it as the reference for adopting Campfire in a new project without forking the core skills.
+
+## Docs
+
+Use the focused docs for the deeper details:
+
+- [Task state contract](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/task-state-contract.md)
+- [Automation patterns](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/automation-patterns.md)
+- [Campfire Board spec](/Users/alexmeckes/Downloads/Campfire/docs/campfire-board-spec.md)
+- [Campfire v3 control plane](/Users/alexmeckes/Downloads/Campfire/docs/campfire-v3-control-plane.md)
 
 ## Principles
 
-- Keep the skill small and the harness strong.
-- Keep project rules out of the global workflow skill.
-- Write state to disk, not only to chat.
-- Make validation explicit.
-- Prefer bounded resumable runs over one immortal session.
-- Track blockers and stop reasons so the agent does not thrash.
-
-## Current Status
-
-Campfire is early, but it is now concrete enough to install and test:
-
-- portable generic Codex skills
-- task framing and course correction as first-class skills
-- explicit task evaluation as a first-class skill
-- durable task-state scaffolding
-- optional worktree-aware bootstrapping for git repos
-- lifecycle verifiers for success, blocked retry, course correction, task evaluation, and rolling execution
-- dynamic rolling queue-replenishment coverage so unattended runs do not stop just because the queue empties
-- explicit rolling stop-condition coverage for budget-limit and waiting-on-decision pauses
-- explicit manual-stop rolling mode with no internal runtime budget or milestone cap
-- task-state-driven automation prompt generation plus resume-time automation guidance
-- repo-local install and verification scripts
-- a minimal example workspace
-
-## Roadmap
-
-- publish the generic skill files
-- add reusable task-state verifiers
-- add optional worktree-aware bootstrapping for git repos
-- document automation patterns for recurring Codex App runs
-
-## Name
-
-Campfire fits the model:
-
-- long-running work that stays warm between runs
-- shared handoff state around one task
-- a place where logs, artifacts, plans, and next steps gather in one spot
+- Keep the skill layer thin and the control plane mechanical.
+- Keep project rules local to the repo.
+- Write durable state outside chat history.
+- Make validation explicit and queryable.
+- Prefer resumable work over session memory.

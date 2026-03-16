@@ -18,9 +18,11 @@ zsh -n \
   "$ROOT_DIR/scripts/new_task.sh" \
   "$ROOT_DIR/scripts/resume_task.sh" \
   "$ROOT_DIR/scripts/enable_rolling_mode.sh" \
+  "$ROOT_DIR/scripts/doctor_task.sh" \
   "$ROOT_DIR/scripts/start_slice.sh" \
   "$ROOT_DIR/scripts/complete_slice.sh" \
   "$ROOT_DIR/scripts/refresh_registry.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/doctor_task.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh" \
@@ -30,6 +32,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/bootstrap_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/resume_task.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/doctor_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/start_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/complete_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/touch_heartbeat.sh" \
@@ -38,6 +41,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_start_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_complete_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_registry_refresh.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_sql_control_plane.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
@@ -73,8 +77,11 @@ expect_file "$ROOT_DIR/skills/task-evaluator/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/task-evaluator/references/evaluation-checklist.md"
 
 echo "== Example workspace presence =="
+expect_file "$ROOT_DIR/campfire.toml"
 expect_file "$ROOT_DIR/examples/basic-workspace/AGENTS.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/campfire.toml"
 expect_file "$ROOT_DIR/examples/basic-workspace/README.md"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/doctor_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh"
@@ -117,6 +124,9 @@ echo "== Complete-slice verifier =="
 
 echo "== Registry refresh verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_registry_refresh.sh"
+
+echo "== SQL control-plane verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_sql_control_plane.sh"
 
 echo "== Blocked retry verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh"

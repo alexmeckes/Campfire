@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 const appRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(appRoot, "../..");
 const exampleRoot = path.join(repoRoot, "examples/basic-workspace");
-const exampleTaskDir = path.join(exampleRoot, ".autonomous/example-task");
-const smokeTouchPath = path.join(exampleTaskDir, ".smoke-touch");
+const rollingTaskDir = path.join(exampleRoot, ".autonomous/rolling-task");
+const smokeTouchPath = path.join(rollingTaskDir, ".smoke-touch");
 const apiPort = Number(process.env.CAMPFIRE_BOARD_SMOKE_PORT || 4329);
 const apiUrl = `http://127.0.0.1:${apiPort}`;
 const serverEntry = path.join(appRoot, "dist/server/server/index.js");
@@ -137,8 +137,8 @@ try {
   );
   assert.match(
     ((await appWindow.locator(".live-label").textContent()) || "").trim(),
-    /^Live\s+\d/,
-    "Expected a visible live label with a sync time."
+    /^Live(?:\s+(?:just now|recently|\d+[smhd]\s+ago))?$/,
+    "Expected a visible live label with freshness text."
   );
 
   const topbarRegion = await appWindow.locator(".topbar").evaluate((element) => {
@@ -184,8 +184,8 @@ try {
     "Electron window should report normal stacking after unpinning."
   );
 
-  const exampleTaskCard = appWindow.locator('.card[data-task-slug="example-task"]').first();
-  await exampleTaskCard.click();
+  const rollingTaskCard = appWindow.locator('.card[data-task-slug="rolling-task"]').first();
+  await rollingTaskCard.click();
   await waitForCondition(
     async () => (await appWindow.locator(".tray-progress").textContent())?.trim().length > 0,
     "tray progress summary"
@@ -198,11 +198,16 @@ try {
   await fs.writeFile(smokeTouchPath, `${Date.now()}\n`, "utf8");
   await waitForCondition(
     async () =>
-      (await appWindow.locator('.card[data-task-slug="example-task"].card-activity').count()) >
+      (await appWindow.locator('.card[data-task-slug="rolling-task"].card-activity').count()) >
       0,
     "activity pulse on changed task"
   );
   await fs.rm(smokeTouchPath, { force: true });
+  
+  const activityCount = await appWindow
+    .locator('.card[data-task-slug="rolling-task"].card-activity')
+    .count();
+  assert(activityCount > 0, "Expected rolling-task card to show activity pulse.");
 
   const repoPicker = appWindow.locator("select");
   assert.equal(await repoPicker.count(), 1, "Expected repo picker when multiple roots are present.");

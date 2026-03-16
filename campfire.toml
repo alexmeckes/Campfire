@@ -1,0 +1,29 @@
+version = 1
+project_name = "Campfire"
+default_task_root = ".autonomous"
+default_run_style = "bounded"
+
+[source_docs]
+priority = [
+  "README.md",
+  "AGENTS.md",
+  "docs/campfire-v3-control-plane.md",
+]
+
+[skills]
+default = [
+  "task-framer",
+  "course-corrector",
+  "long-horizon-worker",
+  "task-evaluator",
+  "task-handoff-state",
+]
+
+[task_defaults]
+planning_slice_minutes = 15
+runtime_budget_minutes = 120
+min_runtime_minutes = 60
+min_milestones_per_run = 3
+max_milestones_per_run = 6
+reframe_queue_below = 1
+target_queue_depth = 4

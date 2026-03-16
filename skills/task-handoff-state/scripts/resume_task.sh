@@ -40,6 +40,8 @@ fi
 TASK_SLUG="${POSITIONAL[1]}"
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
 TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
+PROJECT_CONTEXT_FILE="$ROOT_DIR/.campfire/project_context.json"
+TASK_CONTEXT_FILE="$TASK_DIR/task_context.json"
 
 if [ ! -d "$TASK_DIR" ]; then
   echo "Task not found: $TASK_DIR" >&2
@@ -51,6 +53,18 @@ fi
 echo "Task directory:"
 echo "  $TASK_DIR"
 echo
+
+if [ -f "$PROJECT_CONTEXT_FILE" ]; then
+  echo "Project context:"
+  sed -n '1,120p' "$PROJECT_CONTEXT_FILE"
+  echo
+fi
+
+if [ -f "$TASK_CONTEXT_FILE" ]; then
+  echo "Task context:"
+  sed -n '1,160p' "$TASK_CONTEXT_FILE"
+  echo
+fi
 
 if [ -f "$TASK_DIR/checkpoints.json" ]; then
   echo "Checkpoint summary:"

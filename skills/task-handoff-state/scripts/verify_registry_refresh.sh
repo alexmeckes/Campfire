@@ -40,6 +40,6 @@ expect_contains "$REGISTRY_FILE" '"task_slug": "task-one"'
 expect_contains "$REGISTRY_FILE" '"task_slug": "task-two"'
 expect_contains "$REGISTRY_FILE" '"state": "active"'
 expect_contains "$REGISTRY_FILE" '"state": "idle"'
-expect_contains /tmp/campfire_registry.out 'Registry refreshed:'
+expect_contains /tmp/campfire_registry.out 'Registry rendered:'
 
 echo "PASS: Registry refresh verification completed."

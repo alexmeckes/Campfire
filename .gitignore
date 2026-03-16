@@ -2,5 +2,9 @@ node_modules/
 dist/
 .DS_Store
 .campfire/registry.json
+.campfire/project_context.json
+.campfire/campfire.db
+.campfire/campfire.db-*
 .autonomous/*/heartbeat.json
+.autonomous/*/task_context.json
 .autonomous/*/logs/session.log

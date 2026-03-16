@@ -1,0 +1,16 @@
+version = 1
+project_name = "basic-workspace"
+default_task_root = ".autonomous"
+default_run_style = "bounded"
+
+[source_docs]
+priority = ["AGENTS.md", "README.md"]
+
+[skills]
+default = [
+  "task-framer",
+  "course-corrector",
+  "long-horizon-worker",
+  "task-evaluator",
+  "task-handoff-state",
+]

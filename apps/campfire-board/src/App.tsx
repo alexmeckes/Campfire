@@ -64,7 +64,40 @@ function latestProgressLine(markdown: string) {
   return null;
 }
 
-function formatLiveLabel(liveState: string, lastSyncAt: string | null) {
+function relativeTimeLabel(value: string | null, nowMs: number, fallback: string) {
+  if (!value) {
+    return fallback;
+  }
+
+  const timestamp = new Date(value).getTime();
+  if (Number.isNaN(timestamp)) {
+    return fallback;
+  }
+
+  const deltaMs = Math.max(0, nowMs - timestamp);
+  const deltaSeconds = Math.floor(deltaMs / 1000);
+  if (deltaSeconds < 10) {
+    return "just now";
+  }
+  if (deltaSeconds < 60) {
+    return `${deltaSeconds}s ago`;
+  }
+
+  const deltaMinutes = Math.floor(deltaSeconds / 60);
+  if (deltaMinutes < 60) {
+    return `${deltaMinutes}m ago`;
+  }
+
+  const deltaHours = Math.floor(deltaMinutes / 60);
+  if (deltaHours < 24) {
+    return `${deltaHours}h ago`;
+  }
+
+  const deltaDays = Math.floor(deltaHours / 24);
+  return `${deltaDays}d ago`;
+}
+
+function formatLiveLabel(liveState: string, lastSyncAt: string | null, nowMs: number) {
   const labels: Record<string, string> = {
     connecting: "Connecting",
     live: "Live",
@@ -77,26 +110,14 @@ function formatLiveLabel(liveState: string, lastSyncAt: string | null) {
     return base;
   }
 
-  const time = new Intl.DateTimeFormat([], {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(lastSyncAt));
-
-  return `${base} ${time}`;
+  return `${base} ${relativeTimeLabel(lastSyncAt, nowMs, "recently")}`;
 }
 
-function formatHeartbeatLabel(value: string | null) {
+function formatHeartbeatLabel(value: string | null, nowMs: number) {
   if (!value) {
     return "no heartbeat";
   }
-
-  const date = new Date(value);
-  const time = new Intl.DateTimeFormat([], {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-
-  return `heartbeat ${time}`;
+  return `heartbeat ${relativeTimeLabel(value, nowMs, "recently")}`;
 }
 
 export default function App() {
@@ -109,6 +130,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [liveState, setLiveState] = useState("connecting");
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
   const [recentTaskIds, setRecentTaskIds] = useState<string[]>([]);
   const tasksRef = useRef<TaskBoardItem[]>([]);
@@ -136,6 +158,7 @@ export default function App() {
           return nextPayload.tasks[0]?.id ?? null;
         });
       });
+      setLastSyncAt(nextPayload.generatedAt || new Date().toISOString());
       tasksRef.current = nextPayload.tasks;
     } catch (nextError) {
       setError(nextError instanceof Error ? nextError.message : "Unable to load board.");
@@ -172,7 +195,6 @@ export default function App() {
     const eventSource = new EventSource("/api/events");
     eventSource.addEventListener("ready", () => {
       setLiveState("live");
-      setLastSyncAt(new Date().toISOString());
     });
     eventSource.addEventListener("tasks-changed", (event) => {
       setLiveState("syncing");
@@ -202,7 +224,6 @@ export default function App() {
 
       void loadBoard().finally(() => {
         setLiveState("live");
-        setLastSyncAt(new Date().toISOString());
       });
     });
     eventSource.onerror = () => {
@@ -216,6 +237,16 @@ export default function App() {
         window.clearTimeout(timer);
       }
       clearTimersRef.current = {};
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 10000);
+
+    return () => {
+      window.clearInterval(interval);
     };
   }, []);
 
@@ -241,7 +272,7 @@ export default function App() {
   );
 
   const showRepoPicker = (payload?.repos.length ?? 0) > 1;
-  const liveLabel = formatLiveLabel(liveState, lastSyncAt);
+  const liveLabel = formatLiveLabel(liveState, lastSyncAt, nowMs);
 
   async function toggleAlwaysOnTop() {
     const nextValue = await window.campfireBoardDesktop?.setAlwaysOnTop?.(!alwaysOnTop);
@@ -340,7 +371,7 @@ export default function App() {
               <span>{selectedTask.queuedMilestones.length} queued</span>
               <span>{selectedTask.validation?.type || "no proof"}</span>
               <span>{selectedTask.lastRun.stopReason || "running"}</span>
-              <span>{formatHeartbeatLabel(selectedTask.heartbeat?.lastSeenAt || null)}</span>
+              <span>{formatHeartbeatLabel(selectedTask.heartbeat?.lastSeenAt || null, nowMs)}</span>
             </div>
           </div>
 

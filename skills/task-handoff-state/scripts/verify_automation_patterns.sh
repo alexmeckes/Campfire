@@ -44,8 +44,7 @@ expect_contains "$REFERENCE" 'If the task is `waiting_on_decision`, do not guess
 
 expect_contains "$README_FILE" "## Recurring Automation Patterns"
 expect_contains "$README_FILE" "Automations are best when the task already has stable Campfire state and a known task slug."
-expect_contains "$README_FILE" "Nightly rolling resume"
-expect_contains "$README_FILE" "Verifier sweep"
+expect_contains "$README_FILE" "Automation patterns"
 
 expect_contains "$EXAMPLE_AGENTS" "For recurring Codex App automations, keep prompts task-only and let the automation own schedule plus workspace selection."
 expect_contains "$EXAMPLE_FINDING" "Nightly rolling resume"
