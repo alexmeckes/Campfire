@@ -38,6 +38,7 @@ install_skill "task-framer"
 install_skill "task-handoff-state"
 install_skill "course-corrector"
 install_skill "task-evaluator"
+install_skill "task-retrospector"
 
 echo
 echo "Restart Codex App so the skill list refreshes."

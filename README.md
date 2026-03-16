@@ -13,9 +13,12 @@ Campfire uses a small stack:
 - `long-horizon-worker`
 - `task-evaluator`
 - `task-handoff-state`
+- `task-retrospector`
 
 Each repo supplies its own `AGENTS.md`, docs, validators, and local wrappers.  
 Each task lives under `.autonomous/<task>/`.
+
+`task-retrospector` is the improvement loop. It turns completed runs, failures, and benchmark regressions into benchmark, verifier, control-plane, or generated-skill follow-up candidates instead of relying on vague memory.
 
 ## Control Plane
 
@@ -162,6 +165,8 @@ Use the focused docs for the deeper details:
 - [Campfire Board spec](/Users/alexmeckes/Downloads/Campfire/docs/campfire-board-spec.md)
 - [Campfire v3 control plane](/Users/alexmeckes/Downloads/Campfire/docs/campfire-v3-control-plane.md)
 - [CampfireBench](/Users/alexmeckes/Downloads/Campfire/docs/campfire-bench.md)
+- [Campfire generated skills](/Users/alexmeckes/Downloads/Campfire/docs/campfire-generated-skills.md)
+- [Task retrospection checklist](/Users/alexmeckes/Downloads/Campfire/skills/task-retrospector/references/retrospective-checklist.md)
 
 ## Principles
 

@@ -76,6 +76,9 @@ expect_file "$ROOT_DIR/skills/course-corrector/references/course-correction-trig
 expect_file "$ROOT_DIR/skills/task-evaluator/SKILL.md"
 expect_file "$ROOT_DIR/skills/task-evaluator/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/task-evaluator/references/evaluation-checklist.md"
+expect_file "$ROOT_DIR/skills/task-retrospector/SKILL.md"
+expect_file "$ROOT_DIR/skills/task-retrospector/agents/openai.yaml"
+expect_file "$ROOT_DIR/skills/task-retrospector/references/retrospective-checklist.md"
 
 echo "== Example workspace presence =="
 expect_file "$ROOT_DIR/campfire.toml"

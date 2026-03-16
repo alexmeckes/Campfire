@@ -8,3 +8,5 @@ dist/
 .autonomous/*/heartbeat.json
 .autonomous/*/task_context.json
 .autonomous/*/logs/session.log
+__pycache__/
+*.pyc

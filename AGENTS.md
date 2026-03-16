@@ -6,6 +6,8 @@
 - Use `$long-horizon-worker` with `$task-handoff-state` for multi-step execution.
 - Use `$course-corrector` when new facts or blockers change the best path.
 - Use `$task-evaluator` when a milestone seems done or needs an independent completion check.
+- Use `$task-retrospector` after meaningful completed, failed, or benchmarked runs to turn lessons into benchmark, verifier, skill, or control-plane improvements.
+- Treat generated skills conservatively: create candidates first, keep drafts task-local or repo-local by default, and only promote to Campfire core with benchmark-backed evidence.
 - For Codex App runs that should keep going while the user is away, use rolling execution in `checkpoints.json` with queued milestones and bounded planning slices.
 - Keep durable task state under `.autonomous/<task>/`.
 - Create a task with `./scripts/new_task.sh "<objective>"`.
