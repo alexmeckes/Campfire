@@ -4,6 +4,8 @@ Campfire is a lightweight long-horizon Codex harness.
 
 It keeps the workflow generic, keeps project rules local to each repo, and gives Codex durable task state outside chat history.
 
+The design constraint is simple: if a feature is not required for a single agent to resume, work, validate, and stop cleanly, it should start as an extension instead of becoming Campfire core.
+
 ## Model
 
 Campfire uses a small stack:
@@ -31,6 +33,23 @@ Campfire now has a lightweight local control plane:
 - `.campfire/project_context.json` and `.autonomous/<task>/task_context.json` provide structured resume context
 
 This is intentionally still single-agent and local-first. The skills stay as the Codex behavior layer; the control plane makes the workflow more mechanical and less prompt-dependent.
+
+## Core Boundary
+
+Campfire core should stay small.
+
+Core is only the surface needed for the basic single-agent loop:
+
+- resume from disk
+- activate a slice
+- do work
+- validate it
+- write durable state
+- stop cleanly
+
+Features like automation helpers, generated-skill drafting, benchmark adapters, repo-specific wrappers, and app-specific integrations should default to extensions layered on top of the core control plane.
+
+For the explicit boundary, see [Campfire core vs extensions](/Users/alexmeckes/Downloads/Campfire/docs/campfire-core-vs-extensions.md).
 
 ## Install
 
@@ -225,6 +244,7 @@ Use the focused docs for the deeper details:
 - [Automation patterns](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/automation-patterns.md)
 - [Campfire Board spec](/Users/alexmeckes/Downloads/Campfire/docs/campfire-board-spec.md)
 - [Campfire v3 control plane](/Users/alexmeckes/Downloads/Campfire/docs/campfire-v3-control-plane.md)
+- [Campfire core vs extensions](/Users/alexmeckes/Downloads/Campfire/docs/campfire-core-vs-extensions.md)
 - [CampfireBench](/Users/alexmeckes/Downloads/Campfire/docs/campfire-bench.md)
 - [Campfire generated skills](/Users/alexmeckes/Downloads/Campfire/docs/campfire-generated-skills.md)
 - [Task retrospection checklist](/Users/alexmeckes/Downloads/Campfire/skills/task-retrospector/references/retrospective-checklist.md)
@@ -233,6 +253,7 @@ Use the focused docs for the deeper details:
 
 - Keep the skill layer thin and the control plane mechanical.
 - Keep project rules local to the repo.
+- Keep core small; push optional capability into extensions.
 - Write durable state outside chat history.
 - Make validation explicit and queryable.
 - Prefer resumable work over session memory.

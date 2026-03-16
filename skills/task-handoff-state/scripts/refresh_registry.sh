@@ -33,4 +33,5 @@ done
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
 
 python3 "$SQL_HELPER" sync-all --root "$ROOT_DIR" >/dev/null
+python3 "$SQL_HELPER" render-projections --root "$ROOT_DIR" >/dev/null
 python3 "$SQL_HELPER" render-registry --root "$ROOT_DIR"

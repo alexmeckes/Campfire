@@ -1712,15 +1712,40 @@ def render_registry(conn: sqlite3.Connection, root_dir: Path, output_path: Path 
         "tasks": tasks,
     }
     dump_json(output_path, payload)
-    render_skill_inventory(root_dir, str(project["task_root"]))
-    render_improvement_backlog(conn, root_dir)
-    dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
-    for task in tasks:
-        dump_json(
-            task_context_path(root_dir, str(project["task_root"]), str(task["task_slug"])),
-            build_task_context(conn, root_dir, str(task["task_slug"])),
-        )
     return output_path
+
+
+def render_all_projections(conn: sqlite3.Connection, root_dir: Path) -> dict[str, Path]:
+    project = ensure_project(conn, root_dir)
+    task_root = str(project["task_root"])
+    registry_output = render_registry(conn, root_dir)
+    skill_inventory_output = render_skill_inventory(root_dir, task_root)
+    improvement_backlog_output = render_improvement_backlog(conn, root_dir)
+    project_context_output = project_context_path(root_dir)
+    dump_json(project_context_output, build_project_context(conn, root_dir))
+
+    task_rows = conn.execute(
+        """
+        SELECT slug
+        FROM tasks
+        WHERE project_id = ?
+        ORDER BY updated_at DESC, slug ASC
+        """,
+        (int(project["id"]),),
+    ).fetchall()
+    for row in task_rows:
+        task_slug = str(row["slug"])
+        dump_json(
+            task_context_path(root_dir, task_root, task_slug),
+            build_task_context(conn, root_dir, task_slug),
+        )
+
+    return {
+        "registry": registry_output,
+        "skill_inventory": skill_inventory_output,
+        "improvement_backlog": improvement_backlog_output,
+        "project_context": project_context_output,
+    }
 
 
 def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> None:
@@ -2006,12 +2031,23 @@ def command_render_registry(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_render_projections(args: argparse.Namespace) -> int:
+    root_dir = Path(args.root).resolve()
+    conn = connect_db(root_dir)
+    try:
+        outputs = render_all_projections(conn, root_dir)
+    finally:
+        conn.close()
+    print(json.dumps({key: str(value) for key, value in outputs.items()}, indent=2))
+    return 0
+
+
 def command_doctor_task(args: argparse.Namespace) -> int:
     root_dir = Path(args.root).resolve()
     conn = connect_db(root_dir)
     try:
         sync_task(conn, root_dir, args.task_slug)
-        render_registry(conn, root_dir)
+        render_all_projections(conn, root_dir)
         doctor_task(conn, root_dir, args.task_slug)
     finally:
         conn.close()
@@ -2045,13 +2081,7 @@ def command_record_improvement_candidate(args: argparse.Namespace) -> int:
             promoted_task_slug=args.promoted_task_slug or "",
             output_path=args.output_path or "",
         )
-        render_improvement_backlog(conn, root_dir)
-        dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
-        if args.task_slug:
-            dump_json(
-                task_context_path(root_dir, str(ensure_project(conn, root_dir)["task_root"]), args.task_slug),
-                build_task_context(conn, root_dir, args.task_slug),
-            )
+        render_all_projections(conn, root_dir)
     finally:
         conn.close()
     print(json.dumps(payload, indent=2))
@@ -2085,7 +2115,6 @@ def command_render_improvement_backlog(args: argparse.Namespace) -> int:
     conn = connect_db(root_dir)
     try:
         output_path = render_improvement_backlog(conn, root_dir)
-        dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
     finally:
         conn.close()
     print(f"Improvement backlog rendered: {output_path}")
@@ -2103,18 +2132,7 @@ def command_promote_improvement_candidate(args: argparse.Namespace) -> int:
             args.promotion_state,
             args.promoted_task_slug,
         )
-        render_improvement_backlog(conn, root_dir)
-        dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
-        if payload["source"]["task_slug"]:
-            project = ensure_project(conn, root_dir)
-            dump_json(
-                task_context_path(
-                    root_dir,
-                    str(project["task_root"]),
-                    str(payload["source"]["task_slug"]),
-                ),
-                build_task_context(conn, root_dir, str(payload["source"]["task_slug"])),
-            )
+        render_all_projections(conn, root_dir)
     finally:
         conn.close()
     print(json.dumps(payload, indent=2))
@@ -2129,6 +2147,7 @@ def build_parser() -> argparse.ArgumentParser:
         "sync-task": command_sync_task,
         "sync-all": command_sync_all,
         "render-registry": command_render_registry,
+        "render-projections": command_render_projections,
         "doctor-task": command_doctor_task,
         "record-improvement-candidate": command_record_improvement_candidate,
         "show-improvement-candidate": command_show_improvement_candidate,
