@@ -1193,6 +1193,13 @@ def update_improvement_candidate_promotion(
 def discover_skill_entries(root_dir: Path, task_root: str) -> list[dict[str, Any]]:
     entries: list[dict[str, Any]] = []
 
+    def relative_path(path: Path) -> str:
+        resolved_root = root_dir.resolve()
+        resolved_path = path.resolve()
+        if resolved_path == resolved_root:
+            return "."
+        return resolved_path.relative_to(resolved_root).as_posix()
+
     def candidate_metadata(candidate_path: Path) -> dict[str, str]:
         if not candidate_path.exists():
             return {"candidate_id": "", "promotion_state": ""}
@@ -1229,9 +1236,9 @@ def discover_skill_entries(root_dir: Path, task_root: str) -> list[dict[str, Any
                 "scope": scope,
                 "task_slug": task_slug,
                 "package_name": install_target(scope, skill_dir.name, task_slug),
-                "source_dir": str(skill_dir),
-                "skill_path": str(skill_file),
-                "candidate_path": str(candidate_path) if candidate_path.exists() else "",
+                "source_dir": relative_path(skill_dir),
+                "skill_path": relative_path(skill_file),
+                "candidate_path": relative_path(candidate_path) if candidate_path.exists() else "",
                 "candidate_id": metadata["candidate_id"],
                 "promotion_state": metadata["promotion_state"],
                 "has_agent_config": (skill_dir / "agents" / "openai.yaml").exists(),
@@ -1273,7 +1280,7 @@ def build_skill_inventory(root_dir: Path, task_root: str) -> dict[str, Any]:
         counts[scope] = counts.get(scope, 0) + 1
     return {
         "generated_at": now_utc(),
-        "root": str(root_dir),
+        "root": ".",
         "manifest_version": 1,
         "task_root": task_root,
         "package_count": len(skills),

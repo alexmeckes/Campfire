@@ -210,6 +210,7 @@ Recommended manifest fields:
 - `promotion_state`
 
 `package_name` should be stable across renders so repo-local installers or review tools do not need custom naming logic for every scope.
+`source_dir`, `skill_path`, and optional `candidate_path` should be repo-relative so the manifest stays portable across machines.
 
 ## Promotion States
 

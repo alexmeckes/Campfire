@@ -89,18 +89,36 @@ def find(scope, name):
 core = find("core", "core-skill")
 if core.get("package_name") != "core-skill":
     raise SystemExit("unexpected core package name")
+if core.get("source_dir") != "skills/core-skill":
+    raise SystemExit("unexpected core source_dir")
+if core.get("skill_path") != "skills/core-skill/SKILL.md":
+    raise SystemExit("unexpected core skill_path")
 
 repo = find("repo_local_generated", "repo-draft-skill")
 if repo.get("package_name") != "repo-local--repo-draft-skill":
     raise SystemExit("unexpected repo-local package name")
 if repo.get("candidate_id") != "repo-draft-skill":
     raise SystemExit("repo-local candidate metadata missing")
+if repo.get("source_dir") != ".campfire/generated-skills/repo-draft-skill":
+    raise SystemExit("unexpected repo-local source_dir")
+if repo.get("candidate_path") != ".campfire/generated-skills/repo-draft-skill/skill_candidate.json":
+    raise SystemExit("unexpected repo-local candidate_path")
 
 task = find("task_local_generated", "task-draft-skill")
 if task.get("task_slug") != task_slug:
     raise SystemExit("task-local skill missing task slug")
 if task.get("package_name") != f"{task_slug}--task-draft-skill":
     raise SystemExit("unexpected task-local package name")
+if task.get("source_dir") != f".autonomous/{task_slug}/generated-skills/task-draft-skill":
+    raise SystemExit("unexpected task-local source_dir")
+if task.get("skill_path") != f".autonomous/{task_slug}/generated-skills/task-draft-skill/SKILL.md":
+    raise SystemExit("unexpected task-local skill_path")
+
+if inventory.get("root") != ".":
+    raise SystemExit("skill inventory root should be repo-relative")
+inventory_text = (workspace / ".campfire" / "skill_inventory.json").read_text()
+if str(workspace) in inventory_text:
+    raise SystemExit("skill inventory leaked an absolute workspace path")
 
 project_context = json.loads((workspace / ".campfire" / "project_context.json").read_text())
 if project_context.get("skill_inventory_path") != str(workspace / ".campfire" / "skill_inventory.json"):

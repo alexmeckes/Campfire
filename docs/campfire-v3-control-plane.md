@@ -91,6 +91,7 @@ Generated task projections should also expose lightweight operator guidance when
 - `task_context.json` should surface one active interrupt-now entry plus queued next-boundary follow-ups
 - `registry.json` should surface active guidance count, follow-up count, and the active summary for boards
 - `skill_inventory.json` should surface stable package names plus scope metadata for core, repo-local, and task-local skill surfaces
+- path fields inside `skill_inventory.json` should be repo-relative rather than machine-local absolute paths
 
 The main shift is:
 
