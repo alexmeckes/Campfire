@@ -1,6 +1,6 @@
 {
   "task_slug": "improve-campfire",
-  "last_updated": "2026-03-14",
+  "last_updated": "2026-03-15",
   "artifacts": [
     {
       "path": "AGENTS.md",
@@ -241,6 +241,12 @@
       "type": "planning_note",
       "milestone_id": "milestone-024",
       "reason": "Restores the deferred automation-helper backlog with enough queue depth to benefit from the stronger autonomous floor."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-039-pi-inspired-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-039",
+      "reason": "Defines the next self-hosted backlog around prompt templates, steering queues, packageable generated skills, and session lineage after reviewing pi-mono/coding-agent."
     },
     {
       "path": "skills/task-handoff-state/scripts/enable_rolling_mode.sh",

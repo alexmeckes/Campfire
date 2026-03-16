@@ -53,11 +53,11 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - [x] Prevent missing continue targets from bootstrapping replacement tasks in the wrong workspace
 - [x] Add deterministic verification for the missing-resume guardrail
 - [x] Document the missing-resume guardrail in README and example guidance
-- [ ] Add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state
-- [ ] Add deterministic verification for automation proposal helper output and task-state selection
-- [ ] Document automation proposal helper usage in README and example guidance
-- [ ] Expose automation proposal helper guidance from `resume_task.sh` for rolling tasks
-- [ ] Add deterministic verification that `resume_task.sh` surfaces automation proposal guidance correctly
+- [ ] Add a prompt-template layer for canonical Campfire operator flows
+- [ ] Add deterministic verification and example coverage for prompt templates
+- [ ] Add a lightweight steering versus follow-up queue model for active tasks
+- [ ] Add packageable repo-local and generated skill discovery surfaces
+- [ ] Add session-lineage metadata for retries, branches, and benchmark repros
 
 ## Notes
 
@@ -75,3 +75,4 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - The next refinement after the autonomy floor was explicit until-stopped mode, so the self-hosted task now runs without an internal budget or milestone cap while the automation-helper backlog stays queued behind it
 - Milestones 024 through 028 completed the automation-helper backlog, so the next bounded reframe now focuses on automation proposal metadata for Codex App recurring runs
 - The fresh-thread test exposed a more urgent workspace-mismatch bug, so the automation-proposal backlog was deferred behind a missing-resume guardrail before being requeued at milestone-034
+- A later review of `pi-mono/packages/coding-agent` suggested higher-leverage follow-up work around prompt templates, steering queues, packageable generated skills, and session lineage, so the deferred automation-proposal backlog is now parked behind the new milestone-039 through milestone-043 queue.

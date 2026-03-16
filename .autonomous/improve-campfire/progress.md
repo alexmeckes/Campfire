@@ -341,3 +341,12 @@
 - Validation: reviewed the guardrail evaluation and confirmed the automation-proposal backlog is still the next safe generic improvement area.
 - Blockers: none.
 - Next slice: add an automation proposal helper that emits a suggested automation name and task-only prompt from existing Campfire state.
+
+## 2026-03-15 milestone-039 framing
+
+- Course correction: reviewing `badlogic/pi-mono/packages/coding-agent` suggested a higher-leverage next backlog than the deferred automation-proposal helper queue.
+- Changed: recorded a new bounded backlog in `findings/milestone-039-pi-inspired-backlog.md` focused on prompt templates, steering-versus-follow-up task guidance, packageable generated skills, and session-lineage metadata.
+- Changed: rewrote `plan.md`, `handoff.md`, `checkpoints.json`, and `artifacts.json` so the self-hosted task now resumes on `milestone-039` instead of the stale automation-proposal backlog.
+- Validation: reviewed the Pi-inspired backlog against the current Campfire control-plane, generated-skill, and benchmark docs and confirmed the five milestones remain single-agent, local-first, and dependency-safe.
+- Blockers: none.
+- Next slice: add a prompt-template layer for canonical Campfire operator flows, then verify and document it before moving into steering queues and session lineage.

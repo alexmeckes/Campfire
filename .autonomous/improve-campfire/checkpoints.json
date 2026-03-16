@@ -4,22 +4,23 @@
   "status": "ready",
   "phase": "execution",
   "current": {
-    "milestone_id": "milestone-034",
-    "milestone_title": "Add an automation proposal helper that emits a suggested automation name and task-only prompt from Campfire state",
-    "slice_id": "slice-034",
-    "slice_title": "Add a helper under skills/task-handoff-state/scripts that prints a suggested automation name plus task-only prompt proposal fields for an existing task slug without embedding schedule or workspace settings",
+    "milestone_id": "milestone-039",
+    "milestone_title": "Add a prompt-template layer for canonical Campfire operator flows",
+    "slice_id": "slice-039",
+    "slice_title": "Define a small reusable template format and add canonical resume, retrospective, benchmark, and improvement-promotion templates without duplicating large markdown prompt blocks",
     "acceptance_criteria": [
-      "Campfire provides a reusable helper that emits a short suggested automation name and task-only prompt proposal fields from existing task state",
-      "The helper keeps schedule and workspace selection outside the generated proposal content while targeting a concrete .autonomous/<task>/ directory",
-      "The generic task-state skill, resume guidance, and repo docs can point to the proposal helper once it exists"
+      "Campfire provides a small prompt-template surface for canonical operator flows instead of relying on large hand-written markdown blocks",
+      "Canonical templates exist for resume, retrospective, benchmark, and improvement-promotion flows and stay task-only plus reusable",
+      "The template layer stays compatible with the current skill stack and local-first control-plane model"
     ],
     "dependencies": [
-      "skills/task-handoff-state/references/automation-patterns.md",
-      "skills/task-handoff-state/SKILL.md",
-      "skills/task-handoff-state/scripts/automation_prompt_helper.sh",
       "README.md",
-      "scripts/verify_repo.sh",
-      ".autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md"
+      "docs/campfire-v3-control-plane.md",
+      "docs/campfire-bench.md",
+      "docs/campfire-generated-skills.md",
+      "skills/task-retrospector/SKILL.md",
+      "skills/task-handoff-state/SKILL.md",
+      ".autonomous/improve-campfire/findings/milestone-039-pi-inspired-backlog.md"
     ]
   },
   "execution": {
@@ -40,23 +41,23 @@
     ],
     "queued_milestones": [
       {
-        "milestone_id": "milestone-035",
-        "milestone_title": "Add deterministic verification for automation proposal helper output and task-state selection"
+        "milestone_id": "milestone-040",
+        "milestone_title": "Add deterministic verification and example coverage for prompt templates"
       },
       {
-        "milestone_id": "milestone-036",
-        "milestone_title": "Document automation proposal helper usage in README and example guidance"
+        "milestone_id": "milestone-041",
+        "milestone_title": "Add a lightweight steering versus follow-up queue model for active tasks"
       },
       {
-        "milestone_id": "milestone-037",
-        "milestone_title": "Expose automation proposal helper guidance from resume_task.sh for rolling tasks"
+        "milestone_id": "milestone-042",
+        "milestone_title": "Add packageable repo-local and generated skill discovery surfaces"
       },
       {
-        "milestone_id": "milestone-038",
-        "milestone_title": "Add deterministic verification that resume_task.sh surfaces automation proposal guidance correctly"
+        "milestone_id": "milestone-043",
+        "milestone_title": "Add session-lineage metadata for retries, branches, and benchmark repros"
       }
     ],
-    "notes": "The self-hosted task is configured for manual-stop autonomous runs with no internal budget or milestone cap. The missing-resume guardrail now prevents continue requests from silently bootstrapping replacement tasks, and the deferred automation-proposal backlog has been restored behind that fix.",
+    "notes": "The self-hosted task is configured for manual-stop autonomous runs with no internal budget or milestone cap. A later review of pi-mono/coding-agent suggested a higher-leverage next backlog around prompt templates, steering queues, packageable generated skills, and session lineage, so the deferred automation-proposal backlog is parked behind this new queue.",
     "run_style": "until_stopped"
   },
   "blocker": {
@@ -67,15 +68,13 @@
     "next_action": ""
   },
   "last_run": {
-    "started_at": "2026-03-15T02:00:00Z",
-    "ended_at": "2026-03-15T02:20:00Z",
-    "stop_reason": "manual_pause",
-    "summary": "Course-corrected the queue around a missing-resume guardrail, validated the new resume-stop behavior and documentation, and then restored the deferred automation-proposal backlog as the next queue.",
-    "next_step": "Add the automation proposal helper, then verify it, document it, and expose it through resume guidance.",
+    "started_at": "2026-03-16T02:21:42Z",
+    "ended_at": "2026-03-16T02:21:42Z",
+    "stop_reason": "course_corrected",
+    "summary": "Reframed the self-hosted Campfire backlog around Pi-inspired prompt templates, steering queues, packageable generated skills, and session lineage instead of the older deferred automation-proposal helper queue.",
+    "next_step": "Add the prompt-template layer, then verify and document it before moving into steering queues and session lineage.",
     "events": [
-      "course_corrected",
-      "auto_advanced",
-      "auto_reframed"
+      "course_corrected"
     ]
   },
   "runbook": "runbook.md",
@@ -115,6 +114,13 @@
       "command": "review .autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md",
       "artifact": ".autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md",
       "summary": "Restored the deferred automation-proposal backlog once the missing-resume guardrail validated."
+    },
+    {
+      "type": "plan_review",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-039-pi-inspired-backlog.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-039-pi-inspired-backlog.md",
+      "summary": "Reframed the next Campfire backlog around prompt templates, steering queues, packageable generated skills, and session lineage after reviewing pi-mono/coding-agent."
     },
     {
       "type": "plan_review",
@@ -249,5 +255,5 @@
       "summary": "Evaluation note confirms the worktree-aware backlog is complete."
     }
   ],
-  "last_updated": "2026-03-14"
+  "last_updated": "2026-03-15"
 }
