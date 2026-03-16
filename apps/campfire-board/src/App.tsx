@@ -45,6 +45,25 @@ function milestoneId(task: TaskBoardItem) {
   return task.currentMilestone?.id || laneForTask(task);
 }
 
+function eventLabel(task: TaskBoardItem) {
+  const lastEvent = task.lastRun.events[task.lastRun.events.length - 1];
+  if (!lastEvent) {
+    return task.status.replaceAll("_", " ");
+  }
+
+  return lastEvent.replaceAll("_", " ");
+}
+
+function cardSummary(task: TaskBoardItem) {
+  return (
+    task.currentSliceTitle ||
+    latestProgressLine(task.progressMarkdown) ||
+    task.lastRun.summary ||
+    task.handoff.nextSlice ||
+    null
+  );
+}
+
 function latestProgressLine(markdown: string) {
   const lines = markdown
     .split("\n")
@@ -181,7 +200,7 @@ export default function App() {
       clearTimersRef.current[taskId] = window.setTimeout(() => {
         setRecentTaskIds((current) => current.filter((entry) => entry !== taskId));
         delete clearTimersRef.current[taskId];
-      }, 3200);
+      }, 12000);
     }
   }
 
@@ -345,6 +364,13 @@ export default function App() {
                     <span className="card-milestone">{milestoneId(task)}</span>
                   </div>
                   <strong>{task.taskSlug}</strong>
+                  <span className="card-summary">{cardSummary(task) || "No active slice."}</span>
+                  <div className="card-meta">
+                    <span className="card-event">{eventLabel(task)}</span>
+                    {task.queuedMilestones.length > 0 ? (
+                      <span className="card-queue">{task.queuedMilestones.length} queued</span>
+                    ) : null}
+                  </div>
                 </button>
               ))}
 

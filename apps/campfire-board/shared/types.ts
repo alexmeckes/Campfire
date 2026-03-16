@@ -61,6 +61,7 @@ export type TaskBoardItem = {
   column: BoardColumn;
   health: TaskHealth;
   currentMilestone: MilestoneRef | null;
+  currentSliceTitle: string | null;
   queuedMilestones: MilestoneRef[];
   execution: {
     mode: "single_milestone" | "rolling";

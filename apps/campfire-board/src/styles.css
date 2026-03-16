@@ -195,7 +195,7 @@ select {
 
 .card,
 .empty-card {
-  min-height: 62px;
+  min-height: 110px;
   border-radius: 18px;
 }
 
@@ -217,8 +217,10 @@ select {
 
 .card-activity {
   border-color: rgba(184, 106, 45, 0.22);
-  box-shadow: 0 0 0 1px rgba(184, 106, 45, 0.08);
-  animation: card-pulse 1.2s ease-out 2;
+  box-shadow:
+    0 0 0 1px rgba(184, 106, 45, 0.08),
+    0 0 0 6px rgba(184, 106, 45, 0.06);
+  animation: card-pulse 1.4s ease-out 4;
 }
 
 .card strong {
@@ -232,6 +234,34 @@ select {
 .card-milestone {
   color: var(--text-dim);
   font-size: 0.7rem;
+}
+
+.card-summary {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-dim);
+  font-size: 0.74rem;
+  line-height: 1.3;
+}
+
+.card-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.card-event,
+.card-queue {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: rgba(184, 106, 45, 0.08);
+  color: var(--text-dim);
+  font-size: 0.68rem;
+  text-transform: lowercase;
 }
 
 .status-dot-healthy {

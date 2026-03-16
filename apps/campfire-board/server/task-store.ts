@@ -393,6 +393,7 @@ async function loadTask(
       heartbeat?.last_seen_at
     ),
     currentMilestone: displayMilestone,
+    currentSliceTitle: checkpoints.current?.slice_title ?? null,
     queuedMilestones,
     execution: {
       mode: checkpoints.execution?.mode || "single_milestone",
