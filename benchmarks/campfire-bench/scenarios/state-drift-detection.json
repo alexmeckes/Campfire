@@ -1,0 +1,27 @@
+{
+  "id": "state-drift-detection",
+  "name": "State Drift Detection",
+  "category": "synthetic_lifecycle",
+  "description": "Task files and the SQL control plane diverge, and the doctor path must fail deterministically.",
+  "objective": "Measure whether Campfire can detect and surface control-plane drift instead of silently continuing.",
+  "required_capabilities": [
+    "doctor_task",
+    "sql_control_plane",
+    "registry_refresh"
+  ],
+  "success_criteria": [
+    "Drift is detected and reported clearly.",
+    "The system refuses to treat the task as healthy when DB and files disagree.",
+    "The failure message is specific enough to localize the mismatch."
+  ],
+  "scoring_weights": {
+    "task_success": 0.1,
+    "state_fidelity": 0.5,
+    "resume_fidelity": 0.1,
+    "validation_quality": 0.1,
+    "overhead": 0.2
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.1
+  }
+}

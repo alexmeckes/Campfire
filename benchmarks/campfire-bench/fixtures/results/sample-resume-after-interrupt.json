@@ -1,0 +1,14 @@
+{
+  "scenario_id": "resume-after-interrupt",
+  "run_id": "sample-001",
+  "status": "passed",
+  "task_success": 1.0,
+  "state_fidelity": 0.95,
+  "resume_fidelity": 0.9,
+  "replan_quality": 0.8,
+  "validation_quality": 0.85,
+  "orchestration_tokens": 1800,
+  "total_tokens": 12000,
+  "orchestration_seconds": 45,
+  "notes": "Sample result for benchmark runner validation."
+}

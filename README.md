@@ -46,6 +46,12 @@ Run the main repo verification:
 ./scripts/verify_repo.sh
 ```
 
+Run the benchmark scaffold verifier:
+
+```bash
+./scripts/verify_benchmark.sh
+```
+
 Run the board smoke test:
 
 ```bash
@@ -155,6 +161,7 @@ Use the focused docs for the deeper details:
 - [Automation patterns](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/automation-patterns.md)
 - [Campfire Board spec](/Users/alexmeckes/Downloads/Campfire/docs/campfire-board-spec.md)
 - [Campfire v3 control plane](/Users/alexmeckes/Downloads/Campfire/docs/campfire-v3-control-plane.md)
+- [CampfireBench](/Users/alexmeckes/Downloads/Campfire/docs/campfire-bench.md)
 
 ## Principles
 

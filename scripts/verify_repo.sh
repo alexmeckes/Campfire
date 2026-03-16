@@ -18,6 +18,7 @@ zsh -n \
   "$ROOT_DIR/scripts/new_task.sh" \
   "$ROOT_DIR/scripts/resume_task.sh" \
   "$ROOT_DIR/scripts/enable_rolling_mode.sh" \
+  "$ROOT_DIR/scripts/verify_benchmark.sh" \
   "$ROOT_DIR/scripts/doctor_task.sh" \
   "$ROOT_DIR/scripts/start_slice.sh" \
   "$ROOT_DIR/scripts/complete_slice.sh" \
@@ -101,6 +102,15 @@ expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/checkpo
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/artifacts.json"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/findings/rolling-queue.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md"
+expect_file "$ROOT_DIR/benchmarks/campfire-bench/README.md"
+expect_file "$ROOT_DIR/benchmarks/campfire-bench/scenarios/resume-after-interrupt.json"
+expect_file "$ROOT_DIR/benchmarks/campfire-bench/scenarios/blocked-then-unblock.json"
+expect_file "$ROOT_DIR/benchmarks/campfire-bench/scenarios/queue-replenish.json"
+expect_file "$ROOT_DIR/benchmarks/campfire-bench/scenarios/state-drift-detection.json"
+expect_file "$ROOT_DIR/benchmarks/campfire-bench/scenarios/repo-medium-validation.json"
+expect_file "$ROOT_DIR/benchmarks/campfire-bench/fixtures/results/sample-resume-after-interrupt.json"
+expect_file "$ROOT_DIR/scripts/run_campfire_bench.py"
+expect_file "$ROOT_DIR/docs/campfire-bench.md"
 
 echo "== Example workspace wrapper verifier =="
 CAMPFIRE_SKILLS_ROOT="$ROOT_DIR/skills" "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
@@ -127,6 +137,9 @@ echo "== Registry refresh verifier =="
 
 echo "== SQL control-plane verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_sql_control_plane.sh"
+
+echo "== Benchmark verifier =="
+"$ROOT_DIR/scripts/verify_benchmark.sh"
 
 echo "== Blocked retry verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh"

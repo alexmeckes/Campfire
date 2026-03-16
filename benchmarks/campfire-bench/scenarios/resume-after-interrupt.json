@@ -1,0 +1,27 @@
+{
+  "id": "resume-after-interrupt",
+  "name": "Resume After Interrupt",
+  "category": "synthetic_lifecycle",
+  "description": "A task starts a slice, the session is interrupted, and a new thread must resume from task state alone.",
+  "objective": "Measure whether Campfire preserves enough state for a clean resume without relying on prior chat memory.",
+  "required_capabilities": [
+    "start_slice",
+    "resume_from_state",
+    "doctor_task"
+  ],
+  "success_criteria": [
+    "The resumed run uses the persisted active milestone and slice.",
+    "The task remains internally consistent according to doctor_task.",
+    "The resume context surfaces the active slice and next step."
+  ],
+  "scoring_weights": {
+    "task_success": 0.2,
+    "state_fidelity": 0.3,
+    "resume_fidelity": 0.3,
+    "validation_quality": 0.1,
+    "overhead": 0.1
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.2
+  }
+}

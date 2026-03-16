@@ -1,0 +1,29 @@
+{
+  "id": "blocked-then-unblock",
+  "name": "Blocked Then Unblock",
+  "category": "synthetic_lifecycle",
+  "description": "A task hits a real blocker, records it, and then resumes successfully after the blocker is removed.",
+  "objective": "Measure whether Campfire records blocked state cleanly without thrash and preserves continuity across unblock.",
+  "required_capabilities": [
+    "start_slice",
+    "complete_slice_blocked",
+    "resume_from_state",
+    "doctor_task"
+  ],
+  "success_criteria": [
+    "Blocked state is explicit in task status, heartbeat, and stop reason.",
+    "The next run resumes the same task rather than bootstrapping a replacement.",
+    "The task can continue after unblock with preserved continuity."
+  ],
+  "scoring_weights": {
+    "task_success": 0.2,
+    "state_fidelity": 0.3,
+    "resume_fidelity": 0.2,
+    "replan_quality": 0.1,
+    "validation_quality": 0.1,
+    "overhead": 0.1
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.25
+  }
+}

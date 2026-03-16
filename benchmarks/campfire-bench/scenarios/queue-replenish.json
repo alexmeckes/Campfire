@@ -1,0 +1,29 @@
+{
+  "id": "queue-replenish",
+  "name": "Queue Replenish",
+  "category": "long_horizon",
+  "description": "A rolling task consumes its queued milestones and must replenish the queue once before continuing.",
+  "objective": "Measure whether rolling mode can reframe once, preserve continuity, and keep going without manual restart.",
+  "required_capabilities": [
+    "rolling_mode",
+    "auto_advance",
+    "auto_reframe",
+    "queue_refresh"
+  ],
+  "success_criteria": [
+    "The queue is replenished when it falls below threshold.",
+    "The run continues after reframe rather than stopping on empty queue.",
+    "The task state preserves both the transition event and the updated queue."
+  ],
+  "scoring_weights": {
+    "task_success": 0.2,
+    "state_fidelity": 0.25,
+    "resume_fidelity": 0.15,
+    "replan_quality": 0.25,
+    "validation_quality": 0.05,
+    "overhead": 0.1
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.18
+  }
+}

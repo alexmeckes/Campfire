@@ -1,0 +1,29 @@
+{
+  "id": "repo-medium-validation",
+  "name": "Repo Medium Validation",
+  "category": "repo_medium",
+  "description": "A medium repo task spans multiple milestones, requires one resume, and must end with explicit validation evidence.",
+  "objective": "Measure whether Campfire can support a real code-editing task with milestone tracking and evidence-backed evaluation.",
+  "required_capabilities": [
+    "multi_milestone_execution",
+    "resume_from_state",
+    "validation_recording",
+    "task_evaluator"
+  ],
+  "success_criteria": [
+    "The task advances through at least three coherent milestone transitions.",
+    "At least one interruption/resume occurs without loss of continuity.",
+    "A final validated state is backed by explicit recorded evidence."
+  ],
+  "scoring_weights": {
+    "task_success": 0.25,
+    "state_fidelity": 0.2,
+    "resume_fidelity": 0.15,
+    "replan_quality": 0.1,
+    "validation_quality": 0.2,
+    "overhead": 0.1
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.15
+  }
+}
