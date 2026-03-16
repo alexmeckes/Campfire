@@ -18,7 +18,7 @@ Campfire uses a small stack:
 - `task-retrospector`
 
 Each repo supplies its own `AGENTS.md`, docs, validators, and local wrappers.  
-Each task lives under `.autonomous/<task>/`.
+Each repo also chooses a task root in `campfire.toml` via `default_task_root` (default: `.autonomous`).
 
 `task-retrospector` is the improvement loop. It turns completed runs, failures, and benchmark regressions into benchmark, verifier, control-plane, or generated-skill follow-up candidates instead of relying on vague memory.
 
@@ -26,11 +26,11 @@ Each task lives under `.autonomous/<task>/`.
 
 Campfire now has a lightweight local control plane:
 
-- `.autonomous/<task>/` remains the operator-facing task directory
+- `<task-root>/<task>/` remains the operator-facing task directory
 - `.campfire/campfire.db` stores SQL-backed runtime state
 - `.campfire/registry.json` provides a repo-wide task summary
 - `.campfire/improvement_backlog.json` provides a repo-wide improvement queue
-- `.campfire/project_context.json` and `.autonomous/<task>/task_context.json` provide structured resume context
+- `.campfire/project_context.json` and `<task-root>/<task>/task_context.json` provide structured resume context
 
 This is intentionally still single-agent and local-first. The skills stay as the Codex behavior layer; the control plane makes the workflow more mechanical and less prompt-dependent.
 
@@ -83,7 +83,7 @@ npm install
 npm run test:smoke
 ```
 
-## Quick Start
+## Core Quick Start
 
 Create a task:
 
@@ -97,32 +97,19 @@ Frame it if needed:
 Use $task-framer and $task-handoff-state to turn this objective into a concrete Campfire task.
 ```
 
-Print the canonical operator prompts from state instead of rewriting them by hand:
-
-```bash
-./scripts/prompt_template_helper.sh --task-slug <task-slug> resume
-./scripts/prompt_template_helper.sh --task-slug <task-slug> retrospective
-./scripts/prompt_template_helper.sh benchmark
-```
-
-Persist operator guidance without hand-editing task state:
-
-```bash
-./scripts/queue_guidance.sh --mode interrupt_now --summary "Stop and inspect the failing verifier." <task-slug>
-./scripts/queue_guidance.sh --mode next_boundary --summary "Revisit this after the current milestone." <task-slug>
-```
-
 Start a slice before editing project files:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/start_slice.sh --root /path/to/project --from-next --slice-title "Implement the next safe slice" your-task-slug
 ```
 
-Resume in Codex App:
+Inspect the task state and use the emitted resume prompt:
 
-```text
-Use $long-horizon-worker and $task-handoff-state to continue .autonomous/<task>/ and validate the next slice before stopping.
+```bash
+./scripts/resume_task.sh <task-slug>
 ```
+
+Resume in Codex App with the prompt from that output. If you need to refer to the task directory directly, use the repo's configured `default_task_root` from `campfire.toml` rather than assuming `.autonomous/`.
 
 If `resume_task.sh` says the task is missing during a continue/resume request, stop and confirm the workspace plus task slug instead of bootstrapping a replacement task.
 
@@ -136,6 +123,31 @@ Check consistency:
 
 ```bash
 ./scripts/doctor_task.sh <task-slug>
+```
+
+For long unattended runs, switch the task into rolling mode:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --root /path/to/project your-task-slug --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
+```
+
+For a manual-stop rolling run, use `--until-stopped`.
+
+## Optional Extensions
+
+Print canonical operator prompts from state instead of rewriting them by hand:
+
+```bash
+./scripts/prompt_template_helper.sh --task-slug <task-slug> resume
+./scripts/prompt_template_helper.sh --task-slug <task-slug> retrospective
+./scripts/prompt_template_helper.sh benchmark
+```
+
+Persist operator guidance without hand-editing task state:
+
+```bash
+./scripts/queue_guidance.sh --mode interrupt_now --summary "Stop and inspect the failing verifier." <task-slug>
+./scripts/queue_guidance.sh --mode next_boundary --summary "Revisit this after the current milestone." <task-slug>
 ```
 
 Record a structured improvement candidate from a retrospective:
@@ -171,13 +183,13 @@ Validate the draft-generated-skill helper and wrapper flow:
 
 For the full template list, see [Prompt templates](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/prompt-templates.md).
 
-For long unattended runs, switch the task into rolling mode:
+## Resume Prompt Pattern
 
-```bash
-~/.codex/skills/task-handoff-state/scripts/enable_rolling_mode.sh --root /path/to/project your-task-slug --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice"
+When a repo does not yet have a local `resume_task.sh` wrapper, the minimal core prompt still looks like this:
+
+```text
+Use $long-horizon-worker and $task-handoff-state to continue <task-root>/<task>/ and validate the next slice before stopping.
 ```
-
-For a manual-stop rolling run, use `--until-stopped`.
 
 ## Recurring Automation Patterns
 
@@ -222,7 +234,7 @@ Point it at specific repos:
 CAMPFIRE_BOARD_REPOS=/abs/repo-one,/abs/repo-two npm run dev
 ```
 
-The board reads `.autonomous/` plus `.campfire/`, so active slices, registry refreshes, heartbeats, and SQL-derived context can all show up without a full rescan.
+The board reads the repo task directory plus `.campfire/`. In the default layout that means `.autonomous/` plus `.campfire/`, so active slices, registry refreshes, heartbeats, and SQL-derived context can all show up without a full rescan.
 
 ## Example Workspace
 
