@@ -163,7 +163,7 @@ stop_reason_by_status = {
 
 now = datetime.now(timezone.utc)
 today = now.strftime("%Y-%m-%d")
-now_utc = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+now_utc = now.isoformat(timespec="microseconds").replace("+00:00", "Z")
 
 checkpoint["status"] = status
 checkpoint["phase"] = phase_by_status.get(status, checkpoint.get("phase", "implementation"))

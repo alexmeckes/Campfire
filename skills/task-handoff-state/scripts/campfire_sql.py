@@ -20,7 +20,7 @@ SCHEMA_VERSION = 1
 
 
 def now_utc() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z")
 
 
 def today_utc() -> str:
@@ -52,6 +52,10 @@ def project_context_path(root_dir: Path) -> Path:
 
 def improvement_backlog_path(root_dir: Path) -> Path:
     return root_dir / ".campfire" / "improvement_backlog.json"
+
+
+def skill_inventory_path(root_dir: Path) -> Path:
+    return root_dir / ".campfire" / "skill_inventory.json"
 
 
 def extract_plan_objective(plan_path: Path) -> str:
@@ -163,6 +167,13 @@ def connect_db(root_dir: Path) -> sqlite3.Connection:
     return conn
 
 
+def ensure_column(conn: sqlite3.Connection, table: str, column: str, definition: str) -> None:
+    rows = conn.execute(f"PRAGMA table_info({table})").fetchall()
+    existing = {str(row["name"]) for row in rows}
+    if column not in existing:
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+
+
 def ensure_schema(conn: sqlite3.Connection) -> None:
     conn.executescript(
         """
@@ -234,6 +245,19 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
           UNIQUE(task_id, position)
         );
 
+        CREATE TABLE IF NOT EXISTS guidance_entries (
+          id INTEGER PRIMARY KEY,
+          task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+          active INTEGER NOT NULL DEFAULT 0,
+          position INTEGER NOT NULL DEFAULT 0,
+          mode TEXT NOT NULL DEFAULT '',
+          summary TEXT NOT NULL DEFAULT '',
+          details TEXT NOT NULL DEFAULT '',
+          source TEXT NOT NULL DEFAULT 'operator',
+          created_at TEXT NOT NULL,
+          UNIQUE(task_id, active, position)
+        );
+
         CREATE TABLE IF NOT EXISTS sessions (
           id INTEGER PRIMARY KEY,
           task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
@@ -241,6 +265,10 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
           ended_at TEXT,
           stop_reason TEXT NOT NULL DEFAULT '',
           summary TEXT NOT NULL DEFAULT '',
+          run_id TEXT NOT NULL DEFAULT '',
+          parent_run_id TEXT NOT NULL DEFAULT '',
+          lineage_kind TEXT NOT NULL DEFAULT '',
+          branch_label TEXT NOT NULL DEFAULT '',
           UNIQUE(task_id, started_at)
         );
 
@@ -324,6 +352,10 @@ def ensure_schema(conn: sqlite3.Connection) -> None:
         PRAGMA user_version = 1;
         """
     )
+    ensure_column(conn, "sessions", "run_id", "TEXT NOT NULL DEFAULT ''")
+    ensure_column(conn, "sessions", "parent_run_id", "TEXT NOT NULL DEFAULT ''")
+    ensure_column(conn, "sessions", "lineage_kind", "TEXT NOT NULL DEFAULT ''")
+    ensure_column(conn, "sessions", "branch_label", "TEXT NOT NULL DEFAULT ''")
     conn.commit()
 
 
@@ -425,6 +457,7 @@ def sync_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> dict[
     if not isinstance(current, dict):
         current = {}
     queue = normalize_queue(execution.get("queued_milestones", []))
+    guidance = normalize_guidance(checkpoint.get("guidance", {}))
 
     run_mode = str(execution.get("mode", "single_milestone")).strip() or "single_milestone"
     run_style = str(execution.get("run_style", "bounded")).strip() or "bounded"
@@ -505,6 +538,46 @@ def sync_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> dict[
             (task_id, entry["milestone_id"], entry["milestone_title"], index, now),
         )
 
+    conn.execute("DELETE FROM guidance_entries WHERE task_id = ?", (task_id,))
+    active_guidance = guidance.get("active")
+    if isinstance(active_guidance, dict):
+        conn.execute(
+            """
+            INSERT INTO guidance_entries(
+              task_id, active, position, mode, summary, details, source, created_at
+            )
+            VALUES(?, 1, 0, ?, ?, ?, ?, ?)
+            """,
+            (
+                task_id,
+                active_guidance.get("mode", "interrupt_now"),
+                active_guidance.get("summary", ""),
+                active_guidance.get("details", ""),
+                active_guidance.get("source", "operator"),
+                active_guidance.get("created_at", "") or now,
+            ),
+        )
+    for index, follow_up in enumerate(guidance.get("follow_ups", []), start=1):
+        if not isinstance(follow_up, dict):
+            continue
+        conn.execute(
+            """
+            INSERT INTO guidance_entries(
+              task_id, active, position, mode, summary, details, source, created_at
+            )
+            VALUES(?, 0, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                task_id,
+                index,
+                follow_up.get("mode", "next_boundary"),
+                follow_up.get("summary", ""),
+                follow_up.get("details", ""),
+                follow_up.get("source", "operator"),
+                follow_up.get("created_at", "") or now,
+            ),
+        )
+
     if current_slice_key:
         conn.execute(
             """
@@ -539,17 +612,26 @@ def sync_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> dict[
     last_run = checkpoint.get("last_run", {})
     if not isinstance(last_run, dict):
         last_run = {}
+    lineage = normalize_lineage(last_run.get("lineage", {}))
     session_started_at = str(last_run.get("started_at", "")).strip() or str(heartbeat.get("session_started_at", "")).strip()
     session_id: int | None = None
     if session_started_at:
+        run_id = str(last_run.get("run_id", "")).strip() or session_started_at
         conn.execute(
             """
-            INSERT INTO sessions(task_id, started_at, ended_at, stop_reason, summary)
-            VALUES(?, ?, ?, ?, ?)
+            INSERT INTO sessions(
+              task_id, started_at, ended_at, stop_reason, summary,
+              run_id, parent_run_id, lineage_kind, branch_label
+            )
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(task_id, started_at) DO UPDATE SET
               ended_at = excluded.ended_at,
               stop_reason = excluded.stop_reason,
-              summary = excluded.summary
+              summary = excluded.summary,
+              run_id = excluded.run_id,
+              parent_run_id = excluded.parent_run_id,
+              lineage_kind = excluded.lineage_kind,
+              branch_label = excluded.branch_label
             """,
             (
                 task_id,
@@ -557,6 +639,10 @@ def sync_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> dict[
                 str(last_run.get("ended_at", "")).strip() or None,
                 str(last_run.get("stop_reason", "")).strip(),
                 str(last_run.get("summary", "")).strip(),
+                run_id,
+                lineage["parent_run_id"],
+                lineage["kind"],
+                lineage["branch_label"],
             ),
         )
         row = conn.execute(
@@ -729,6 +815,136 @@ def parse_json_array(value: str) -> list[Any]:
     except Exception:
         return []
     return payload if isinstance(payload, list) else []
+
+
+def normalize_guidance_mode(value: Any, fallback: str) -> str:
+    text = str(value or "").strip().lower()
+    aliases = {
+        "interrupt_now": "interrupt_now",
+        "interrupt-now": "interrupt_now",
+        "interrupt": "interrupt_now",
+        "urgent": "interrupt_now",
+        "immediate": "interrupt_now",
+        "next_boundary": "next_boundary",
+        "next-boundary": "next_boundary",
+        "boundary": "next_boundary",
+        "follow_up": "next_boundary",
+        "follow-up": "next_boundary",
+    }
+    return aliases.get(text, fallback)
+
+
+def normalize_guidance_entry(raw_entry: Any, *, default_mode: str) -> dict[str, str] | None:
+    if isinstance(raw_entry, str):
+        summary = raw_entry.strip()
+        details = ""
+        source = "operator"
+        created_at = ""
+        mode = default_mode
+    elif isinstance(raw_entry, dict):
+        summary = str(
+            raw_entry.get("summary")
+            or raw_entry.get("title")
+            or raw_entry.get("text")
+            or ""
+        ).strip()
+        details = str(
+            raw_entry.get("details")
+            or raw_entry.get("description")
+            or raw_entry.get("note")
+            or ""
+        ).strip()
+        source = str(raw_entry.get("source", "operator")).strip() or "operator"
+        created_at = str(
+            raw_entry.get("created_at")
+            or raw_entry.get("queued_at")
+            or ""
+        ).strip()
+        mode = normalize_guidance_mode(raw_entry.get("mode", default_mode), default_mode)
+    else:
+        return None
+
+    if not summary:
+        return None
+
+    return {
+        "mode": mode,
+        "summary": summary,
+        "details": details,
+        "source": source,
+        "created_at": created_at,
+    }
+
+
+def normalize_guidance(raw_guidance: Any) -> dict[str, Any]:
+    if not isinstance(raw_guidance, dict):
+        return {"active": None, "follow_ups": []}
+
+    active = normalize_guidance_entry(
+        raw_guidance.get("active"),
+        default_mode="interrupt_now",
+    )
+    follow_up_key = "follow_ups"
+    if follow_up_key not in raw_guidance and isinstance(raw_guidance.get("queued"), list):
+        follow_up_key = "queued"
+    follow_ups: list[dict[str, str]] = []
+    for raw_entry in raw_guidance.get(follow_up_key, []):
+        entry = normalize_guidance_entry(raw_entry, default_mode="next_boundary")
+        if entry is not None:
+            follow_ups.append(entry)
+    return {
+        "active": active,
+        "follow_ups": follow_ups,
+    }
+
+
+def guidance_payload_from_rows(rows: list[sqlite3.Row]) -> dict[str, Any]:
+    active: dict[str, Any] | None = None
+    follow_ups: list[dict[str, Any]] = []
+    for row in rows:
+        entry = {
+            "mode": row["mode"] or "",
+            "summary": row["summary"] or "",
+            "details": row["details"] or "",
+            "source": row["source"] or "",
+            "created_at": row["created_at"] or "",
+        }
+        if int(row["active"] or 0):
+            active = entry
+        else:
+            entry["position"] = int(row["position"] or 0)
+            follow_ups.append(entry)
+    return {
+        "active": active,
+        "follow_ups": follow_ups,
+    }
+
+
+def normalize_lineage_kind(value: Any) -> str:
+    text = str(value or "").strip().lower()
+    aliases = {
+        "retry": "retry",
+        "course_correction": "course_correction",
+        "course-correction": "course_correction",
+        "benchmark_repro": "benchmark_repro",
+        "benchmark-repro": "benchmark_repro",
+        "repro": "benchmark_repro",
+    }
+    return aliases.get(text, "")
+
+
+def normalize_lineage(raw_lineage: Any) -> dict[str, str]:
+    if not isinstance(raw_lineage, dict):
+        return {
+            "parent_run_id": "",
+            "kind": "",
+            "branch_label": "",
+        }
+    return {
+        "parent_run_id": str(raw_lineage.get("parent_run_id", "")).strip(),
+        "kind": normalize_lineage_kind(raw_lineage.get("kind", "")),
+        "branch_label": str(raw_lineage.get("branch_label", "")).strip(),
+    }
 
 
 def upsert_improvement_candidate(
@@ -974,9 +1190,111 @@ def update_improvement_candidate_promotion(
     return payload
 
 
+def discover_skill_entries(root_dir: Path, task_root: str) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+
+    def candidate_metadata(candidate_path: Path) -> dict[str, str]:
+        if not candidate_path.exists():
+            return {"candidate_id": "", "promotion_state": ""}
+        payload = load_json(candidate_path)
+        return {
+            "candidate_id": str(
+                payload.get("candidate_id")
+                or payload.get("id")
+                or ""
+            ).strip(),
+            "promotion_state": str(payload.get("promotion_state", "")).strip(),
+        }
+
+    def install_target(scope: str, skill_name: str, task_slug: str = "") -> str:
+        if scope == "core":
+            return skill_name
+        if scope == "campfire_generated_core":
+            return f"generated--{skill_name}"
+        if scope == "repo_local_generated":
+            return f"repo-local--{skill_name}"
+        if scope == "task_local_generated":
+            return f"{slugify(task_slug, 'task')}--{skill_name}"
+        return skill_name
+
+    def append_entry(skill_dir: Path, scope: str, *, task_slug: str = "") -> None:
+        skill_file = skill_dir / "SKILL.md"
+        if not skill_file.exists():
+            return
+        candidate_path = skill_dir / "skill_candidate.json"
+        metadata = candidate_metadata(candidate_path)
+        entries.append(
+            {
+                "skill_name": skill_dir.name,
+                "scope": scope,
+                "task_slug": task_slug,
+                "package_name": install_target(scope, skill_dir.name, task_slug),
+                "source_dir": str(skill_dir),
+                "skill_path": str(skill_file),
+                "candidate_path": str(candidate_path) if candidate_path.exists() else "",
+                "candidate_id": metadata["candidate_id"],
+                "promotion_state": metadata["promotion_state"],
+                "has_agent_config": (skill_dir / "agents" / "openai.yaml").exists(),
+                "installable": True,
+            }
+        )
+
+    core_root = root_dir / "skills"
+    if core_root.exists():
+        for skill_dir in sorted(p for p in core_root.iterdir() if p.is_dir() and p.name != "generated"):
+            append_entry(skill_dir, "core")
+        generated_core_root = core_root / "generated"
+        if generated_core_root.exists():
+            for skill_dir in sorted(p for p in generated_core_root.iterdir() if p.is_dir()):
+                append_entry(skill_dir, "campfire_generated_core")
+
+    repo_generated_root = root_dir / ".campfire" / "generated-skills"
+    if repo_generated_root.exists():
+        for skill_dir in sorted(p for p in repo_generated_root.iterdir() if p.is_dir()):
+            append_entry(skill_dir, "repo_local_generated")
+
+    task_root_path = root_dir / task_root
+    if task_root_path.exists():
+        for task_dir in sorted(p for p in task_root_path.iterdir() if p.is_dir()):
+            generated_root = task_dir / "generated-skills"
+            if not generated_root.exists():
+                continue
+            for skill_dir in sorted(p for p in generated_root.iterdir() if p.is_dir()):
+                append_entry(skill_dir, "task_local_generated", task_slug=task_dir.name)
+
+    return entries
+
+
+def build_skill_inventory(root_dir: Path, task_root: str) -> dict[str, Any]:
+    skills = discover_skill_entries(root_dir, task_root)
+    counts: dict[str, int] = {}
+    for entry in skills:
+        scope = str(entry.get("scope", ""))
+        counts[scope] = counts.get(scope, 0) + 1
+    return {
+        "generated_at": now_utc(),
+        "root": str(root_dir),
+        "manifest_version": 1,
+        "task_root": task_root,
+        "package_count": len(skills),
+        "counts": {
+            "by_scope": counts,
+        },
+        "skills": skills,
+    }
+
+
+def render_skill_inventory(root_dir: Path, task_root: str, output_path: Path | None = None) -> Path:
+    if output_path is None:
+        output_path = skill_inventory_path(root_dir)
+    dump_json(output_path, build_skill_inventory(root_dir, task_root))
+    return output_path
+
+
 def build_project_context(conn: sqlite3.Connection, root_dir: Path) -> dict[str, Any]:
     project = ensure_project(conn, root_dir)
     config = load_config(root_dir)
+    skill_inventory = build_skill_inventory(root_dir, str(project["task_root"]))
     task_rows = conn.execute(
         """
         SELECT status, COUNT(*) AS count
@@ -1008,6 +1326,7 @@ def build_project_context(conn: sqlite3.Connection, root_dir: Path) -> dict[str,
         "task_root": str(project["task_root"]),
         "db_path": str(db_path_for_root(root_dir)),
         "improvement_backlog_path": str(improvement_backlog_path(root_dir)),
+        "skill_inventory_path": str(skill_inventory_path(root_dir)),
         "source_docs": list(config.get("source_docs", {}).get("priority", []))
         if isinstance(config.get("source_docs"), dict)
         else [],
@@ -1031,6 +1350,19 @@ def build_project_context(conn: sqlite3.Connection, root_dir: Path) -> dict[str,
             "total": sum(improvement_counts.values()),
             "by_promotion_state": improvement_counts,
         },
+        "skill_counts": skill_inventory.get("counts", {}),
+        "discoverable_skills": {
+            "repo_local_generated": [
+                entry
+                for entry in skill_inventory.get("skills", [])
+                if str(entry.get("scope", "")) == "repo_local_generated"
+            ],
+            "campfire_generated_core": [
+                entry
+                for entry in skill_inventory.get("skills", [])
+                if str(entry.get("scope", "")) == "campfire_generated_core"
+            ],
+        },
         "task_defaults": config.get("task_defaults", {})
         if isinstance(config.get("task_defaults"), dict)
         else {},
@@ -1041,6 +1373,7 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
     project = ensure_project(conn, root_dir)
     config = load_config(root_dir)
     task_root = str(project["task_root"])
+    skill_inventory = build_skill_inventory(root_dir, task_root)
     row = conn.execute(
         """
         SELECT
@@ -1061,6 +1394,10 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
           hb.session_started_at AS heartbeat_session_started_at,
           hb.summary AS heartbeat_summary,
           hb.touched_path AS heartbeat_touched_path,
+          sess.run_id AS last_run_id,
+          sess.parent_run_id AS last_parent_run_id,
+          sess.lineage_kind AS last_lineage_kind,
+          sess.branch_label AS last_branch_label,
           sess.stop_reason AS last_stop_reason,
           sess.started_at AS last_started_at,
           sess.ended_at AS last_ended_at,
@@ -1125,11 +1462,21 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
         """,
         (int(project["id"]), task_slug),
     ).fetchall()
+    guidance_rows = conn.execute(
+        """
+        SELECT active, position, mode, summary, details, source, created_at
+        FROM guidance_entries
+        WHERE task_id = ?
+        ORDER BY active DESC, position ASC
+        """,
+        (int(row["id"]),),
+    ).fetchall()
 
     return {
         "generated_at": now_utc(),
         "root": str(root_dir),
         "db_path": str(db_path_for_root(root_dir)),
+        "skill_inventory_path": str(skill_inventory_path(root_dir)),
         "project_name": str(project["name"]),
         "task_root": task_root,
         "task_slug": str(row["slug"]),
@@ -1152,6 +1499,7 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
             }
             for queue_row in queue_rows
         ],
+        "guidance": guidance_payload_from_rows(guidance_rows),
         "heartbeat": {
             "state": row["heartbeat_state"] or "",
             "last_seen_at": row["heartbeat_last_seen_at"] or "",
@@ -1160,10 +1508,16 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
             "touched_path": row["heartbeat_touched_path"] or "",
         },
         "last_run": {
+            "run_id": row["last_run_id"] or "",
             "stop_reason": row["last_stop_reason"] or "",
             "started_at": row["last_started_at"] or "",
             "ended_at": row["last_ended_at"] or "",
             "summary": row["last_summary"] or "",
+            "lineage": {
+                "parent_run_id": row["last_parent_run_id"] or "",
+                "kind": row["last_lineage_kind"] or "",
+                "branch_label": row["last_branch_label"] or "",
+            },
         },
         "source_docs": list(config.get("source_docs", {}).get("priority", []))
         if isinstance(config.get("source_docs"), dict)
@@ -1171,6 +1525,24 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
         "recommended_skills": list(config.get("skills", {}).get("default", []))
         if isinstance(config.get("skills"), dict)
         else [],
+        "skill_surfaces": {
+            "campfire_generated_core": [
+                entry
+                for entry in skill_inventory.get("skills", [])
+                if str(entry.get("scope", "")) == "campfire_generated_core"
+            ],
+            "repo_local_generated": [
+                entry
+                for entry in skill_inventory.get("skills", [])
+                if str(entry.get("scope", "")) == "repo_local_generated"
+            ],
+            "task_local_generated": [
+                entry
+                for entry in skill_inventory.get("skills", [])
+                if str(entry.get("scope", "")) == "task_local_generated"
+                and str(entry.get("task_slug", "")) == task_slug
+            ],
+        },
         "recent_validations": [
             {
                 "validator_id": validation_row["validator_type"],
@@ -1226,11 +1598,35 @@ def render_registry(conn: sqlite3.Connection, root_dir: Path, output_path: Path 
           (
             SELECT COUNT(*) FROM queue_entries q WHERE q.task_id = t.id
           ) AS queued_count,
+          (
+            SELECT COUNT(*) FROM guidance_entries g
+            WHERE g.task_id = t.id AND g.active = 1
+          ) AS guidance_active_count,
+          (
+            SELECT COUNT(*) FROM guidance_entries g
+            WHERE g.task_id = t.id AND g.active = 0
+          ) AS guidance_follow_up_count,
+          (
+            SELECT g.summary FROM guidance_entries g
+            WHERE g.task_id = t.id AND g.active = 1
+            ORDER BY g.position ASC
+            LIMIT 1
+          ) AS guidance_active_summary,
+          (
+            SELECT g.mode FROM guidance_entries g
+            WHERE g.task_id = t.id AND g.active = 1
+            ORDER BY g.position ASC
+            LIMIT 1
+          ) AS guidance_active_mode,
           hb.state AS heartbeat_state,
           hb.last_seen_at AS heartbeat_last_seen_at,
           hb.session_started_at AS heartbeat_session_started_at,
           hb.summary AS heartbeat_summary,
           hb.touched_path AS heartbeat_touched_path,
+          sess.run_id AS last_run_id,
+          sess.parent_run_id AS last_parent_run_id,
+          sess.lineage_kind AS last_lineage_kind,
+          sess.branch_label AS last_branch_label,
           sess.stop_reason AS last_stop_reason,
           sess.started_at AS last_started_at,
           sess.ended_at AS last_ended_at,
@@ -1271,12 +1667,24 @@ def render_registry(conn: sqlite3.Connection, root_dir: Path, output_path: Path 
                     "slice_title": row["current_slice_title"] or "",
                 },
                 "queued_count": int(row["queued_count"] or 0),
+                "guidance": {
+                    "active_count": int(row["guidance_active_count"] or 0),
+                    "follow_up_count": int(row["guidance_follow_up_count"] or 0),
+                    "active_mode": row["guidance_active_mode"] or "",
+                    "active_summary": row["guidance_active_summary"] or "",
+                },
                 "last_updated": row["updated_at"] or "",
                 "last_run": {
+                    "run_id": row["last_run_id"] or "",
                     "stop_reason": row["last_stop_reason"] or "",
                     "started_at": row["last_started_at"] or "",
                     "ended_at": row["last_ended_at"] or "",
                     "summary": row["last_summary"] or "",
+                    "lineage": {
+                        "parent_run_id": row["last_parent_run_id"] or "",
+                        "kind": row["last_lineage_kind"] or "",
+                        "branch_label": row["last_branch_label"] or "",
+                    },
                 },
                 "heartbeat": {
                     "state": row["heartbeat_state"] or "",
@@ -1292,10 +1700,12 @@ def render_registry(conn: sqlite3.Connection, root_dir: Path, output_path: Path 
         "generated_at": now_utc(),
         "root": str(root_dir),
         "db_path": str(db_path_for_root(root_dir)),
+        "skill_inventory_path": str(skill_inventory_path(root_dir)),
         "task_count": len(tasks),
         "tasks": tasks,
     }
     dump_json(output_path, payload)
+    render_skill_inventory(root_dir, str(project["task_root"]))
     render_improvement_backlog(conn, root_dir)
     dump_json(project_context_path(root_dir), build_project_context(conn, root_dir))
     for task in tasks:
@@ -1320,6 +1730,50 @@ def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> Non
           t.phase,
           t.current_milestone_key,
           t.current_slice_key,
+          (
+            SELECT COUNT(*) FROM guidance_entries g
+            WHERE g.task_id = t.id AND g.active = 1
+          ) AS guidance_active_count,
+          (
+            SELECT COUNT(*) FROM guidance_entries g
+            WHERE g.task_id = t.id AND g.active = 0
+          ) AS guidance_follow_up_count,
+          (
+            SELECT g.summary FROM guidance_entries g
+            WHERE g.task_id = t.id AND g.active = 1
+            ORDER BY g.position ASC
+            LIMIT 1
+          ) AS guidance_active_summary,
+          (
+            SELECT g.mode FROM guidance_entries g
+            WHERE g.task_id = t.id AND g.active = 1
+            ORDER BY g.position ASC
+            LIMIT 1
+          ) AS guidance_active_mode,
+          (
+            SELECT s.run_id FROM sessions s
+            WHERE s.task_id = t.id
+            ORDER BY s.started_at DESC
+            LIMIT 1
+          ) AS last_run_id,
+          (
+            SELECT s.parent_run_id FROM sessions s
+            WHERE s.task_id = t.id
+            ORDER BY s.started_at DESC
+            LIMIT 1
+          ) AS last_parent_run_id,
+          (
+            SELECT s.lineage_kind FROM sessions s
+            WHERE s.task_id = t.id
+            ORDER BY s.started_at DESC
+            LIMIT 1
+          ) AS last_lineage_kind,
+          (
+            SELECT s.branch_label FROM sessions s
+            WHERE s.task_id = t.id
+            ORDER BY s.started_at DESC
+            LIMIT 1
+          ) AS last_branch_label,
           hb.state AS heartbeat_state,
           hb.last_seen_at AS heartbeat_last_seen_at
         FROM tasks t
@@ -1341,6 +1795,7 @@ def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> Non
     current = checkpoint.get("current", {})
     if not isinstance(current, dict):
         current = {}
+    guidance = normalize_guidance(checkpoint.get("guidance", {}))
     checkpoint_milestone = str(current.get("milestone_id", "")).strip()
     checkpoint_slice = str(current.get("slice_id", "")).strip()
     if checkpoint_milestone != (row["current_milestone_key"] or ""):
@@ -1352,6 +1807,36 @@ def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> Non
 
     if checkpoint_status == "in_progress" and not checkpoint_slice:
         failures.append("in_progress task is missing an active slice")
+
+    active_guidance = guidance.get("active")
+    checkpoint_active_summary = ""
+    checkpoint_active_mode = ""
+    if isinstance(active_guidance, dict):
+        checkpoint_active_summary = str(active_guidance.get("summary", "")).strip()
+        checkpoint_active_mode = str(active_guidance.get("mode", "")).strip()
+    checkpoint_follow_up_count = len(guidance.get("follow_ups", []))
+    if checkpoint_active_summary != (row["guidance_active_summary"] or ""):
+        failures.append("active guidance summary mismatch between checkpoints and DB")
+    if checkpoint_active_mode != (row["guidance_active_mode"] or ""):
+        failures.append("active guidance mode mismatch between checkpoints and DB")
+    if int(bool(checkpoint_active_summary)) != int(row["guidance_active_count"] or 0):
+        failures.append("active guidance count mismatch between checkpoints and DB")
+    if checkpoint_follow_up_count != int(row["guidance_follow_up_count"] or 0):
+        failures.append("follow-up guidance count mismatch between checkpoints and DB")
+
+    last_run = checkpoint.get("last_run", {})
+    if not isinstance(last_run, dict):
+        last_run = {}
+    checkpoint_run_id = str(last_run.get("run_id", "")).strip() or str(last_run.get("started_at", "")).strip()
+    checkpoint_lineage = normalize_lineage(last_run.get("lineage", {}))
+    if checkpoint_run_id != (row["last_run_id"] or ""):
+        failures.append("last_run run_id mismatch between checkpoints and DB")
+    if checkpoint_lineage["parent_run_id"] != (row["last_parent_run_id"] or ""):
+        failures.append("last_run parent_run_id mismatch between checkpoints and DB")
+    if checkpoint_lineage["kind"] != (row["last_lineage_kind"] or ""):
+        failures.append("last_run lineage kind mismatch between checkpoints and DB")
+    if checkpoint_lineage["branch_label"] != (row["last_branch_label"] or ""):
+        failures.append("last_run branch label mismatch between checkpoints and DB")
 
     if heartbeat:
         heartbeat_state = str(heartbeat.get("state", "")).strip()
@@ -1372,11 +1857,16 @@ def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> Non
     improvement_backlog_file = improvement_backlog_path(root_dir)
     if not improvement_backlog_file.exists():
         failures.append("improvement_backlog.json is missing")
+    skill_inventory_file = skill_inventory_path(root_dir)
+    if not skill_inventory_file.exists():
+        failures.append("skill_inventory.json is missing")
 
     if task_context_file.exists():
         task_context = load_json(task_context_file)
         if str(task_context.get("status", "")).strip() != (row["status"] or ""):
             failures.append("task_context status mismatch")
+        if str(task_context.get("skill_inventory_path", "")).strip() != str(skill_inventory_file):
+            failures.append("task_context skill_inventory_path mismatch")
         context_current = task_context.get("current", {})
         if not isinstance(context_current, dict):
             context_current = {}
@@ -1384,6 +1874,37 @@ def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> Non
             failures.append("task_context current milestone mismatch")
         if str(context_current.get("slice_id", "")).strip() != (row["current_slice_key"] or ""):
             failures.append("task_context current slice mismatch")
+        context_last_run = task_context.get("last_run", {})
+        if not isinstance(context_last_run, dict):
+            context_last_run = {}
+        context_lineage = context_last_run.get("lineage", {})
+        if not isinstance(context_lineage, dict):
+            context_lineage = {}
+        if str(context_last_run.get("run_id", "")).strip() != (row["last_run_id"] or ""):
+            failures.append("task_context last_run run_id mismatch")
+        if str(context_lineage.get("parent_run_id", "")).strip() != (row["last_parent_run_id"] or ""):
+            failures.append("task_context lineage parent_run_id mismatch")
+        if str(context_lineage.get("kind", "")).strip() != (row["last_lineage_kind"] or ""):
+            failures.append("task_context lineage kind mismatch")
+        if str(context_lineage.get("branch_label", "")).strip() != (row["last_branch_label"] or ""):
+            failures.append("task_context lineage branch label mismatch")
+        context_guidance = task_context.get("guidance", {})
+        if not isinstance(context_guidance, dict):
+            context_guidance = {}
+        context_active = context_guidance.get("active")
+        if context_active is None:
+            context_active = {}
+        if not isinstance(context_active, dict):
+            context_active = {}
+        context_follow_ups = context_guidance.get("follow_ups", [])
+        if not isinstance(context_follow_ups, list):
+            context_follow_ups = []
+        if str(context_active.get("summary", "")).strip() != (row["guidance_active_summary"] or ""):
+            failures.append("task_context active guidance summary mismatch")
+        if str(context_active.get("mode", "")).strip() != (row["guidance_active_mode"] or ""):
+            failures.append("task_context active guidance mode mismatch")
+        if len(context_follow_ups) != int(row["guidance_follow_up_count"] or 0):
+            failures.append("task_context follow-up guidance count mismatch")
 
     if project_context_file.exists():
         project_context = load_json(project_context_file)
@@ -1391,6 +1912,49 @@ def doctor_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> Non
             failures.append("project_context db_path mismatch")
         if str(project_context.get("improvement_backlog_path", "")).strip() != str(improvement_backlog_file):
             failures.append("project_context improvement_backlog_path mismatch")
+        if str(project_context.get("skill_inventory_path", "")).strip() != str(skill_inventory_file):
+            failures.append("project_context skill_inventory_path mismatch")
+
+    if registry_path.exists():
+        registry = load_json(registry_path)
+        registry_tasks = registry.get("tasks", [])
+        if not isinstance(registry_tasks, list):
+            registry_tasks = []
+        registry_task = next(
+            (
+                item for item in registry_tasks
+                if isinstance(item, dict) and str(item.get("task_slug", "")).strip() == task_slug
+            ),
+            None,
+        )
+        if registry_task is None:
+            failures.append("registry task entry missing")
+        else:
+            registry_guidance = registry_task.get("guidance", {})
+            if not isinstance(registry_guidance, dict):
+                registry_guidance = {}
+            if int(registry_guidance.get("active_count", 0) or 0) != int(row["guidance_active_count"] or 0):
+                failures.append("registry active guidance count mismatch")
+            if int(registry_guidance.get("follow_up_count", 0) or 0) != int(row["guidance_follow_up_count"] or 0):
+                failures.append("registry follow-up guidance count mismatch")
+            if str(registry_guidance.get("active_summary", "")).strip() != (row["guidance_active_summary"] or ""):
+                failures.append("registry active guidance summary mismatch")
+            if str(registry_guidance.get("active_mode", "")).strip() != (row["guidance_active_mode"] or ""):
+                failures.append("registry active guidance mode mismatch")
+            registry_last_run = registry_task.get("last_run", {})
+            if not isinstance(registry_last_run, dict):
+                registry_last_run = {}
+            registry_lineage = registry_last_run.get("lineage", {})
+            if not isinstance(registry_lineage, dict):
+                registry_lineage = {}
+            if str(registry_last_run.get("run_id", "")).strip() != (row["last_run_id"] or ""):
+                failures.append("registry last_run run_id mismatch")
+            if str(registry_lineage.get("parent_run_id", "")).strip() != (row["last_parent_run_id"] or ""):
+                failures.append("registry lineage parent_run_id mismatch")
+            if str(registry_lineage.get("kind", "")).strip() != (row["last_lineage_kind"] or ""):
+                failures.append("registry lineage kind mismatch")
+            if str(registry_lineage.get("branch_label", "")).strip() != (row["last_branch_label"] or ""):
+                failures.append("registry lineage branch label mismatch")
 
     if failures:
         message = "\n".join(f"- {item}" for item in failures)

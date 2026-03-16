@@ -11,6 +11,14 @@
 - Rolling-mode helper: ./scripts/enable_rolling_mode.sh <task-slug> --queue "milestone-id:Milestone title"
 - Manual-stop rolling helper: ./scripts/enable_rolling_mode.sh --until-stopped <task-slug> --queue "milestone-id:Milestone title"
 - Automation prompt helper: ./skills/task-handoff-state/scripts/automation_prompt_helper.sh --root /Users/alexmeckes/Downloads/Campfire <task-slug>
+- Automation proposal helper: ./scripts/automation_proposal_helper.sh <task-slug>
+- Prompt template helper: ./scripts/prompt_template_helper.sh --task-slug <task-slug> resume
+- Prompt template verifier: ./skills/task-handoff-state/scripts/verify_prompt_template_helper.sh
+- Draft generated skill verifier: ./skills/task-handoff-state/scripts/verify_draft_generated_skill.sh
+- Guidance queue helper: ./scripts/queue_guidance.sh --mode interrupt_now --summary "..." <task-slug>
+- Guidance queue verifier: ./skills/task-handoff-state/scripts/verify_guidance_queue.sh
+- Skill inventory verifier: ./skills/task-handoff-state/scripts/verify_skill_inventory.sh
+- Session lineage verifier: ./skills/task-handoff-state/scripts/verify_session_lineage.sh
 - Repo verification: ./scripts/verify_repo.sh
 - Lifecycle verification: ./skills/task-handoff-state/scripts/verify_task_lifecycle.sh
 - Blocked/retry verification: ./skills/task-handoff-state/scripts/verify_blocked_retry.sh
@@ -44,6 +52,7 @@
 - Review automation proposal backlog brief: .autonomous/improve-campfire/findings/milestone-029-automation-proposal-backlog.md
 - Review refreshed automation proposal backlog brief: .autonomous/improve-campfire/findings/milestone-034-automation-proposal-backlog.md
 - Review automation patterns reference: skills/task-handoff-state/references/automation-patterns.md
+- Review prompt template reference: skills/task-handoff-state/references/prompt-templates.md
 
 ## Validation
 
@@ -63,6 +72,12 @@
 - Secondary: ./skills/task-handoff-state/scripts/verify_automation_patterns.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh
 - Secondary: ./skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_prompt_template_helper.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_draft_generated_skill.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_guidance_queue.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_skill_inventory.sh
+- Secondary: ./skills/task-handoff-state/scripts/verify_session_lineage.sh
+- Secondary: direct prompt-template rendering checks for resume, retrospective, benchmark, and improvement-promotion flows
 - Secondary: inspect the task-evaluator skill, reference docs, installer wiring, and repo verifier wiring
 - Record new verifier scripts in artifacts.json when they become part of the harness
 

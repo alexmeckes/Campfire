@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT_DIR="$(pwd -P)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 AUTOMATION_HELPER_SCRIPT="$SCRIPT_DIR/automation_prompt_helper.sh"
+AUTOMATION_PROPOSAL_HELPER_SCRIPT="$SCRIPT_DIR/automation_proposal_helper.sh"
+PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
 START_SLICE_SCRIPT="$SCRIPT_DIR/start_slice.sh"
 COMPLETE_SLICE_SCRIPT="$SCRIPT_DIR/complete_slice.sh"
 
@@ -216,23 +218,7 @@ if [ -f "$TASK_DIR/progress.md" ]; then
 fi
 
 echo "Recommended Codex App prompt:"
-python3 - "$TASK_DIR/checkpoints.json" "$TASK_SLUG" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-task_slug = sys.argv[2]
-data = json.loads(path.read_text())
-execution = data.get("execution", {})
-if isinstance(execution, dict) and execution.get("mode") == "rolling":
-    if execution.get("run_style") == "until_stopped":
-        print(f"  Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/{task_slug}/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows, and keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause appears. Do not impose an internal runtime budget or milestone cap.")
-    else:
-        print(f"  Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/{task_slug}/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on the configured run limits or a real blocker.")
-else:
-    print(f"  Use $long-horizon-worker and $task-handoff-state to continue .autonomous/{task_slug}/ from the current handoff and validate the next slice before stopping.")
-PY
+echo "  $("$PROMPT_TEMPLATE_SCRIPT" --root "$ROOT_DIR" --task-slug "$TASK_SLUG" resume)"
 
 echo
 echo "Pre-edit slice activation:"
@@ -322,5 +308,10 @@ PY
     echo
     echo "Automation prompt variants:"
     "$AUTOMATION_HELPER_SCRIPT" --root "$ROOT_DIR" "$TASK_SLUG"
+    if [ -x "$AUTOMATION_PROPOSAL_HELPER_SCRIPT" ]; then
+      echo
+      echo "Automation proposal metadata:"
+      "$AUTOMATION_PROPOSAL_HELPER_SCRIPT" --root "$ROOT_DIR" "$TASK_SLUG"
+    fi
   fi
 fi

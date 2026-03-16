@@ -2,10 +2,10 @@
 
 ## Current Status
 
-- Status: ready
-- Current milestone: milestone-039 - add a prompt-template layer for canonical Campfire operator flows
-- Next slice: define a small reusable template format and add canonical resume, retrospective, benchmark, and improvement-promotion templates without duplicating large markdown prompt blocks
-- Stop reason: course_corrected
+- Status: waiting on decision
+- Current milestone: `milestone-050` - Add deterministic verification that resume_task.sh surfaces automation proposal guidance correctly
+- Next slice: Decision boundary: choose whether Campfire should stay proposal-only, add generic schedule-input scaffolds, or add Codex App-specific automation instantiation support.
+- Stop reason: waiting_on_decision
 
 ## Resume Prompt
 

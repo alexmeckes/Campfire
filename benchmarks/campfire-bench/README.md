@@ -22,6 +22,12 @@ Score the bundled sample results:
 python3 scripts/run_campfire_bench.py --root . --results-dir benchmarks/campfire-bench/fixtures/results
 ```
 
+Print the canonical benchmark-review prompt:
+
+```bash
+./scripts/prompt_template_helper.sh benchmark
+```
+
 ## Scenario Categories
 
 - `synthetic_lifecycle`

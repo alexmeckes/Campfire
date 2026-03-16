@@ -51,6 +51,7 @@ TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
 TODAY="$(date +%Y-%m-%d)"
 NOW_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
 TOUCH_HEARTBEAT_SCRIPT="$SCRIPT_DIR/touch_heartbeat.sh"
 REFRESH_REGISTRY_SCRIPT="$SCRIPT_DIR/refresh_registry.sh"
 
@@ -304,4 +305,4 @@ echo "Created or reused task directory:"
 echo "  $TASK_DIR"
 echo
 echo "Recommended Codex App prompt:"
-echo "  Use \$long-horizon-worker and \$task-handoff-state to continue .autonomous/$TASK_SLUG/ and keep working until the current milestone is validated."
+echo "  $("$PROMPT_TEMPLATE_SCRIPT" --root "$ROOT_DIR" --task-slug "$TASK_SLUG" task_bootstrap)"

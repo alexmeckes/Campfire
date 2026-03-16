@@ -75,15 +75,37 @@ Suggested fields:
 - `status`
 - `phase`
 - `current`
+- `guidance`
 - `execution`
 - `blocker`
 - `workspace`
 - `last_run`
+- `last_run.run_id`
+- `last_run.lineage`
 - `last_run.events`
 - `runbook`
 - `artifacts_manifest`
 - `validation`
 - `last_updated`
+
+Suggested `guidance` shape:
+
+- `active`: one interrupt-now entry that should change the worker immediately when present
+- `follow_ups`: queued operator notes that should wait until the next safe slice or milestone boundary
+
+Suggested guidance entry fields:
+
+- `mode`: `interrupt_now` or `next_boundary`
+- `summary`
+- `details`
+- `source`
+- `created_at`
+
+Suggested `last_run.lineage` shape:
+
+- `parent_run_id`
+- `kind`: `retry`, `course_correction`, or `benchmark_repro`
+- `branch_label`
 
 ### `artifacts.json`
 
@@ -127,6 +149,7 @@ Maintain `.campfire/registry.json` at the repo root as the lightweight control-p
 - current status and phase
 - current milestone and slice
 - queued count
+- active guidance count and active summary
 - last run summary
 - heartbeat state and last seen timestamp
 
@@ -143,20 +166,31 @@ Maintain `.campfire/improvement_backlog.json` at the repo root as the projected 
 
 Retrospectives should prefer structured candidate output over prose-only "remember this later" notes.
 
+### Skill inventory
+
+Maintain `.campfire/skill_inventory.json` at the repo root as the generated discovery manifest for packageable skill surfaces.
+
+- one entry per discoverable Campfire core skill, repo-local generated skill, or task-local generated skill
+- stable `package_name` values so later installers do not need one-off naming logic per scope
+- source path, optional candidate metadata, and scope information for promotion-aware tooling
+
 ### Generated context files
 
 Render machine-readable context snapshots from the control plane to reduce markdown-only resume flows.
 
+- `.campfire/skill_inventory.json`
 - `.campfire/project_context.json`
 - `.autonomous/<task>/task_context.json`
 
-These files should summarize the repo/task defaults, recommended skills, current milestone and slice, queue, heartbeat, last run, recent validation evidence, and recent improvement candidates when relevant. They are generated views, not hand-edited source files.
+These files should summarize the repo/task defaults, recommended skills, current milestone and slice, queue, heartbeat, last run, recent validation evidence, recent improvement candidates, and discoverable skill surfaces when relevant. They are generated views, not hand-edited source files.
+When task guidance exists, `task_context.json` should expose the active interrupt-now entry plus any queued next-boundary follow-ups, and `registry.json` should expose enough guidance summary to make that state visible in boards.
 
 ### Repo-local SQLite control plane
 
 Maintain `.campfire/campfire.db` at the repo root as the durable SQL-backed control plane.
 
 - stores task, milestone, slice, session, heartbeat, queue, validation, and artifact index state
+- stores lightweight guidance entries for active interrupt-now steering versus queued next-boundary follow-ups
 - is updated by lifecycle helpers such as `init_task.sh`, `start_slice.sh`, `complete_slice.sh`, and `refresh_registry.sh`
 - should be treated as the future runtime source of truth even while markdown and JSON projections remain for compatibility
 

@@ -82,8 +82,15 @@ Those are better solved later, if needed, than built into v3 by default.
 - `.autonomous/<task>/checkpoints.json`
 - `.campfire/registry.json`
 - `.campfire/improvement_backlog.json`
+- `.campfire/skill_inventory.json`
 - optional `.autonomous/<task>/task_context.json`
 - optional `.campfire/project_context.json`
+
+Generated task projections should also expose lightweight operator guidance when present:
+
+- `task_context.json` should surface one active interrupt-now entry plus queued next-boundary follow-ups
+- `registry.json` should surface active guidance count, follow-up count, and the active summary for boards
+- `skill_inventory.json` should surface stable package names plus scope metadata for core, repo-local, and task-local skill surfaces
 
 The main shift is:
 
@@ -246,6 +253,31 @@ The real queued backlog.
 - `course_corrected`
 - `manual`
 
+#### `guidance_entries`
+
+Lightweight operator guidance that stays local to the task instead of becoming a scheduler.
+
+- `id`
+- `task_id`
+- `active`
+- `position`
+- `mode`
+- `summary`
+- `details`
+- `source`
+- `created_at`
+
+`mode` values:
+
+- `interrupt_now`
+- `next_boundary`
+
+Rules:
+
+- allow at most one active interrupt-now entry per task
+- keep next-boundary entries ordered and local to the task
+- do not use this table to model multi-agent routing, resource scheduling, or future cron-style work
+
 #### `sessions`
 
 Session-level lifecycle.
@@ -254,8 +286,18 @@ Session-level lifecycle.
 - `task_id`
 - `started_at`
 - `ended_at`
+- `run_id`
+- `parent_run_id`
+- `lineage_kind`
+- `branch_label`
 - `stop_reason`
 - `summary`
+
+Rules:
+
+- `run_id` should be stable enough for benchmark results or retrospective evidence to point at a specific branch
+- `parent_run_id` should link retry, course-corrected, or benchmark-repro branches back to the run they came from
+- lineage stays local to the existing single-agent session model rather than becoming a general branch-history database
 
 #### `events`
 
@@ -598,6 +640,7 @@ The skill framework stays lightweight if the split is:
 That means:
 
 - prompts stay short
+- canonical resume, retrospective, benchmark, and promotion prompts can come from one small template layer instead of drifting across scripts
 - the agent still gets specialized guidance
 - fewer workflow failures depend on memory
 

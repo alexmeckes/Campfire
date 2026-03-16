@@ -188,6 +188,29 @@ Use this scope only after promotion.
 
 Campfire core should remain curated. Generated core candidates should still be reviewed before they are treated as durable defaults.
 
+## Discovery Surfaces
+
+Campfire should make these skill locations discoverable through one generated manifest instead of bespoke path guessing.
+
+Generated surfaces:
+
+- `.campfire/skill_inventory.json`
+- `.campfire/project_context.json`
+- `.autonomous/<task>/task_context.json`
+
+Recommended manifest fields:
+
+- `skill_name`
+- `scope`
+- `task_slug` when task-local
+- `package_name`
+- `source_dir`
+- `skill_path`
+- `candidate_id`
+- `promotion_state`
+
+`package_name` should be stable across renders so repo-local installers or review tools do not need custom naming logic for every scope.
+
 ## Promotion States
 
 Use a small explicit state machine:
@@ -312,6 +335,8 @@ Campfire can now store candidates mechanically with:
 
 - `record_improvement_candidate.sh`
 - `promote_improvement.sh`
+- `draft_generated_skill.sh`
+- `verify_draft_generated_skill.sh`
 
 Use those helpers to keep the improvement backlog queryable instead of leaving it only in markdown.
 

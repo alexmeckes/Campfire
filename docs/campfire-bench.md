@@ -24,6 +24,12 @@ Benchmarks like SWE-bench, Terminal-Bench, WebArena, GAIA, and AssistantBench ar
 
 CampfireBench is meant to evaluate those properties directly.
 
+When you want the canonical operator prompt for reviewing benchmark state in this repo, print it from the shared template layer:
+
+```bash
+./scripts/prompt_template_helper.sh benchmark
+```
+
 ## Core Dimensions
 
 ### 1. Success
@@ -123,6 +129,8 @@ Derived metrics:
 
 - `orchestration_token_ratio = orchestration_tokens / total_tokens`
 - `overall_score` from weighted dimensions
+
+When Campfire task sessions expose stable `run_id` values, benchmark repro runs should reuse or point at that same identifier so follow-up task evidence can link back to the exact branch that produced the result.
 
 ## Long-Term Memory Question
 

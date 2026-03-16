@@ -78,6 +78,21 @@ Frame it if needed:
 Use $task-framer and $task-handoff-state to turn this objective into a concrete Campfire task.
 ```
 
+Print the canonical operator prompts from state instead of rewriting them by hand:
+
+```bash
+./scripts/prompt_template_helper.sh --task-slug <task-slug> resume
+./scripts/prompt_template_helper.sh --task-slug <task-slug> retrospective
+./scripts/prompt_template_helper.sh benchmark
+```
+
+Persist operator guidance without hand-editing task state:
+
+```bash
+./scripts/queue_guidance.sh --mode interrupt_now --summary "Stop and inspect the failing verifier." <task-slug>
+./scripts/queue_guidance.sh --mode next_boundary --summary "Revisit this after the current milestone." <task-slug>
+```
+
 Start a slice before editing project files:
 
 ```bash
@@ -116,6 +131,27 @@ Promote a reviewed candidate into a real follow-up task:
 ./scripts/promote_improvement.sh <candidate-id>
 ```
 
+Inspect the generated skill discovery manifest when working with repo-local or task-local draft skills:
+
+```bash
+./scripts/refresh_registry.sh
+cat .campfire/skill_inventory.json
+```
+
+Draft a generated skill from a structured improvement candidate:
+
+```bash
+./scripts/draft_generated_skill.sh <candidate-id>
+```
+
+Validate the draft-generated-skill helper and wrapper flow:
+
+```bash
+./skills/task-handoff-state/scripts/verify_draft_generated_skill.sh
+```
+
+For the full template list, see [Prompt templates](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/prompt-templates.md).
+
 For long unattended runs, switch the task into rolling mode:
 
 ```bash
@@ -128,6 +164,18 @@ For a manual-stop rolling run, use `--until-stopped`.
 
 Automations are optional. When you do want recurring runs, keep the automation prompt task-only and let the automation configuration own schedule and workspace.
 Automations are best when the task already has stable Campfire state and a known task slug.
+
+Use the prompt-only helper when you just need reusable prompt bodies:
+
+```bash
+./skills/task-handoff-state/scripts/automation_prompt_helper.sh <task-slug>
+```
+
+Use the proposal helper when you want schedule-agnostic metadata with a suggested name, prompt, and workspace roots:
+
+```bash
+./scripts/automation_proposal_helper.sh <task-slug>
+```
 
 For the reusable patterns and prompt guidance, see [Automation patterns](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/automation-patterns.md).
 

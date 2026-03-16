@@ -350,3 +350,155 @@
 - Validation: reviewed the Pi-inspired backlog against the current Campfire control-plane, generated-skill, and benchmark docs and confirmed the five milestones remain single-agent, local-first, and dependency-safe.
 - Blockers: none.
 - Next slice: add a prompt-template layer for canonical Campfire operator flows, then verify and document it before moving into steering queues and session lineage.
+
+## 2026-03-16 milestone-039
+
+- Changed: added `skills/task-handoff-state/templates/prompt_templates.json`, `skills/task-handoff-state/scripts/prompt_template_helper.sh`, and the repo/example wrappers so Campfire now has one small prompt-template surface for canonical operator flows.
+- Changed: rewired `resume_task.sh`, `automation_prompt_helper.sh`, `start_slice.sh`, `enable_rolling_mode.sh`, `init_task.sh`, `bootstrap_task.sh`, and `promote_improvement.sh` to render prompts from the shared helper instead of repeating prompt prose inline.
+- Changed: documented the prompt-template layer in `README.md`, `skills/task-handoff-state/SKILL.md`, `skills/task-retrospector/SKILL.md`, `docs/campfire-bench.md`, `benchmarks/campfire-bench/README.md`, and `docs/campfire-v3-control-plane.md`.
+- Validation: ran direct helper checks for resume, retrospective, benchmark, and improvement-promotion prompts, then ran `./examples/basic-workspace/scripts/verify_harness.sh` and `./scripts/verify_repo.sh`.
+- Blockers: none.
+- Next slice: auto-advance into milestone-040 and add deterministic verifier coverage for the new prompt-template helper.
+
+## 2026-03-16 milestone-040 framing
+
+- Auto advance: after `milestone-039` validated, the rolling queue promoted `milestone-040` to the active milestone without pausing the unattended run.
+- Changed: recorded the coverage target in `findings/milestone-040-prompt-template-coverage.md` and refreshed the task state so the next slice focuses on verifier wiring rather than more prompt-surface redesign.
+- Validation: reviewed the new prompt-template helper, the example wrapper flow, and the existing repo verifier to confirm the next safe work is deterministic coverage plus repo wiring.
+- Blockers: none.
+- Next slice: add `verify_prompt_template_helper.sh`, wire it into `scripts/verify_repo.sh`, and keep the example wrapper flow green.
+
+## 2026-03-16 milestone-040
+
+- Changed: added `skills/task-handoff-state/scripts/verify_prompt_template_helper.sh` to cover task-bootstrap, resume, retrospective, benchmark, and improvement-promotion prompt rendering from stable task state.
+- Changed: wired the new verifier into `scripts/verify_repo.sh`, tightened the example wrapper harness to invoke `prompt_template_helper.sh` directly in the temp workspace, and updated the task-state skill quick start plus runbook with the new coverage command.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_prompt_template_helper.sh`, `./examples/basic-workspace/scripts/verify_harness.sh`, and `./scripts/verify_repo.sh` successfully.
+- Blockers: none.
+- Next slice: auto-advance into milestone-041 and add a lightweight steering-versus-follow-up queue model in the control plane and generated context surfaces.
+
+## 2026-03-16 milestone-041 framing
+
+- Auto advance: after `milestone-040` validated, the rolling queue promoted `milestone-041` to the active milestone without pausing the unattended run.
+- Changed: recorded the steering-versus-follow-up scope in `findings/milestone-041-steering-follow-up-queue.md` so the next slice can stay narrow: guidance visibility, not scheduler behavior.
+- Validation: reviewed the current SQL control-plane schema, task-state contract, and generated context builders to confirm the next safe work is a small guidance-entry surface and projection update.
+- Blockers: none.
+- Next slice: add a small guidance-entry surface in the SQL control plane and task projections, then expose interrupt-now versus next-boundary guidance without inventing a scheduler.
+
+## 2026-03-16 milestone-041
+
+- Changed: added `guidance_entries` support plus guidance normalization in `skills/task-handoff-state/scripts/campfire_sql.py` so interrupt-now and next-boundary guidance persist in the SQL control plane and generated projections.
+- Changed: added `skills/task-handoff-state/scripts/queue_guidance.sh` and the repo/example wrappers so operators can queue guidance without hand-editing `checkpoints.json`.
+- Changed: added `skills/task-handoff-state/scripts/verify_guidance_queue.sh`, wired it into `scripts/verify_repo.sh`, tightened the example wrapper harness, and documented the guidance surface in `README.md`, `skills/task-handoff-state/SKILL.md`, `skills/task-handoff-state/references/task-state-contract.md`, and `docs/campfire-v3-control-plane.md`.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_guidance_queue.sh`, `CAMPFIRE_SKILLS_ROOT=\"/Users/alexmeckes/Downloads/Campfire/skills\" ./examples/basic-workspace/scripts/verify_harness.sh`, and `./scripts/verify_repo.sh` successfully.
+- Blockers: none.
+- Next slice: auto-advance into milestone-042, then add a standardized skill inventory and generated-skill discovery surface before queue depth falls further.
+
+## 2026-03-16 milestone-042 framing
+
+- Auto advance: after `milestone-041` validated, the rolling queue promoted `milestone-042` to the active milestone without pausing the unattended run.
+- Changed: recorded the discovery-surface scope in `findings/milestone-042-skill-discovery-surfaces.md` so the next slice focuses on a packageable skill inventory instead of a larger generated-skill runtime.
+- Validation: reviewed `docs/campfire-generated-skills.md`, the current installer flow, and the existing context projections to confirm the next safe work is a standardized discovery manifest plus deterministic coverage.
+- Blockers: none.
+- Next slice: add a packageable skill inventory and generated-skill discovery surface, then validate discovered core, repo-local, and task-local skill surfaces with a dedicated verifier.
+
+## 2026-03-16 milestone-042
+
+- Changed: extended `skills/task-handoff-state/scripts/campfire_sql.py` so `refresh_registry.sh` now renders `.campfire/skill_inventory.json` and exposes discovery metadata through `project_context.json` and `task_context.json`.
+- Changed: added `skills/task-handoff-state/scripts/verify_skill_inventory.sh`, wired it into `scripts/verify_repo.sh`, and updated the SQL control-plane verifier to require the generated skill inventory surface.
+- Changed: documented the packageable discovery manifest in `README.md`, `skills/task-handoff-state/SKILL.md`, `skills/task-handoff-state/references/task-state-contract.md`, `docs/campfire-v3-control-plane.md`, and `docs/campfire-generated-skills.md`.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_skill_inventory.sh`, `./skills/task-handoff-state/scripts/verify_sql_control_plane.sh`, `./skills/task-handoff-state/scripts/verify_guidance_queue.sh`, and `./scripts/verify_repo.sh` successfully.
+- Blockers: none.
+- Next slice: auto-advance into milestone-043 before the queue empties, then add stable run identifiers and parent-child lineage metadata.
+
+## 2026-03-16 milestone-043 framing
+
+- Auto advance: after `milestone-042` validated, the rolling queue promoted `milestone-043` to the active milestone without pausing the unattended run.
+- Changed: recorded the session-lineage scope in `findings/milestone-043-session-lineage.md` so the next slice focuses on stable run identifiers, parent-child lineage, and source-run linkage.
+- Validation: reviewed the session table, current `record_improvement_candidate.sh` `source_run_id` path, and benchmark result schema to confirm the next safe work is lineage metadata rather than a new benchmark runtime.
+- Blockers: none.
+- Next slice: add stable run identifiers and parent-child session lineage, then validate retry-style lineage, branch labels, and source-run linkage with a dedicated verifier.
+
+## 2026-03-16 milestone-043
+
+- Changed: extended `skills/task-handoff-state/scripts/start_slice.sh` so new slices can carry stable `run_id` values plus optional `parent_run_id`, `lineage_kind`, and `branch_label` metadata.
+- Changed: extended `skills/task-handoff-state/scripts/campfire_sql.py`, `doctor_task.sh`, and generated context surfaces so sessions persist and expose lineage metadata across retries and benchmark repro branches.
+- Changed: added `skills/task-handoff-state/scripts/verify_session_lineage.sh`, wired it into `scripts/verify_repo.sh`, and documented the new run-id and lineage contract in the task-state, control-plane, benchmark, and task-state skill docs.
+- Validation: ran `./skills/task-handoff-state/scripts/verify_session_lineage.sh`, `./skills/task-handoff-state/scripts/verify_task_lifecycle.sh`, `./skills/task-handoff-state/scripts/verify_start_slice.sh`, `./skills/task-handoff-state/scripts/verify_complete_slice.sh`, `./skills/task-handoff-state/scripts/verify_improvement_flow.sh`, and `./scripts/verify_repo.sh` successfully.
+- Blockers: none.
+- Next slice: spend one bounded reframe replenishing the rolling queue around generated-skill drafting, then auto-advance into the first drafted-skill implementation slice.
+
+## 2026-03-16 milestone-044 framing
+
+- Auto reframe: queue depth reached zero after `milestone-043` validated, so the run spent one bounded planning slice replenishing the next backlog around generated-skill drafting and the deferred automation-proposal helper.
+- Changed: recorded the replenished backlog in `findings/milestone-044-generated-skill-drafting-backlog.md` and refreshed `plan.md`, `checkpoints.json`, `handoff.md`, `progress.md`, and `artifacts.json` so the next unattended slice resumes on generated-skill drafting instead of stopping on an empty queue.
+- Validation: reviewed the generated-skill policy, improvement backlog surface, and new packageable discovery manifest to confirm the refreshed queue remains dependency-safe and single-agent.
+- Blockers: none.
+- Next slice: add a helper that drafts generated skills from structured improvement candidates.
+
+## 2026-03-16 milestone-044
+
+- Changed: added `skills/task-handoff-state/scripts/draft_generated_skill.sh` plus the repo-local wrapper `scripts/draft_generated_skill.sh` so structured `skill_candidate` entries can become repo-local or task-local draft skill scaffolds mechanically.
+- Changed: refreshed registry output after draft creation so `.campfire/skill_inventory.json`, `.campfire/project_context.json`, and task-local `task_context.json` expose the new draft skill surfaces immediately.
+- Validation: ran a manual smoke flow in a temp workspace that recorded candidates, drafted repo-local and task-local skills, confirmed the generated files existed, and confirmed inventory discovery reported the drafted repo-local skill surface.
+- Blockers: none.
+- Next slice: auto-advance into milestone-045 and replace the manual smoke check with deterministic verifier and example-wrapper coverage.
+
+## 2026-03-16 milestone-045 framing
+
+- Auto advance: after `milestone-044` validated, the rolling queue promoted `milestone-045` to the active milestone without pausing the unattended run.
+- Changed: recorded the generated-skill coverage target in `findings/milestone-045-generated-skill-coverage.md` and refreshed handoff state so the next slice stays narrow: deterministic verifier wiring plus example wrapper coverage.
+- Validation: reviewed the new draft helper, existing example wrappers, and repo verifier to confirm the next safe work is coverage, not another control-plane expansion.
+- Blockers: none.
+- Next slice: add `verify_draft_generated_skill.sh`, wire it into `scripts/verify_repo.sh`, and make the example harness prove drafted skills appear in the generated inventory surfaces.
+
+## 2026-03-16
+
+- Completed `milestone-050` / `slice-050-resume-automation-proposal-verifier` with status `validated`.
+- Summary: Validated rolling resume automation proposal guidance through the dedicated verifier and the repo suite.
+- Next step: Decision boundary: choose whether Campfire should stay proposal-only, add generic schedule-input scaffolds, or add Codex App-specific automation instantiation support.
+
+## 2026-03-16 milestone-050 retrospective
+
+- Retrospective: the automation-proposal backlog completed cleanly, and the reusable rollout ladder was helper -> verifier coverage -> docs -> live resume surfacing -> resume-surface verifier.
+- Decision boundary: the next automation surface now depends on a product choice between generic schedule-input scaffolds and Codex App-specific automation instantiation support.
+- Next action: resolve that boundary before framing a new automation backlog.
+
+- Started `milestone-050` / `slice-050-resume-automation-proposal-verifier`.
+- Active slice: Verify rolling resume automation proposal guidance
+- Validation target: Add a dedicated verifier for rolling resume automation proposal metadata and wire it into the repo suite.
+
+- Completed `milestone-049` / `slice-049-resume-automation-proposals` with status `validated`.
+- Summary: Validated rolling resume automation proposal guidance through direct resume output inspection and helper parity.
+- Next step: Auto-advance into milestone-050 and add a dedicated verifier for the new resume-task proposal guidance.
+
+- Started `milestone-049` / `slice-049-resume-automation-proposals`.
+- Active slice: Surface automation proposal guidance in rolling resume output
+- Validation target: Update rolling resume output to call the automation proposal helper without duplicating proposal logic.
+
+- Completed `milestone-048` / `slice-048-automation-proposal-docs` with status `validated`.
+- Summary: Validated automation proposal documentation across README, task-state quick start, example guidance, and the task runbook.
+- Next step: Auto-advance into milestone-049 and surface automation proposal guidance from rolling resume output.
+
+- Started `milestone-048` / `slice-048-automation-proposal-docs`.
+- Active slice: Document automation proposal helper usage
+- Validation target: Update README, task-state skill docs, and example guidance for automation proposal metadata.
+
+- Completed `milestone-047` / `slice-047-automation-proposal-coverage` with status `validated`.
+- Summary: Validated automation proposal coverage through the dedicated verifier, example wrapper flow, and the repo suite.
+- Next step: Auto-advance into milestone-048 and document when to use automation proposal metadata across README and example guidance.
+
+- Started `milestone-047` / `slice-047-automation-proposal-coverage`.
+- Active slice: Verify automation proposal helper and example coverage
+- Validation target: Add a dedicated automation proposal verifier, example wrapper flow, and repo-suite wiring.
+
+- Completed `milestone-046` / `slice-046-automation-proposal-helper` with status `validated`.
+- Summary: Validated automation proposal helper metadata through direct helper output and repo-wrapper JSON assertions.
+- Next step: Auto-advance into milestone-047 and add deterministic verifier plus example-wrapper coverage for automation proposals.
+
+- Started `milestone-046` / `slice-046-automation-proposal-helper`.
+- Active slice: Add schedule-agnostic automation proposal helper metadata
+- Validation target: Implement automation proposal helper and repo wrapper using task context plus prompt-template output.
+
+- Completed `milestone-045` / `slice-045-draft-skill-coverage` with status `validated`.
+- Summary: Validated generated-skill draft coverage through dedicated verifier, example wrapper flow, and the repo suite.
+- Next step: Auto-advance into milestone-046 and implement schedule-agnostic automation proposal helper metadata on top of prompt templates and task context.

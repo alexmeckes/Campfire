@@ -9,6 +9,7 @@ TASK_OBJECTIVE=""
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SQL_HELPER="$SCRIPT_DIR/campfire_sql.py"
 INIT_SCRIPT="$SCRIPT_DIR/init_task.sh"
+PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
 REFRESH_REGISTRY_SCRIPT="$SCRIPT_DIR/refresh_registry.sh"
 
 usage() {
@@ -159,4 +160,7 @@ Promoted improvement candidate:
   promotion_state: $PROMOTION_STATE
   task_slug: $PROMOTED_TASK_SLUG
   objective: $TASK_OBJECTIVE
+
+Recommended Codex App prompt:
+  $("$PROMPT_TEMPLATE_SCRIPT" --root "$ROOT_DIR" --task-slug "$PROMOTED_TASK_SLUG" --candidate-id "$CANDIDATE_ID" improvement_promotion)
 EOF

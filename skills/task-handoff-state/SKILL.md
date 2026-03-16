@@ -11,11 +11,16 @@ This skill standardizes a task directory at `.autonomous/<task>/` inside the act
 
 Read [references/task-state-contract.md](references/task-state-contract.md) when you need the full file contract and schema conventions.
 Read [references/automation-patterns.md](references/automation-patterns.md) when the task should drive a recurring Codex App automation instead of a one-off run.
+Read [references/prompt-templates.md](references/prompt-templates.md) when you want the canonical operator prompts for resume, retrospection, benchmark review, or promoted-improvement follow-up.
 Use [scripts/automation_prompt_helper.sh](scripts/automation_prompt_helper.sh) when you want task-only automation prompt variants emitted from existing Campfire state.
+Use [scripts/automation_proposal_helper.sh](scripts/automation_proposal_helper.sh) when you want schedule-agnostic automation proposal metadata with stable names, prompt bodies, and workspace roots.
+Use [scripts/prompt_template_helper.sh](scripts/prompt_template_helper.sh) when you want the shared prompt-template layer instead of hand-writing common operator prompts.
+Use [scripts/queue_guidance.sh](scripts/queue_guidance.sh) when you need to persist active interrupt-now guidance or queued next-boundary follow-ups without hand-editing `checkpoints.json`.
+Use [scripts/draft_generated_skill.sh](scripts/draft_generated_skill.sh) when a structured `skill_candidate` should become a task-local or repo-local draft skill scaffold instead of staying only in the backlog.
 Use [scripts/start_slice.sh](scripts/start_slice.sh) to move a task into an active implementation slice before touching project files.
 Use [scripts/complete_slice.sh](scripts/complete_slice.sh) to close a slice mechanically and update handoff state, heartbeat, and registry.
 Use [scripts/touch_heartbeat.sh](scripts/touch_heartbeat.sh) when you need to refresh task liveness without re-writing the whole handoff.
-Use [scripts/refresh_registry.sh](scripts/refresh_registry.sh) to rebuild the repo-local task registry under `.campfire/registry.json`.
+Use [scripts/refresh_registry.sh](scripts/refresh_registry.sh) to rebuild the repo-local task registry under `.campfire/registry.json` and refresh generated discovery surfaces such as `.campfire/skill_inventory.json`.
 Use [scripts/doctor_task.sh](scripts/doctor_task.sh) to compare task files against the SQL control plane and catch drift.
 Use [scripts/record_improvement_candidate.sh](scripts/record_improvement_candidate.sh) to turn a retrospective finding into a structured improvement candidate and append it to the SQL-backed improvement backlog.
 Use [scripts/promote_improvement.sh](scripts/promote_improvement.sh) to convert a structured improvement candidate into a real follow-up task without hand-editing the backlog.
@@ -86,10 +91,40 @@ Print task-only automation prompt variants for an existing task:
 ~/.codex/skills/task-handoff-state/scripts/automation_prompt_helper.sh build-the-next-milestone
 ```
 
+Print schedule-agnostic automation proposal metadata for an existing task:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/automation_proposal_helper.sh build-the-next-milestone
+```
+
+Print a canonical retrospective prompt for an existing task:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/prompt_template_helper.sh --task-slug build-the-next-milestone retrospective
+```
+
+Print the benchmark review prompt:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/prompt_template_helper.sh benchmark
+```
+
+Queue guidance for the active task without inventing scheduler semantics:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/queue_guidance.sh --mode interrupt_now --summary "Stop and inspect the failing verifier." build-the-next-milestone
+```
+
 Activate the next implementation slice before editing project files:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/start_slice.sh --from-next --slice-title "Implement the next safe slice" build-the-next-milestone
+```
+
+When a new slice is a retry, course correction, or benchmark repro branch, record lineage at slice start instead of inventing a separate helper:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/start_slice.sh --milestone-id milestone-003 --slice-title "Retry the verifier" --parent-run-id run-20260316T120102123456Z --lineage-kind retry --branch-label "retry-after-doctor" build-the-next-milestone
 ```
 
 Complete a slice and park the task cleanly:
@@ -108,6 +143,12 @@ Promote an improvement candidate into a real follow-up task:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/promote_improvement.sh slice-start-guard
+```
+
+Draft a generated skill scaffold from an existing candidate:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/draft_generated_skill.sh slice-start-guard
 ```
 
 Verify the task-state lifecycle:
@@ -176,6 +217,18 @@ Verify the missing-resume guardrail:
 ~/.codex/skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh
 ```
 
+Verify the prompt-template helper:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_prompt_template_helper.sh
+```
+
+Verify generated-skill drafting coverage:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_draft_generated_skill.sh
+```
+
 Verify deterministic slice activation:
 
 ```bash
@@ -206,6 +259,18 @@ Verify the structured improvement-candidate flow:
 ~/.codex/skills/task-handoff-state/scripts/verify_improvement_flow.sh
 ```
 
+Verify packageable skill discovery across core, repo-local, and task-local surfaces:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_skill_inventory.sh
+```
+
+Verify session-lineage metadata for retries and benchmark repro branches:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_session_lineage.sh
+```
+
 Verify recurring automation-pattern coverage:
 
 ```bash
@@ -216,6 +281,12 @@ Verify automation prompt helper coverage:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh
+```
+
+Verify interrupt-now versus next-boundary guidance persistence:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_guidance_queue.sh
 ```
 
 Verify the autonomous rolling floor defaults:

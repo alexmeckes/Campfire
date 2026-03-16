@@ -141,7 +141,7 @@ if not isinstance(current, dict):
     current = {}
 
 heartbeat = load_json(heartbeat_path)
-now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+now = datetime.now(timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z")
 
 derived_state = requested_state
 if not derived_state:

@@ -22,6 +22,10 @@ zsh -n \
   "$ROOT_DIR/scripts/doctor_task.sh" \
   "$ROOT_DIR/scripts/record_improvement_candidate.sh" \
   "$ROOT_DIR/scripts/promote_improvement.sh" \
+  "$ROOT_DIR/scripts/prompt_template_helper.sh" \
+  "$ROOT_DIR/scripts/queue_guidance.sh" \
+  "$ROOT_DIR/scripts/draft_generated_skill.sh" \
+  "$ROOT_DIR/scripts/automation_proposal_helper.sh" \
   "$ROOT_DIR/scripts/start_slice.sh" \
   "$ROOT_DIR/scripts/complete_slice.sh" \
   "$ROOT_DIR/scripts/refresh_registry.sh" \
@@ -30,8 +34,12 @@ zsh -n \
   "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/automation_prompt_helper.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/automation_proposal_helper.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/prompt_template_helper.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/queue_guidance.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/record_improvement_candidate.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/promote_improvement.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/draft_generated_skill.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/bootstrap_task.sh" \
@@ -40,6 +48,9 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/doctor_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/record_improvement_candidate.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/promote_improvement.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/prompt_template_helper.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/queue_guidance.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/draft_generated_skill.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/start_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/complete_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/touch_heartbeat.sh" \
@@ -50,6 +61,10 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_registry_refresh.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_sql_control_plane.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_improvement_flow.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_skill_inventory.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_session_lineage.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_draft_generated_skill.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
@@ -60,8 +75,11 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_waiting_on_decision.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_enable_rolling_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_prompt_template_helper.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_proposal_guidance.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_guidance_queue.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_autonomous_floor.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_until_stopped_mode.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh" \
@@ -77,6 +95,8 @@ expect_file "$ROOT_DIR/skills/task-handoff-state/SKILL.md"
 expect_file "$ROOT_DIR/skills/task-handoff-state/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/task-handoff-state/references/task-state-contract.md"
 expect_file "$ROOT_DIR/skills/task-handoff-state/references/automation-patterns.md"
+expect_file "$ROOT_DIR/skills/task-handoff-state/references/prompt-templates.md"
+expect_file "$ROOT_DIR/skills/task-handoff-state/templates/prompt_templates.json"
 expect_file "$ROOT_DIR/skills/course-corrector/SKILL.md"
 expect_file "$ROOT_DIR/skills/course-corrector/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/course-corrector/references/course-correction-triggers.md"
@@ -97,8 +117,12 @@ expect_file "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/automation_prompt_helper.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/automation_proposal_helper.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/prompt_template_helper.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/queue_guidance.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/record_improvement_candidate.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/promote_improvement.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/draft_generated_skill.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/plan.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/runbook.md"
@@ -154,6 +178,18 @@ echo "== SQL control-plane verifier =="
 echo "== Improvement flow verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_improvement_flow.sh"
 
+echo "== Skill inventory verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_skill_inventory.sh"
+
+echo "== Session lineage verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_session_lineage.sh"
+
+echo "== Draft generated skill verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_draft_generated_skill.sh"
+
+echo "== Automation proposal helper verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh"
+
 echo "== Benchmark verifier =="
 "$ROOT_DIR/scripts/verify_benchmark.sh"
 
@@ -187,11 +223,17 @@ echo "== Rolling mode helper verifier =="
 echo "== Missing resume guardrail verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_missing_resume_guardrail.sh"
 
+echo "== Prompt template helper verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_prompt_template_helper.sh"
+
 echo "== Automation pattern verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh"
 
 echo "== Automation prompt helper verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh"
+
+echo "== Guidance queue verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_guidance_queue.sh"
 
 echo "== Autonomous floor verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_autonomous_floor.sh"
@@ -201,6 +243,9 @@ echo "== Until-stopped verifier =="
 
 echo "== Resume automation-guidance verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_prompt_guidance.sh"
+
+echo "== Resume automation-proposal verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_proposal_guidance.sh"
 
 rm -f /tmp/campfire_install.out
 

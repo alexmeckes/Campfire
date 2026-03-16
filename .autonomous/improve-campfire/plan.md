@@ -53,11 +53,18 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - [x] Prevent missing continue targets from bootstrapping replacement tasks in the wrong workspace
 - [x] Add deterministic verification for the missing-resume guardrail
 - [x] Document the missing-resume guardrail in README and example guidance
-- [ ] Add a prompt-template layer for canonical Campfire operator flows
-- [ ] Add deterministic verification and example coverage for prompt templates
-- [ ] Add a lightweight steering versus follow-up queue model for active tasks
-- [ ] Add packageable repo-local and generated skill discovery surfaces
-- [ ] Add session-lineage metadata for retries, branches, and benchmark repros
+- [x] Add a prompt-template layer for canonical Campfire operator flows
+- [x] Add deterministic verification and example coverage for prompt templates
+- [x] Add a lightweight steering versus follow-up queue model for active tasks
+- [x] Add packageable repo-local and generated skill discovery surfaces
+- [x] Add session-lineage metadata for retries, branches, and benchmark repros
+- [x] Add a helper that drafts generated skills from structured improvement candidates
+- [x] Add deterministic verification and example coverage for generated-skill drafting
+- [x] Add an automation proposal helper that emits schedule-agnostic proposal metadata from Campfire state
+- [x] Add deterministic verification and example coverage for automation proposals
+- [x] Document automation proposal helper usage in README and example guidance
+- [x] Surface automation proposal guidance from `resume_task.sh` for rolling tasks
+- [x] Add deterministic verification that `resume_task.sh` surfaces automation proposal guidance correctly
 
 ## Notes
 
@@ -76,3 +83,4 @@ dogfood Campfire on itself and harden lifecycle verification coverage
 - Milestones 024 through 028 completed the automation-helper backlog, so the next bounded reframe now focuses on automation proposal metadata for Codex App recurring runs
 - The fresh-thread test exposed a more urgent workspace-mismatch bug, so the automation-proposal backlog was deferred behind a missing-resume guardrail before being requeued at milestone-034
 - A later review of `pi-mono/packages/coding-agent` suggested higher-leverage follow-up work around prompt templates, steering queues, packageable generated skills, and session lineage, so the deferred automation-proposal backlog is now parked behind the new milestone-039 through milestone-043 queue.
+- Milestones 044 and 045 completed the generated-skill draft path with deterministic coverage, so the next bounded reframe restores the deferred automation-proposal backlog on top of the stronger prompt-template, task-guidance, and discovery surfaces.

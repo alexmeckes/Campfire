@@ -48,6 +48,7 @@ expect_file "$DB_PATH"
 expect_file "$TEMP_WORKSPACE/.campfire/registry.json"
 expect_file "$TEMP_WORKSPACE/.campfire/project_context.json"
 expect_file "$TEMP_WORKSPACE/.campfire/improvement_backlog.json"
+expect_file "$TEMP_WORKSPACE/.campfire/skill_inventory.json"
 expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/task_context.json"
 
 python3 - "$DB_PATH" "$TASK_SLUG" <<'PY'

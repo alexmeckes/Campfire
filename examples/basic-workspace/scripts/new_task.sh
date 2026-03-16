@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SKILLS_ROOT="${CAMPFIRE_SKILLS_ROOT:-$HOME/.codex/skills}"
 BOOTSTRAP_SCRIPT="$SKILLS_ROOT/task-handoff-state/scripts/bootstrap_task.sh"
+PROMPT_TEMPLATE_SCRIPT="$SKILLS_ROOT/task-handoff-state/scripts/prompt_template_helper.sh"
 FORWARD_ARGS=("$@")
 TASK_SLUG=""
 
@@ -15,6 +16,12 @@ slugify() {
 
 if [ ! -x "$BOOTSTRAP_SCRIPT" ]; then
   echo "Campfire bootstrap script not found: $BOOTSTRAP_SCRIPT" >&2
+  echo "Set CAMPFIRE_SKILLS_ROOT or install Campfire skills with ./scripts/install_skills.sh." >&2
+  exit 1
+fi
+
+if [ ! -x "$PROMPT_TEMPLATE_SCRIPT" ]; then
+  echo "Campfire prompt template helper not found: $PROMPT_TEMPLATE_SCRIPT" >&2
   echo "Set CAMPFIRE_SKILLS_ROOT or install Campfire skills with ./scripts/install_skills.sh." >&2
   exit 1
 fi
@@ -49,5 +56,5 @@ TASK_SLUG="${TASK_SLUG:-$(slugify "$OBJECTIVE")}"
 
 echo
 echo "Workspace-specific prompt:"
-echo "  Use \$long-horizon-worker and \$task-handoff-state to continue .autonomous/$TASK_SLUG/ and keep working until the current milestone is validated."
+echo "  $("$PROMPT_TEMPLATE_SCRIPT" --root "$ROOT_DIR" --task-slug "$TASK_SLUG" task_bootstrap)"
 echo "  To switch this task into rolling mode later: ./scripts/enable_rolling_mode.sh --until-stopped $TASK_SLUG"

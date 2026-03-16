@@ -7,11 +7,13 @@
 - For rolling Codex App runs, switch a task with `./scripts/enable_rolling_mode.sh <task-slug> ...`.
 - Run `./scripts/doctor_task.sh <task-slug>` when you want to confirm the task files and SQL control plane still agree.
 - Print rolling automation prompt variants with `./scripts/automation_prompt_helper.sh <task-slug>`.
+- Print schedule-agnostic automation proposal metadata with `./scripts/automation_proposal_helper.sh <task-slug>`.
 - Use `$long-horizon-worker` with `$task-handoff-state` for long-running multi-step work.
 - Use `$task-evaluator` before treating a milestone as fully complete.
 - For unattended Codex App runs, prefer a rolling backlog with explicit stop conditions instead of one milestone at a time.
 - For recurring Codex App automations, keep prompts task-only and let the automation own schedule plus workspace selection.
 - Generate recurring task-only prompts from existing state with `./scripts/automation_prompt_helper.sh <task-slug>` instead of copying examples by hand.
+- Use `./scripts/automation_proposal_helper.sh <task-slug>` when you also want a suggested automation name and workspace roots without choosing a schedule yet.
 - If a named `.autonomous/<task>/` is missing during a continue request, stop and confirm the workspace instead of creating a replacement task.
 - If this example lives inside a git repo and you need isolation, prefer worktree-backed bootstrap for risky long runs.
 - Keep durable task state under `.autonomous/<task>/`.

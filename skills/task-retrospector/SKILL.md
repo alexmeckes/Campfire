@@ -17,6 +17,7 @@ Pair it with:
 
 Read [references/retrospective-checklist.md](references/retrospective-checklist.md) when you need the retrospective checklist and output rules.
 Read [/Users/alexmeckes/Downloads/Campfire/docs/campfire-generated-skills.md](/Users/alexmeckes/Downloads/Campfire/docs/campfire-generated-skills.md) when a retrospective should propose a generated micro-skill instead of a verifier, benchmark, or control-plane change.
+Use [/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/prompt_template_helper.sh](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/prompt_template_helper.sh) when you want the canonical retrospective operator prompt instead of rewriting it from scratch.
 Use [/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/record_improvement_candidate.sh](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/record_improvement_candidate.sh) when you want the retrospective result stored mechanically in the SQL improvement backlog instead of only in prose.
 Use [/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/promote_improvement.sh](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/scripts/promote_improvement.sh) when a reviewed candidate should become a real follow-up task.
 

@@ -7,9 +7,13 @@ NEW_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/new_task.sh"
 RESUME_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/resume_task.sh"
 ENABLE_ROLLING_SCRIPT="$EXAMPLE_ROOT/scripts/enable_rolling_mode.sh"
 AUTOMATION_PROMPTS_SCRIPT="$EXAMPLE_ROOT/scripts/automation_prompt_helper.sh"
+AUTOMATION_PROPOSAL_SCRIPT="$EXAMPLE_ROOT/scripts/automation_proposal_helper.sh"
+PROMPT_TEMPLATE_SCRIPT="$EXAMPLE_ROOT/scripts/prompt_template_helper.sh"
+QUEUE_GUIDANCE_SCRIPT="$EXAMPLE_ROOT/scripts/queue_guidance.sh"
 DOCTOR_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/doctor_task.sh"
 RECORD_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/record_improvement_candidate.sh"
 PROMOTE_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/promote_improvement.sh"
+DRAFT_SKILL_SCRIPT="$EXAMPLE_ROOT/scripts/draft_generated_skill.sh"
 TASK_SLUG="verify-example-wrapper-flow"
 
 fail() {
@@ -31,7 +35,7 @@ expect_contains() {
 }
 
 echo "== Syntax checks =="
-zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
+zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
 
 echo "== Skill presence =="
 expect_file "$SKILLS_ROOT/task-handoff-state/SKILL.md"
@@ -42,16 +46,21 @@ expect_file "$SKILLS_ROOT/course-corrector/SKILL.md"
 
 echo "== Temp workspace wrapper flow =="
 TEMP_WORKSPACE="$(mktemp -d)"
-trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_example_roll.out /tmp/campfire_example_prompts.out /tmp/campfire_example_resume.out' EXIT
+trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_example_roll.out /tmp/campfire_example_prompts.out /tmp/campfire_example_template.out /tmp/campfire_example_guidance.out /tmp/campfire_example_resume.out' EXIT
 mkdir -p "$TEMP_WORKSPACE/scripts"
-cp "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$TEMP_WORKSPACE/scripts/"
+cp "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
+cp "$QUEUE_GUIDANCE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$DOCTOR_TASK_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$TEMP_WORKSPACE/scripts/"
+cp "$DRAFT_SKILL_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 chmod +x "$TEMP_WORKSPACE"/scripts/*.sh
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/new_task.sh" --slug "$TASK_SLUG" "verify example wrapper flow" >/tmp/campfire_example_new.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/enable_rolling_mode.sh" --until-stopped --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice" "$TASK_SLUG" >/tmp/campfire_example_roll.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/automation_prompt_helper.sh" "$TASK_SLUG" >/tmp/campfire_example_prompts.out
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/automation_proposal_helper.sh" --json "$TASK_SLUG" >/tmp/campfire_example_proposals.json
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/prompt_template_helper.sh" --task-slug "$TASK_SLUG" resume >/tmp/campfire_example_template.out
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/queue_guidance.sh" --mode next_boundary --summary "Pause for review at the next boundary." "$TASK_SLUG" >/tmp/campfire_example_guidance.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/resume_task.sh" "$TASK_SLUG" >/tmp/campfire_example_resume.out
 
 expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/plan.md"
@@ -67,11 +76,40 @@ expect_file "$TEMP_WORKSPACE/.campfire/improvement_backlog.json"
 expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/task_context.json"
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/checkpoints.json" '"mode": "rolling"'
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/checkpoints.json" '"run_style": "until_stopped"'
+expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/checkpoints.json" '"guidance"'
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/handoff.md" 'Use $task-framer'
 expect_contains /tmp/campfire_example_new.out 'Workspace-specific prompt:'
 expect_contains /tmp/campfire_example_new.out 'To switch this task into rolling mode later:'
 expect_contains /tmp/campfire_example_roll.out 'Workspace-local follow-ups:'
 expect_contains /tmp/campfire_example_prompts.out 'rolling_resume:'
+python3 - "$TEMP_WORKSPACE" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+workspace = Path(sys.argv[1]).resolve()
+payload = json.loads(Path("/tmp/campfire_example_proposals.json").read_text())
+proposals = payload.get("proposals", [])
+if [item.get("variant") for item in proposals] != ["rolling_resume", "verifier_sweep", "backlog_refresh"]:
+    raise SystemExit("proposal variant mismatch")
+names = {item["variant"]: item["name"] for item in proposals}
+if names["rolling_resume"] != "Continue verify-example-wrapper-flow":
+    raise SystemExit("rolling proposal name mismatch")
+if names["verifier_sweep"] != "Sweep verify-example-wrapper-flow verifier":
+    raise SystemExit("verifier proposal name mismatch")
+if names["backlog_refresh"] != "Refresh verify-example-wrapper-flow backlog":
+    raise SystemExit("backlog proposal name mismatch")
+for item in proposals:
+    if item.get("cwds") != [str(workspace)]:
+        raise SystemExit("proposal cwd mismatch")
+    if item.get("status") != "ACTIVE":
+        raise SystemExit("proposal status mismatch")
+    if not str(item.get("prompt", "")).startswith("Use $"):
+        raise SystemExit("proposal prompt mismatch")
+PY
+expect_contains /tmp/campfire_example_template.out '.autonomous/'
+expect_contains /tmp/campfire_example_guidance.out 'queued next_boundary guidance:'
+expect_contains /tmp/campfire_example_template.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state'
 expect_contains /tmp/campfire_example_resume.out 'Workspace-specific prompt:'
 expect_contains /tmp/campfire_example_resume.out 'Project context:'
 expect_contains /tmp/campfire_example_resume.out 'Task context:'
@@ -83,6 +121,37 @@ expect_contains /tmp/campfire_example_doctor.out 'Doctor passed:'
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/record_improvement_candidate.sh" --task-slug "$TASK_SLUG" --candidate-id "example-flow-candidate" --category verifier_candidate --scope repo_local --title "Catch stale state earlier" --problem "Wrapper flow should prove improvement candidates can be stored mechanically." --next-action "Promote the candidate if the wrapper flow stays healthy." >/tmp/campfire_example_candidate.out
 expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/findings/example-flow-candidate.json"
 expect_contains "$TEMP_WORKSPACE/.campfire/improvement_backlog.json" 'example-flow-candidate'
+
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/record_improvement_candidate.sh" --task-slug "$TASK_SLUG" --candidate-id "example-draft-skill" --category skill_candidate --scope repo_local --title "Draft example wrapper skill" --problem "Example wrappers should prove generated skills can be drafted mechanically." --proposed-skill-name "example-wrapper-skill" --proposed-skill-purpose "Exercise the draft-generated-skill wrapper in the example workspace." --next-action "Review the drafted example skill." >/tmp/campfire_example_skill_candidate.out
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/draft_generated_skill.sh" "example-draft-skill" >/tmp/campfire_example_draft.out
+expect_file "$TEMP_WORKSPACE/.campfire/generated-skills/example-wrapper-skill/SKILL.md"
+expect_file "$TEMP_WORKSPACE/.campfire/generated-skills/example-wrapper-skill/skill_candidate.json"
+expect_file "$TEMP_WORKSPACE/.campfire/skill_inventory.json"
+expect_contains /tmp/campfire_example_draft.out 'Drafted generated skill: example-wrapper-skill'
+
+python3 - "$TEMP_WORKSPACE" "$TASK_SLUG" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+workspace = Path(sys.argv[1]).resolve()
+task_slug = sys.argv[2]
+inventory = json.loads((workspace / ".campfire" / "skill_inventory.json").read_text())
+skills = inventory.get("skills", [])
+entry = next(item for item in skills if item["skill_name"] == "example-wrapper-skill")
+if entry["scope"] != "repo_local_generated":
+    raise SystemExit("drafted example skill scope mismatch")
+
+project_context = json.loads((workspace / ".campfire" / "project_context.json").read_text())
+repo_skills = project_context.get("discoverable_skills", {}).get("repo_local_generated", [])
+if not any(item.get("skill_name") == "example-wrapper-skill" for item in repo_skills):
+    raise SystemExit("project context missing drafted example skill")
+
+task_context = json.loads((workspace / ".autonomous" / task_slug / "task_context.json").read_text())
+repo_local = task_context.get("skill_surfaces", {}).get("repo_local_generated", [])
+if not any(item.get("skill_name") == "example-wrapper-skill" for item in repo_local):
+    raise SystemExit("task context missing drafted example skill")
+PY
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/promote_improvement.sh" --task-slug "improve-example-flow-candidate" "example-flow-candidate" >/tmp/campfire_example_promote.out
 expect_file "$TEMP_WORKSPACE/.autonomous/improve-example-flow-candidate/plan.md"

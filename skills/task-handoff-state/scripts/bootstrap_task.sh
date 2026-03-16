@@ -7,6 +7,9 @@ USE_WORKTREE=false
 WORKTREE_ROOT=""
 BRANCH_NAME=""
 BASE_REF=""
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+INIT_SCRIPT="$SCRIPT_DIR/init_task.sh"
+PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
 
 usage() {
   cat <<'EOF'
@@ -142,8 +145,6 @@ fi
 OBJECTIVE="${POSITIONAL[1]}"
 TASK_SLUG="${TASK_SLUG:-$(slugify "$OBJECTIVE")}"
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-INIT_SCRIPT="$SCRIPT_DIR/init_task.sh"
 
 if [ ! -x "$INIT_SCRIPT" ]; then
   echo "Missing init_task.sh beside bootstrap_task.sh" >&2
@@ -197,4 +198,4 @@ if [ -n "$BRANCH_NAME" ] && [ "$WORKSPACE_STRATEGY" = "git_worktree" ]; then
 fi
 echo
 echo "Recommended Codex App prompt:"
-echo "  Use \$task-framer, \$course-corrector, \$long-horizon-worker, \$task-evaluator, and \$task-handoff-state to continue .autonomous/$TASK_SLUG/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, and stop only on the configured run limits or a real blocker."
+echo "  $("$PROMPT_TEMPLATE_SCRIPT" --root "$WORKSPACE_ROOT" --task-slug "$TASK_SLUG" task_bootstrap)"

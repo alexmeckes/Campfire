@@ -1,6 +1,6 @@
 {
   "task_slug": "improve-campfire",
-  "last_updated": "2026-03-15",
+  "last_updated": "2026-03-16",
   "artifacts": [
     {
       "path": "AGENTS.md",
@@ -403,6 +403,276 @@
       "type": "planning_note",
       "milestone_id": "milestone-034",
       "reason": "Restores the deferred automation-proposal backlog after the missing-resume guardrail validated."
+    },
+    {
+      "path": "skills/task-handoff-state/templates/prompt_templates.json",
+      "type": "workflow_data",
+      "milestone_id": "milestone-039",
+      "reason": "Stores the canonical prompt bodies for task bootstrap, resume, retrospection, benchmark review, and improvement-promotion flows."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/prompt_template_helper.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-039",
+      "reason": "Renders canonical prompt templates from task state and shared template data."
+    },
+    {
+      "path": "scripts/prompt_template_helper.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-039",
+      "reason": "Exposes the prompt-template helper as a repo-local wrapper."
+    },
+    {
+      "path": "examples/basic-workspace/scripts/prompt_template_helper.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-039",
+      "reason": "Exposes the prompt-template helper in the copied example workspace surface."
+    },
+    {
+      "path": "skills/task-handoff-state/references/prompt-templates.md",
+      "type": "reference_doc",
+      "milestone_id": "milestone-039",
+      "reason": "Documents the canonical prompt-template surface and example invocations."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-039-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-039",
+      "reason": "Records the independent evaluation of the prompt-template layer milestone."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-040-prompt-template-coverage.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-040",
+      "reason": "Defines the next deterministic coverage slice for the shared prompt-template helper."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_prompt_template_helper.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-040",
+      "reason": "Verifies the shared prompt-template helper across bootstrap, resume, retrospective, benchmark, and promoted-improvement flows."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-040-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-040",
+      "reason": "Records the independent evaluation of the prompt-template coverage milestone."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-041-steering-follow-up-queue.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-041",
+      "reason": "Defines the next control-plane slice for interrupt-now versus next-boundary guidance visibility."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/queue_guidance.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-041",
+      "reason": "Persists interrupt-now and next-boundary operator guidance without hand-editing task state."
+    },
+    {
+      "path": "scripts/queue_guidance.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-041",
+      "reason": "Exposes the guidance-queue helper as a repo-local wrapper."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_guidance_queue.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-041",
+      "reason": "Verifies interrupt-now versus next-boundary guidance persistence through checkpoints, SQL, task context, and registry projections."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-041-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-041",
+      "reason": "Records the independent evaluation of the steering-versus-follow-up guidance milestone."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-042-skill-discovery-surfaces.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-042",
+      "reason": "Defines the next discovery surface slice for core, repo-local, and task-local generated skills."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_skill_inventory.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-042",
+      "reason": "Verifies the generated skill inventory across core, repo-local, and task-local discovery surfaces."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-042-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-042",
+      "reason": "Records the independent evaluation of the skill-discovery surface milestone."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-043-session-lineage.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-043",
+      "reason": "Defines the next session-lineage slice for retries, branches, and benchmark repros."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_session_lineage.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-043",
+      "reason": "Verifies stable run identifiers, retry lineage, benchmark-repro branches, and source-run linkage."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-043-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-043",
+      "reason": "Records the independent evaluation of the session-lineage milestone."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-044-generated-skill-drafting-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-044",
+      "reason": "Replenishes the rolling queue with generated-skill drafting, coverage, and deferred automation-proposal follow-ups."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/draft_generated_skill.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-044",
+      "reason": "Drafts repo-local or task-local generated skill scaffolds directly from structured improvement candidates."
+    },
+    {
+      "path": "scripts/draft_generated_skill.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-044",
+      "reason": "Exposes the generated-skill drafting helper as a repo-local wrapper."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-044-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-044",
+      "reason": "Records the independent evaluation of the generated-skill drafting helper milestone."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-045-generated-skill-coverage.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-045",
+      "reason": "Defines the deterministic coverage and example-wrapper slice for generated-skill drafting."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-045-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-045",
+      "reason": "Records the independent evaluation of the generated-skill coverage milestone."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_draft_generated_skill.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-045",
+      "reason": "Verifies repo-local and task-local generated-skill drafting, candidate linkage, and inventory refresh behavior."
+    },
+    {
+      "path": "examples/basic-workspace/scripts/draft_generated_skill.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-045",
+      "reason": "Exposes the generated-skill drafting helper in the copied example workspace surface."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-046-automation-proposal-backlog.md",
+      "type": "planning_note",
+      "milestone_id": "milestone-046",
+      "reason": "Restores the deferred automation-proposal backlog with proposal metadata, verification, docs, and resume-surface follow-ups."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/automation_proposal_helper.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-046",
+      "reason": "Builds schedule-agnostic automation proposal metadata from task context, project context, and prompt-template output."
+    },
+    {
+      "path": "scripts/automation_proposal_helper.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-046",
+      "reason": "Exposes the automation proposal helper as a repo-local wrapper."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-046-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-046",
+      "reason": "Records the independent evaluation of the automation proposal helper milestone."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-047",
+      "reason": "Verifies automation proposal naming, prompt-template selection, workspace metadata, and variant filtering."
+    },
+    {
+      "path": "examples/basic-workspace/scripts/automation_proposal_helper.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-047",
+      "reason": "Exposes the automation proposal helper in the copied example workspace surface."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-047-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-047",
+      "reason": "Records the independent evaluation of the automation proposal coverage milestone."
+    },
+    {
+      "path": "README.md",
+      "type": "documentation",
+      "milestone_id": "milestone-048",
+      "reason": "Explains when to use prompt-only automation helpers versus schedule-agnostic automation proposal metadata."
+    },
+    {
+      "path": "skills/task-handoff-state/SKILL.md",
+      "type": "documentation",
+      "milestone_id": "milestone-048",
+      "reason": "Exposes the automation proposal helper in the task-state quick-start guidance."
+    },
+    {
+      "path": "examples/basic-workspace/AGENTS.md",
+      "type": "documentation",
+      "milestone_id": "milestone-048",
+      "reason": "Shows example workspace guidance for the local automation proposal wrapper flow."
+    },
+    {
+      "path": "examples/basic-workspace/README.md",
+      "type": "documentation",
+      "milestone_id": "milestone-048",
+      "reason": "Lists the automation proposal wrapper and explains its schedule-agnostic role."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-048-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-048",
+      "reason": "Records the independent evaluation of the automation proposal documentation milestone."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/resume_task.sh",
+      "type": "workflow_script",
+      "milestone_id": "milestone-049",
+      "reason": "Surfaces automation proposal helper output in rolling resume guidance without duplicating proposal logic."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-049-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-049",
+      "reason": "Records the independent evaluation of the rolling resume automation-proposal guidance milestone."
+    },
+    {
+      "path": "skills/task-handoff-state/scripts/verify_resume_automation_proposal_guidance.sh",
+      "type": "verifier_script",
+      "milestone_id": "milestone-050",
+      "reason": "Verifies that rolling resume output surfaces automation proposal guidance without external automation state."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-050-evaluation.md",
+      "type": "evaluation_note",
+      "milestone_id": "milestone-050",
+      "reason": "Records the independent evaluation of the resume automation-proposal guidance verifier milestone."
+    },
+    {
+      "path": ".autonomous/improve-campfire/findings/milestone-050-retrospective.md",
+      "type": "retrospective_note",
+      "milestone_id": "milestone-050",
+      "reason": "Records the reusable lessons and the decision boundary reached after completing the automation-proposal backlog."
     },
     {
       "path": "examples/basic-workspace/.autonomous/rolling-task/findings/automation-ready.md",

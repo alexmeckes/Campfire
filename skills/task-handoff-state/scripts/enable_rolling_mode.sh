@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(pwd -P)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
 RUN_STYLE="bounded"
 PLANNING_SLICE_MINUTES=10
 RUNTIME_BUDGET_MINUTES=120
@@ -203,24 +205,17 @@ execution.update(
 )
 data["execution"] = execution
 checkpoint_path.write_text(json.dumps(data, indent=2) + "\n")
+PY
 
-rolling_prompt = (
-    f"Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state "
-    f"to continue this task from `.autonomous/{task_slug}/`. Keep planning bounded, auto-advance through the "
-    f"queued milestones, replenish the queue when policy allows"
-)
+ROLLING_PROMPT="$("$PROMPT_TEMPLATE_SCRIPT" --root "$ROOT_DIR" --task-slug "$TASK_SLUG" resume)"
+export HANDOFF_FILE ROLLING_PROMPT
 
-if run_style == "until_stopped":
-    rolling_prompt += (
-        ", and keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause "
-        "appears. Do not impose an internal runtime budget or milestone cap."
-    )
-else:
-    rolling_prompt += (
-        " and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a "
-        "blocker or decision boundary appears, and stop only on a real blocker, decision boundary, budget limit, or "
-        "an external manual pause."
-    )
+python3 <<'PY'
+import os
+from pathlib import Path
+
+handoff_path = Path(os.environ["HANDOFF_FILE"])
+rolling_prompt = os.environ["ROLLING_PROMPT"]
 
 if handoff_path.exists():
     lines = handoff_path.read_text().splitlines()
@@ -240,8 +235,4 @@ echo "Enabled rolling mode for:"
 echo "  $TASK_DIR"
 echo
 echo "Recommended Codex App prompt:"
-if [ "$RUN_STYLE" = "until_stopped" ]; then
-  echo "  Use \$task-framer, \$course-corrector, \$long-horizon-worker, \$task-evaluator, and \$task-handoff-state to continue .autonomous/$TASK_SLUG/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows, and keep going until a real blocker, decision boundary, safe-work exhaustion, or an external manual pause appears. Do not impose an internal runtime budget or milestone cap."
-else
-  echo "  Use \$task-framer, \$course-corrector, \$long-horizon-worker, \$task-evaluator, and \$task-handoff-state to continue .autonomous/$TASK_SLUG/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, do not self-pause before the configured minimum runtime and milestone floor unless a blocker or decision boundary appears, and stop only on a real blocker, decision boundary, budget limit, or an external manual pause."
-fi
+echo "  $ROLLING_PROMPT"

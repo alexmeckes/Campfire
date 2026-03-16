@@ -1,26 +1,22 @@
 {
   "task_slug": "improve-campfire",
   "objective": "dogfood Campfire on itself and harden lifecycle verification coverage",
-  "status": "ready",
-  "phase": "execution",
+  "status": "waiting_on_decision",
+  "phase": "waiting_on_decision",
   "current": {
-    "milestone_id": "milestone-039",
-    "milestone_title": "Add a prompt-template layer for canonical Campfire operator flows",
-    "slice_id": "slice-039",
-    "slice_title": "Define a small reusable template format and add canonical resume, retrospective, benchmark, and improvement-promotion templates without duplicating large markdown prompt blocks",
+    "milestone_id": "milestone-050",
+    "milestone_title": "Add deterministic verification that resume_task.sh surfaces automation proposal guidance correctly",
+    "slice_id": "slice-050-resume-automation-proposal-verifier",
+    "slice_title": "Verify rolling resume automation proposal guidance",
     "acceptance_criteria": [
-      "Campfire provides a small prompt-template surface for canonical operator flows instead of relying on large hand-written markdown blocks",
-      "Canonical templates exist for resume, retrospective, benchmark, and improvement-promotion flows and stay task-only plus reusable",
-      "The template layer stays compatible with the current skill stack and local-first control-plane model"
+      "Verifier coverage proves rolling resume output includes the proposal helper guidance when appropriate.",
+      "The coverage remains local-first and does not depend on external automation state.",
+      "Repo verification fails if the resume guidance drifts."
     ],
     "dependencies": [
-      "README.md",
-      "docs/campfire-v3-control-plane.md",
-      "docs/campfire-bench.md",
-      "docs/campfire-generated-skills.md",
-      "skills/task-retrospector/SKILL.md",
-      "skills/task-handoff-state/SKILL.md",
-      ".autonomous/improve-campfire/findings/milestone-039-pi-inspired-backlog.md"
+      "milestone-049",
+      "skills/task-handoff-state/scripts/resume_task.sh",
+      "skills/task-handoff-state/scripts/automation_proposal_helper.sh"
     ]
   },
   "execution": {
@@ -39,43 +35,31 @@
       "blocked",
       "waiting_on_decision"
     ],
-    "queued_milestones": [
-      {
-        "milestone_id": "milestone-040",
-        "milestone_title": "Add deterministic verification and example coverage for prompt templates"
-      },
-      {
-        "milestone_id": "milestone-041",
-        "milestone_title": "Add a lightweight steering versus follow-up queue model for active tasks"
-      },
-      {
-        "milestone_id": "milestone-042",
-        "milestone_title": "Add packageable repo-local and generated skill discovery surfaces"
-      },
-      {
-        "milestone_id": "milestone-043",
-        "milestone_title": "Add session-lineage metadata for retries, branches, and benchmark repros"
-      }
-    ],
+    "queued_milestones": [],
     "notes": "The self-hosted task is configured for manual-stop autonomous runs with no internal budget or milestone cap. A later review of pi-mono/coding-agent suggested a higher-leverage next backlog around prompt templates, steering queues, packageable generated skills, and session lineage, so the deferred automation-proposal backlog is parked behind this new queue.",
     "run_style": "until_stopped"
   },
   "blocker": {
-    "status": "none",
-    "type": "",
-    "summary": "",
+    "status": "waiting_on_decision",
+    "type": "product_boundary",
+    "summary": "The next automation improvement depends on choosing between generic schedule-input scaffolds and Codex App-specific automation instantiation support.",
     "attempts": 0,
-    "next_action": ""
+    "next_action": "Choose whether Campfire should stay proposal-only, add generic schedule scaffolds, or add app-specific automation directive support."
   },
   "last_run": {
-    "started_at": "2026-03-16T02:21:42Z",
-    "ended_at": "2026-03-16T02:21:42Z",
-    "stop_reason": "course_corrected",
-    "summary": "Reframed the self-hosted Campfire backlog around Pi-inspired prompt templates, steering queues, packageable generated skills, and session lineage instead of the older deferred automation-proposal helper queue.",
-    "next_step": "Add the prompt-template layer, then verify and document it before moving into steering queues and session lineage.",
+    "started_at": "2026-03-16T04:06:03.873640Z",
+    "ended_at": "2026-03-16T04:09:38.601768Z",
+    "stop_reason": "waiting_on_decision",
+    "summary": "Validated the automation-proposal backlog and paused at a decision boundary about whether the next surface should stay generic or become Codex App-specific.",
+    "next_step": "Decision boundary: choose whether Campfire should stay proposal-only, add generic schedule-input scaffolds, or add Codex App-specific automation instantiation support.",
     "events": [
-      "course_corrected"
-    ]
+      "course_corrected",
+      "slice_started",
+      "slice_completed",
+      "auto_advanced",
+      "auto_reframed"
+    ],
+    "run_id": "run-20260316T040603873640Z"
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
@@ -221,6 +205,89 @@
       "summary": "Worktree bootstrap verifier passed."
     },
     {
+      "type": "plan_review",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-046-automation-proposal-backlog.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-046-automation-proposal-backlog.md",
+      "summary": "Reframed the restored automation-proposal backlog around proposal metadata, coverage, docs, and rolling resume surfacing."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_draft_generated_skill.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_draft_generated_skill.sh",
+      "summary": "Generated-skill drafting verifier passed with repo-local and task-local coverage."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-045-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-045-evaluation.md",
+      "summary": "Evaluation note confirms the generated-skill coverage milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./scripts/automation_proposal_helper.sh --json improve-campfire",
+      "artifact": "scripts/automation_proposal_helper.sh",
+      "summary": "Automation proposal helper emitted stable schedule-agnostic proposal metadata through the repo wrapper."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-046-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-046-evaluation.md",
+      "summary": "Evaluation note confirms the automation proposal helper milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh",
+      "summary": "Automation proposal coverage verifier passed across helper defaults, naming, workspace metadata, and variant filtering."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-047-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-047-evaluation.md",
+      "summary": "Evaluation note confirms the automation proposal coverage milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-048-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-048-evaluation.md",
+      "summary": "Evaluation note confirms the automation proposal documentation milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-049-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-049-evaluation.md",
+      "summary": "Evaluation note confirms the rolling resume automation-proposal guidance milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_resume_automation_proposal_guidance.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_resume_automation_proposal_guidance.sh",
+      "summary": "Resume automation-proposal guidance verifier passed without relying on external automation state."
+    },
+    {
+      "type": "repo_verification",
+      "result": "pass",
+      "command": "./scripts/verify_repo.sh",
+      "summary": "Repo verification passed after the automation proposal helper, docs, resume guidance, and verifier updates."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-050-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-050-evaluation.md",
+      "summary": "Evaluation note confirms the resume automation-proposal guidance verifier milestone is complete."
+    },
+    {
       "type": "milestone_evaluation",
       "result": "pass",
       "command": "./skills/task-handoff-state/scripts/verify_rolling_execution.sh",
@@ -250,10 +317,119 @@
     {
       "type": "milestone_evaluation",
       "result": "pass",
+      "command": "./scripts/prompt_template_helper.sh --task-slug improve-campfire resume && ./scripts/prompt_template_helper.sh --task-slug improve-campfire retrospective && ./scripts/prompt_template_helper.sh benchmark && ./scripts/prompt_template_helper.sh --task-slug improve-campfire --candidate-id slice-start-guard improvement_promotion",
+      "artifact": "skills/task-handoff-state/scripts/prompt_template_helper.sh",
+      "summary": "Shared prompt templates rendered correctly for task bootstrap, resume, retrospective, benchmark, and promoted-improvement flows."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./examples/basic-workspace/scripts/verify_harness.sh",
+      "artifact": "examples/basic-workspace/scripts/verify_harness.sh",
+      "summary": "Example workspace wrappers stayed healthy after moving prompt rendering onto the shared helper."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-039-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-039-evaluation.md",
+      "summary": "Evaluation note confirms the prompt-template layer milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_prompt_template_helper.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_prompt_template_helper.sh",
+      "summary": "Dedicated prompt-template verifier passed across bootstrap, resume, retrospective, benchmark, and promoted-improvement flows."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-040-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-040-evaluation.md",
+      "summary": "Evaluation note confirms the prompt-template coverage milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_guidance_queue.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_guidance_queue.sh",
+      "summary": "Guidance-queue verifier passed across checkpoints, SQL, task context, and registry projections."
+    },
+    {
+      "type": "repo_verification",
+      "result": "pass",
+      "command": "./scripts/verify_repo.sh",
+      "summary": "Repo verification passed after the guidance-queue helper, projections, wrappers, and documentation updates."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-041-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-041-evaluation.md",
+      "summary": "Evaluation note confirms the steering-versus-follow-up guidance milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "plan_review",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-042-skill-discovery-surfaces.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-042-skill-discovery-surfaces.md",
+      "summary": "Recorded the first bounded discovery-surface slice for core, repo-local, and task-local generated skills."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_skill_inventory.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_skill_inventory.sh",
+      "summary": "Skill-inventory verifier passed across core, repo-local, and task-local discovery surfaces."
+    },
+    {
+      "type": "repo_verification",
+      "result": "pass",
+      "command": "./scripts/verify_repo.sh",
+      "summary": "Repo verification passed after the skill-inventory manifest, context projections, verifier, and docs updates."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-042-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-042-evaluation.md",
+      "summary": "Evaluation note confirms the skill-discovery surface milestone is complete and safe to auto-advance."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "./skills/task-handoff-state/scripts/verify_session_lineage.sh",
+      "artifact": "skills/task-handoff-state/scripts/verify_session_lineage.sh",
+      "summary": "Session-lineage verifier passed across retry branches, benchmark repro runs, and source-run linkage."
+    },
+    {
+      "type": "repo_verification",
+      "result": "pass",
+      "command": "./scripts/verify_repo.sh",
+      "summary": "Repo verification passed after stable run identifiers, lineage projections, and session-lineage docs updates."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-043-evaluation.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-043-evaluation.md",
+      "summary": "Evaluation note confirms the session-lineage milestone is complete and safe to reframe the queue."
+    },
+    {
+      "type": "plan_review",
+      "result": "pass",
+      "command": "review .autonomous/improve-campfire/findings/milestone-044-generated-skill-drafting-backlog.md",
+      "artifact": ".autonomous/improve-campfire/findings/milestone-044-generated-skill-drafting-backlog.md",
+      "summary": "Replenished the rolling queue with generated-skill drafting, coverage, and deferred automation-proposal follow-up milestones."
+    },
+    {
+      "type": "milestone_evaluation",
+      "result": "pass",
       "command": "review .autonomous/improve-campfire/findings/milestone-017-evaluation.md",
       "artifact": ".autonomous/improve-campfire/findings/milestone-017-evaluation.md",
       "summary": "Evaluation note confirms the worktree-aware backlog is complete."
     }
   ],
-  "last_updated": "2026-03-15"
+  "last_updated": "2026-03-16"
 }
