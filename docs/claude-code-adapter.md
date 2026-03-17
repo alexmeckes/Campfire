@@ -65,6 +65,8 @@ Optional later additions:
     campfire-session-end.sh
 ```
 
+The Campfire repo ships a working starter template in [examples/basic-workspace/.claude](/Users/alexmeckes/Downloads/Campfire/examples/basic-workspace/.claude).
+
 ## Commands
 
 Claude Code project commands should stay thin. They should mostly route the operator into the existing Campfire helpers.

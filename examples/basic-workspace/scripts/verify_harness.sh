@@ -14,6 +14,13 @@ DOCTOR_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/doctor_task.sh"
 RECORD_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/record_improvement_candidate.sh"
 PROMOTE_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/promote_improvement.sh"
 DRAFT_SKILL_SCRIPT="$EXAMPLE_ROOT/scripts/draft_generated_skill.sh"
+CLAUDE_SETTINGS_FILE="$EXAMPLE_ROOT/.claude/settings.json"
+CLAUDE_RESUME_COMMAND="$EXAMPLE_ROOT/.claude/commands/campfire-resume.md"
+CLAUDE_NEW_TASK_COMMAND="$EXAMPLE_ROOT/.claude/commands/campfire-new-task.md"
+CLAUDE_START_SLICE_COMMAND="$EXAMPLE_ROOT/.claude/commands/campfire-start-slice.md"
+CLAUDE_COMPLETE_SLICE_COMMAND="$EXAMPLE_ROOT/.claude/commands/campfire-complete-slice.md"
+CLAUDE_SESSION_START_HOOK="$EXAMPLE_ROOT/.claude/hooks/campfire-session-start.sh"
+CLAUDE_STATUSLINE_HOOK="$EXAMPLE_ROOT/.claude/hooks/campfire-statusline.sh"
 TASK_SLUG="verify-example-wrapper-flow"
 
 fail() {
@@ -35,7 +42,7 @@ expect_contains() {
 }
 
 echo "== Syntax checks =="
-zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
+zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$CLAUDE_SESSION_START_HOOK" "$CLAUDE_STATUSLINE_HOOK" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
 
 echo "== Skill presence =="
 expect_file "$SKILLS_ROOT/task-handoff-state/SKILL.md"
@@ -53,7 +60,9 @@ cp "$QUEUE_GUIDANCE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$DOCTOR_TASK_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$DRAFT_SKILL_SCRIPT" "$TEMP_WORKSPACE/scripts/"
+cp -R "$EXAMPLE_ROOT/.claude" "$TEMP_WORKSPACE/"
 chmod +x "$TEMP_WORKSPACE"/scripts/*.sh
+chmod +x "$TEMP_WORKSPACE/.claude/hooks/"*.sh
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/new_task.sh" --slug "$TASK_SLUG" "verify example wrapper flow" >/tmp/campfire_example_new.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/enable_rolling_mode.sh" --until-stopped --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice" "$TASK_SLUG" >/tmp/campfire_example_roll.out
@@ -74,6 +83,13 @@ expect_file "$TEMP_WORKSPACE/.campfire/registry.json"
 expect_file "$TEMP_WORKSPACE/.campfire/project_context.json"
 expect_file "$TEMP_WORKSPACE/.campfire/improvement_backlog.json"
 expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/task_context.json"
+expect_file "$TEMP_WORKSPACE/.claude/settings.json"
+expect_file "$TEMP_WORKSPACE/.claude/commands/campfire-resume.md"
+expect_file "$TEMP_WORKSPACE/.claude/commands/campfire-new-task.md"
+expect_file "$TEMP_WORKSPACE/.claude/commands/campfire-start-slice.md"
+expect_file "$TEMP_WORKSPACE/.claude/commands/campfire-complete-slice.md"
+expect_file "$TEMP_WORKSPACE/.claude/hooks/campfire-session-start.sh"
+expect_file "$TEMP_WORKSPACE/.claude/hooks/campfire-statusline.sh"
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/checkpoints.json" '"mode": "rolling"'
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/checkpoints.json" '"run_style": "until_stopped"'
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/checkpoints.json" '"guidance"'
@@ -114,6 +130,21 @@ expect_contains /tmp/campfire_example_resume.out 'Workspace-specific prompt:'
 expect_contains /tmp/campfire_example_resume.out 'Project context:'
 expect_contains /tmp/campfire_example_resume.out 'Task context:'
 expect_contains /tmp/campfire_example_resume.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state'
+expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-resume.md" './scripts/resume_task.sh'
+expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-new-task.md" './scripts/new_task.sh'
+expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-start-slice.md" './scripts/start_slice.sh'
+expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-complete-slice.md" './scripts/complete_slice.sh'
+
+CLAUDE_PROJECT_DIR="$TEMP_WORKSPACE" "$TEMP_WORKSPACE/.claude/hooks/campfire-session-start.sh" <<'EOF' >/tmp/campfire_example_claude_session.out
+{"source":"startup"}
+EOF
+CLAUDE_PROJECT_DIR="$TEMP_WORKSPACE" "$TEMP_WORKSPACE/.claude/hooks/campfire-statusline.sh" <<'EOF' >/tmp/campfire_example_claude_statusline.out
+{"session_id":"demo"}
+EOF
+expect_contains /tmp/campfire_example_claude_session.out 'Campfire project detected.'
+expect_contains /tmp/campfire_example_claude_session.out "task: $TASK_SLUG"
+expect_contains /tmp/campfire_example_claude_session.out "./scripts/resume_task.sh $TASK_SLUG"
+expect_contains /tmp/campfire_example_claude_statusline.out "campfire $TASK_SLUG"
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/doctor_task.sh" "$TASK_SLUG" >/tmp/campfire_example_doctor.out
 expect_contains /tmp/campfire_example_doctor.out 'Doctor passed:'
