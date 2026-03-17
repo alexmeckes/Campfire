@@ -27,6 +27,8 @@ The Claude adapter is also intentionally small:
 - `.claude/commands/campfire-start-slice.md`
 - `.claude/commands/campfire-complete-slice.md`
 - `.claude/hooks/campfire-session-start.sh`
+- `.claude/hooks/campfire-pre-tool.sh`
+- `.claude/hooks/campfire-post-tool.sh`
 - `.claude/hooks/campfire-statusline.sh`
 
 By default they look for installed Campfire skills under `~/.codex/skills`.

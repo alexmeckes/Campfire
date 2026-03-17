@@ -135,7 +135,7 @@ Expected flow:
 
 ## Hooks
 
-The first adapter should use only three hooks plus one status line command.
+The first adapter should use only three hooks plus one status line command. The current Campfire example template now includes all three hook categories plus the status line.
 
 ### `campfire-session-start.sh`
 
@@ -176,7 +176,7 @@ Purpose:
 
 - enforce the smallest useful Campfire guardrail in Claude Code
 
-Recommended behavior:
+Implemented template behavior:
 
 1. if the repo is not using Campfire, allow
 2. if Campfire is present but there is no active task, allow with no intervention
@@ -194,7 +194,7 @@ Purpose:
 
 - keep heartbeat and projections reasonably fresh during Claude sessions
 
-Recommended behavior:
+Implemented template behavior:
 
 1. if the repo is not using Campfire, exit
 2. if there is an active task, call the existing Campfire helper path to:
