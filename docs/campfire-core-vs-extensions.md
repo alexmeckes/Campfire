@@ -8,7 +8,7 @@ This note defines the boundary between the core harness and optional extensions 
 
 ## Core
 
-Core is the minimum surface required for this promise:
+The minimum surface is the baseline promise:
 
 - a single agent can resume from disk
 - start a bounded slice
@@ -17,17 +17,23 @@ Core is the minimum surface required for this promise:
 - record state
 - stop cleanly on completion, blocker, or decision boundary
 
+Campfire's current shared core is a little larger than that minimum because the shipped scripts and verifiers already rely on a few supporting surfaces.
+
 Core currently includes:
 
-- task state and task directories under `.autonomous/<task>/`
+- task state and task directories under the configured task root (default: `.autonomous/<task>/`)
 - slice lifecycle helpers such as `start_slice.sh` and `complete_slice.sh`
 - structured runtime state in `.campfire/campfire.db`
 - generated task and project context
 - durable handoff and resume surfaces
 - explicit validation and doctor checks
 - minimal board visibility for active, queued, blocked, and done work
+- prompt-template rendering used by shared helpers
+- operator guidance persistence
+- session lineage metadata
+- skill inventory and generated context projections
 
-If a feature is not required for that loop, it should not be added to core by default.
+The rule from here forward is about growth: if a new feature is not required shared infrastructure for that loop, it should not be added to core by default.
 
 ## Extensions
 
@@ -53,6 +59,7 @@ A feature belongs in core only if at least one of these is true:
 - removing it would break resume, execution, validation, or clean stop behavior
 - it eliminates a repeated manual step for nearly every Campfire task
 - multiple extensions already depend on it as shared infrastructure
+- shipped core helpers or verifiers already rely on it as common infrastructure
 
 Otherwise it should start as an extension.
 
