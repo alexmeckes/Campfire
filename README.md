@@ -172,6 +172,8 @@ Current examples:
 ./scripts/automation_proposal_helper.sh <task-slug>
 ```
 
+For a Claude Code adapter that stays outside Campfire core, see [Claude Code adapter](/Users/alexmeckes/Downloads/Campfire/docs/claude-code-adapter.md).
+
 For generated-skill and automation details, see the focused docs below.
 
 For the full template list, see [Prompt templates](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/prompt-templates.md).
@@ -242,6 +244,7 @@ Use the focused docs for the deeper details:
 - [Campfire Board spec](/Users/alexmeckes/Downloads/Campfire/docs/campfire-board-spec.md)
 - [Campfire v3 control plane](/Users/alexmeckes/Downloads/Campfire/docs/campfire-v3-control-plane.md)
 - [Campfire core vs extensions](/Users/alexmeckes/Downloads/Campfire/docs/campfire-core-vs-extensions.md)
+- [Claude Code adapter](/Users/alexmeckes/Downloads/Campfire/docs/claude-code-adapter.md)
 - [CampfireBench](/Users/alexmeckes/Downloads/Campfire/docs/campfire-bench.md)
 - [Campfire generated skills](/Users/alexmeckes/Downloads/Campfire/docs/campfire-generated-skills.md)
 - [Task retrospection checklist](/Users/alexmeckes/Downloads/Campfire/skills/task-retrospector/references/retrospective-checklist.md)
