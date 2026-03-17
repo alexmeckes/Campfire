@@ -385,6 +385,17 @@ def ensure_project(conn: sqlite3.Connection, root_dir: Path) -> sqlite3.Row:
     ).fetchone()
 
 
+def project_payload(root_dir: Path, project: sqlite3.Row) -> dict[str, Any]:
+    return {
+        "id": int(project["id"]),
+        "root_path": str(root_dir),
+        "name": str(project["name"]),
+        "task_root": str(project["task_root"]),
+        "config_path": str(project["config_path"] or ""),
+        "db_path": str(db_path_for_root(root_dir)),
+    }
+
+
 def upsert_milestone(
     conn: sqlite3.Connection,
     task_id: int,
@@ -783,7 +794,35 @@ def sync_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> dict[
 
 def sync_all(conn: sqlite3.Connection, root_dir: Path) -> list[dict[str, Any]]:
     project = ensure_project(conn, root_dir)
-    task_root = root_dir / str(project["task_root"])
+    task_root_name = str(project["task_root"])
+    task_root = root_dir / task_root_name
+    project_id = int(project["id"])
+    current_slugs: set[str] = set()
+    if task_root.exists():
+        for task_dir in sorted(p for p in task_root.iterdir() if p.is_dir()):
+            if not (task_dir / "checkpoints.json").exists():
+                continue
+            current_slugs.add(task_dir.name)
+
+    db_slugs = {
+        str(row["slug"])
+        for row in conn.execute(
+            "SELECT slug FROM tasks WHERE project_id = ?",
+            (project_id,),
+        ).fetchall()
+    }
+    stale_slugs = sorted(db_slugs - current_slugs)
+    if stale_slugs:
+        conn.executemany(
+            "DELETE FROM tasks WHERE project_id = ? AND slug = ?",
+            [(project_id, slug) for slug in stale_slugs],
+        )
+        for slug in stale_slugs:
+            stale_context = task_context_path(root_dir, task_root_name, slug)
+            if stale_context.exists():
+                stale_context.unlink()
+        conn.commit()
+
     if not task_root.exists():
         return []
     payloads: list[dict[str, Any]] = []
@@ -2042,6 +2081,26 @@ def command_render_projections(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_show_project(args: argparse.Namespace) -> int:
+    root_dir = Path(args.root).resolve()
+    conn = connect_db(root_dir)
+    try:
+        payload = project_payload(root_dir, ensure_project(conn, root_dir))
+    finally:
+        conn.close()
+    if args.field:
+        if args.field not in payload:
+            raise SystemExit(f"Unknown project field: {args.field}")
+        value = payload[args.field]
+        if isinstance(value, (dict, list)):
+            print(json.dumps(value))
+        else:
+            print(value)
+    else:
+        print(json.dumps(payload, indent=2))
+    return 0
+
+
 def command_doctor_task(args: argparse.Namespace) -> int:
     root_dir = Path(args.root).resolve()
     conn = connect_db(root_dir)
@@ -2146,6 +2205,7 @@ def build_parser() -> argparse.ArgumentParser:
     for name, handler in {
         "sync-task": command_sync_task,
         "sync-all": command_sync_all,
+        "show-project": command_show_project,
         "render-registry": command_render_registry,
         "render-projections": command_render_projections,
         "doctor-task": command_doctor_task,
@@ -2158,6 +2218,8 @@ def build_parser() -> argparse.ArgumentParser:
         subparser.add_argument("--root", required=True)
         if name in {"sync-task", "doctor-task"}:
             subparser.add_argument("task_slug")
+        if name == "show-project":
+            subparser.add_argument("--field")
         if name == "record-improvement-candidate":
             subparser.add_argument("--task-slug")
             subparser.add_argument("--candidate-id")

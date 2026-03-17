@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(pwd -P)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SQL_HELPER="${SQL_HELPER:-$SCRIPT_DIR/campfire_sql.py}"
 PROMPT_TEMPLATE_SCRIPT="${PROMPT_TEMPLATE_SCRIPT:-$SCRIPT_DIR/prompt_template_helper.sh}"
 TOUCH_HEARTBEAT_SCRIPT="${TOUCH_HEARTBEAT_SCRIPT:-$SCRIPT_DIR/touch_heartbeat.sh}"
 REFRESH_REGISTRY_SCRIPT="${REFRESH_REGISTRY_SCRIPT:-$SCRIPT_DIR/refresh_registry.sh}"
@@ -101,7 +102,14 @@ fi
 
 TASK_SLUG="$1"
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
-TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "python3 is required to start a slice" >&2
+  exit 1
+fi
+
+TASK_ROOT="$(python3 "$SQL_HELPER" show-project --root "$ROOT_DIR" --field task_root)"
+TASK_DIR="$ROOT_DIR/$TASK_ROOT/$TASK_SLUG"
 CHECKPOINT_FILE="$TASK_DIR/checkpoints.json"
 HANDOFF_FILE="$TASK_DIR/handoff.md"
 PROGRESS_FILE="$TASK_DIR/progress.md"
@@ -118,11 +126,6 @@ for required in "$CHECKPOINT_FILE" "$HANDOFF_FILE" "$PROGRESS_FILE"; do
     exit 1
   fi
 done
-
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "python3 is required to start a slice" >&2
-  exit 1
-fi
 
 export CHECKPOINT_FILE HANDOFF_FILE PROGRESS_FILE ARTIFACTS_FILE TASK_SLUG FROM_NEXT MILESTONE_ID MILESTONE_TITLE SLICE_ID SLICE_TITLE NEXT_SLICE SUMMARY_TEXT RUN_ID PARENT_RUN_ID LINEAGE_KIND BRANCH_LABEL ROOT_DIR PROMPT_TEMPLATE_SCRIPT
 

@@ -41,13 +41,19 @@ TEMP_WORKSPACE="$(mktemp -d)"
 trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_prompt_bootstrap.out /tmp/campfire_prompt_resume.out /tmp/campfire_prompt_retro.out /tmp/campfire_prompt_bench.out /tmp/campfire_prompt_promote.out /tmp/campfire_prompt_bounded.out /tmp/campfire_prompt_until.out' EXIT
 
 TASK_SLUG="verify-prompt-template"
-TASK_DIR="$TEMP_WORKSPACE/.autonomous/$TASK_SLUG"
+TASK_ROOT=".tasks"
+TASK_DIR="$TEMP_WORKSPACE/$TASK_ROOT/$TASK_SLUG"
+cat >"$TEMP_WORKSPACE/campfire.toml" <<'EOF'
+version = 1
+project_name = "Prompt Template Verifier"
+default_task_root = ".tasks"
+EOF
 "$INIT_SCRIPT" --root "$TEMP_WORKSPACE" --slug "$TASK_SLUG" "verify prompt template helper coverage" >/tmp/campfire_prompt_bootstrap.out
 expect_file "$TASK_DIR/checkpoints.json"
 
 "$HELPER_SCRIPT" --root "$TEMP_WORKSPACE" --task-slug "$TASK_SLUG" task_bootstrap >/tmp/campfire_prompt_bootstrap.out
 expect_contains /tmp/campfire_prompt_bootstrap.out 'Use $task-framer, $long-horizon-worker, and $task-handoff-state'
-expect_contains /tmp/campfire_prompt_bootstrap.out ".autonomous/$TASK_SLUG/"
+expect_contains /tmp/campfire_prompt_bootstrap.out ".tasks/$TASK_SLUG/"
 expect_contains /tmp/campfire_prompt_bootstrap.out 'first dependency-safe slice'
 
 "$HELPER_SCRIPT" --root "$TEMP_WORKSPACE" --task-slug "$TASK_SLUG" resume >/tmp/campfire_prompt_resume.out

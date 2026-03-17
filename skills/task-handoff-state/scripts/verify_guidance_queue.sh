@@ -36,7 +36,14 @@ TEMP_WORKSPACE="$(mktemp -d)"
 trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_guidance_fail.out /tmp/campfire_guidance_fail.err' EXIT
 TASK_SLUG="verify-guidance-queue"
 DB_PATH="$TEMP_WORKSPACE/.campfire/campfire.db"
-TASK_DIR="$TEMP_WORKSPACE/.autonomous/$TASK_SLUG"
+TASK_ROOT=".tasks"
+TASK_DIR="$TEMP_WORKSPACE/$TASK_ROOT/$TASK_SLUG"
+
+cat >"$TEMP_WORKSPACE/campfire.toml" <<'EOF'
+version = 1
+project_name = "Guidance Queue Verifier"
+default_task_root = ".tasks"
+EOF
 
 "$INIT_SCRIPT" --root "$TEMP_WORKSPACE" --slug "$TASK_SLUG" "verify guidance queue" >/dev/null
 "$START_SLICE_SCRIPT" --root "$TEMP_WORKSPACE" \
@@ -61,9 +68,9 @@ TASK_DIR="$TEMP_WORKSPACE/.autonomous/$TASK_SLUG"
 
 expect_file "$DB_PATH"
 expect_file "$TEMP_WORKSPACE/.campfire/registry.json"
-expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/task_context.json"
+expect_file "$TEMP_WORKSPACE/$TASK_ROOT/$TASK_SLUG/task_context.json"
 
-python3 - "$TEMP_WORKSPACE" "$DB_PATH" "$TASK_SLUG" <<'PY'
+python3 - "$TEMP_WORKSPACE" "$DB_PATH" "$TASK_SLUG" "$TASK_ROOT" <<'PY'
 import json
 import sqlite3
 import sys
@@ -72,8 +79,9 @@ from pathlib import Path
 workspace = Path(sys.argv[1])
 db_path = sys.argv[2]
 task_slug = sys.argv[3]
+task_root = sys.argv[4]
 
-checkpoint = json.loads((workspace / ".autonomous" / task_slug / "checkpoints.json").read_text())
+checkpoint = json.loads((workspace / task_root / task_slug / "checkpoints.json").read_text())
 guidance = checkpoint.get("guidance", {})
 active = guidance.get("active", {})
 follow_ups = guidance.get("follow_ups", [])
@@ -84,7 +92,7 @@ if active.get("summary") != "Stop and inspect the failing verifier immediately."
 if len(follow_ups) != 1 or follow_ups[0].get("mode") != "next_boundary":
     raise SystemExit("checkpoint follow-up guidance missing")
 
-task_context = json.loads((workspace / ".autonomous" / task_slug / "task_context.json").read_text())
+task_context = json.loads((workspace / task_root / task_slug / "task_context.json").read_text())
 context_guidance = task_context.get("guidance", {})
 if context_guidance.get("active", {}).get("summary") != active.get("summary"):
     raise SystemExit("task_context active guidance summary mismatch")
@@ -152,16 +160,17 @@ fi
 cmp -s "$TASK_DIR/checkpoints.json" "$TEMP_WORKSPACE/checkpoints.before.json" || fail "checkpoints.json changed after refresh failure"
 expect_contains /tmp/campfire_guidance_fail.err 'restored checkpoints.json'
 
-python3 - "$TEMP_WORKSPACE" "$TASK_SLUG" <<'PY'
+python3 - "$TEMP_WORKSPACE" "$TASK_SLUG" "$TASK_ROOT" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 workspace = Path(sys.argv[1]).resolve()
 task_slug = sys.argv[2]
+task_root = sys.argv[3]
 
 before_task = json.loads((workspace / "task_context.before.json").read_text())
-after_task = json.loads((workspace / ".autonomous" / task_slug / "task_context.json").read_text())
+after_task = json.loads((workspace / task_root / task_slug / "task_context.json").read_text())
 if before_task.get("guidance") != after_task.get("guidance"):
     raise SystemExit("task_context guidance changed after refresh failure")
 

@@ -131,6 +131,8 @@ requested_skill_name = os.environ["SKILL_NAME"].strip()
 purpose_override = os.environ["PURPOSE_OVERRIDE"].strip()
 force = os.environ["FORCE"].strip().lower() == "true"
 
+project = run_json("python3", sql_helper, "show-project", "--root", str(root_dir))
+task_root = str(project.get("task_root", "")).strip() or ".autonomous"
 candidate = run_json("python3", sql_helper, "show-improvement-candidate", "--root", str(root_dir), candidate_id)
 
 candidate_scope = str(candidate.get("scope", "")).strip()
@@ -159,7 +161,7 @@ previous_promoted_task_slug = str(candidate.get("promoted_task_slug", "")).strip
 if scope == "repo_local":
     target_dir = root_dir / ".campfire" / "generated-skills" / skill_name
 else:
-    target_dir = root_dir / ".autonomous" / task_slug / "generated-skills" / skill_name
+    target_dir = root_dir / task_root / task_slug / "generated-skills" / skill_name
 
 target_dir_existed = target_dir.exists()
 target_dir.mkdir(parents=True, exist_ok=True)

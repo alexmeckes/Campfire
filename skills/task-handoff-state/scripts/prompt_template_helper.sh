@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(pwd -P)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TEMPLATE_FILE="$SCRIPT_DIR/../templates/prompt_templates.json"
+SQL_HELPER="${SQL_HELPER:-$SCRIPT_DIR/campfire_sql.py}"
 TASK_SLUG=""
 CANDIDATE_ID=""
 
@@ -71,9 +72,10 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
+TASK_ROOT="$(python3 "$SQL_HELPER" show-project --root "$ROOT_DIR" --field task_root)"
 TEMPLATE_NAME="${POSITIONAL[1]}"
 
-export ROOT_DIR TEMPLATE_FILE TASK_SLUG CANDIDATE_ID TEMPLATE_NAME
+export ROOT_DIR TEMPLATE_FILE TASK_SLUG CANDIDATE_ID TEMPLATE_NAME TASK_ROOT
 
 python3 <<'PY'
 import json
@@ -85,6 +87,7 @@ template_file = Path(os.environ["TEMPLATE_FILE"])
 task_slug = os.environ["TASK_SLUG"].strip()
 candidate_id = os.environ["CANDIDATE_ID"].strip()
 template_name = os.environ["TEMPLATE_NAME"].strip()
+task_root = os.environ["TASK_ROOT"].strip() or ".autonomous"
 
 templates = json.loads(template_file.read_text())
 if not isinstance(templates, dict):
@@ -99,14 +102,14 @@ requested_template = aliases.get(template_name, template_name)
 def require_task() -> Path:
     if not task_slug:
         raise SystemExit(f"--task-slug is required for template '{template_name}'")
-    task_dir = root_dir / ".autonomous" / task_slug
+    task_dir = root_dir / task_root / task_slug
     if not task_dir.is_dir():
         raise SystemExit(f"Task not found: {task_dir}")
     return task_dir
 
 
 context = {
-    "task_ref": f".autonomous/{task_slug}/" if task_slug else "",
+    "task_ref": f"{task_root}/{task_slug}/" if task_slug else "",
     "benchmark_root": "benchmarks/campfire-bench/",
     "candidate_ref": f"`{candidate_id}`" if candidate_id else "the promoted improvement candidate",
 }

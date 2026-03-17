@@ -8,6 +8,7 @@ WORKTREE_ROOT=""
 BRANCH_NAME=""
 BASE_REF=""
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SQL_HELPER="${SQL_HELPER:-$SCRIPT_DIR/campfire_sql.py}"
 INIT_SCRIPT="$SCRIPT_DIR/init_task.sh"
 PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
 
@@ -183,8 +184,8 @@ if $USE_WORKTREE; then
 fi
 
 "$INIT_SCRIPT" --root "$WORKSPACE_ROOT" --slug "$TASK_SLUG" "$OBJECTIVE" >/tmp/campfire_bootstrap_init.out
-
-mark_workspace "$WORKSPACE_ROOT/.autonomous/$TASK_SLUG" "$WORKSPACE_STRATEGY" "$WORKSPACE_ROOT" "$GIT_ROOT" "$BRANCH_NAME"
+TASK_ROOT="$(python3 "$SQL_HELPER" show-project --root "$WORKSPACE_ROOT" --field task_root)"
+mark_workspace "$WORKSPACE_ROOT/$TASK_ROOT/$TASK_SLUG" "$WORKSPACE_STRATEGY" "$WORKSPACE_ROOT" "$GIT_ROOT" "$BRANCH_NAME"
 
 echo "Bootstrapped task:"
 echo "  slug: $TASK_SLUG"

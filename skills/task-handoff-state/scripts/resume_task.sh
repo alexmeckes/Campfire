@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(pwd -P)"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SQL_HELPER="${SQL_HELPER:-$SCRIPT_DIR/campfire_sql.py}"
 AUTOMATION_HELPER_SCRIPT="$SCRIPT_DIR/automation_prompt_helper.sh"
 AUTOMATION_PROPOSAL_HELPER_SCRIPT="$SCRIPT_DIR/automation_proposal_helper.sh"
 PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
@@ -41,7 +42,8 @@ fi
 
 TASK_SLUG="${POSITIONAL[1]}"
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
-TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
+TASK_ROOT="$(python3 "$SQL_HELPER" show-project --root "$ROOT_DIR" --field task_root)"
+TASK_DIR="$ROOT_DIR/$TASK_ROOT/$TASK_SLUG"
 PROJECT_CONTEXT_FILE="$ROOT_DIR/.campfire/project_context.json"
 TASK_CONTEXT_FILE="$TASK_DIR/task_context.json"
 

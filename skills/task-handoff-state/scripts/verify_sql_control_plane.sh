@@ -28,8 +28,17 @@ TEMP_WORKSPACE="$(mktemp -d)"
 trap 'rm -rf "$TEMP_WORKSPACE"' EXIT
 TASK_SLUG="verify-sql-control-plane"
 DB_PATH="$TEMP_WORKSPACE/.campfire/campfire.db"
+TASK_ROOT=".tasks"
+STALE_TASK_SLUG="prune-stale-task"
+
+cat >"$TEMP_WORKSPACE/campfire.toml" <<'EOF'
+version = 1
+project_name = "SQL Control Plane Verifier"
+default_task_root = ".tasks"
+EOF
 
 "$INIT_SCRIPT" --root "$TEMP_WORKSPACE" --slug "$TASK_SLUG" "verify sql control plane" >/dev/null
+"$INIT_SCRIPT" --root "$TEMP_WORKSPACE" --slug "$STALE_TASK_SLUG" "verify stale task pruning" >/dev/null
 "$START_SLICE_SCRIPT" --root "$TEMP_WORKSPACE" --milestone-id "milestone-001" \
   --milestone-title "Database-backed lifecycle" \
   --slice-id "sync-pass" \
@@ -43,20 +52,27 @@ DB_PATH="$TEMP_WORKSPACE/.campfire/campfire.db"
   --next-slice "None." \
   "$TASK_SLUG" >/dev/null
 "$REFRESH_REGISTRY_SCRIPT" --root "$TEMP_WORKSPACE" >/dev/null
+rm -rf "$TEMP_WORKSPACE/$TASK_ROOT/$STALE_TASK_SLUG"
+"$REFRESH_REGISTRY_SCRIPT" --root "$TEMP_WORKSPACE" >/dev/null
 
 expect_file "$DB_PATH"
 expect_file "$TEMP_WORKSPACE/.campfire/registry.json"
 expect_file "$TEMP_WORKSPACE/.campfire/project_context.json"
 expect_file "$TEMP_WORKSPACE/.campfire/improvement_backlog.json"
 expect_file "$TEMP_WORKSPACE/.campfire/skill_inventory.json"
-expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/task_context.json"
+expect_file "$TEMP_WORKSPACE/$TASK_ROOT/$TASK_SLUG/task_context.json"
 
-python3 - "$DB_PATH" "$TASK_SLUG" <<'PY'
+python3 - "$TEMP_WORKSPACE" "$DB_PATH" "$TASK_SLUG" "$STALE_TASK_SLUG" "$TASK_ROOT" <<'PY'
+import json
 import sqlite3
 import sys
+from pathlib import Path
 
-db_path = sys.argv[1]
-task_slug = sys.argv[2]
+workspace = Path(sys.argv[1]).resolve()
+db_path = sys.argv[2]
+task_slug = sys.argv[3]
+stale_task_slug = sys.argv[4]
+task_root = sys.argv[5]
 conn = sqlite3.connect(db_path)
 conn.row_factory = sqlite3.Row
 
@@ -96,6 +112,21 @@ session = conn.execute(
 ).fetchone()
 if session is None or session["stop_reason"] != "milestone_validated":
     raise SystemExit("latest session stop reason not synced")
+
+stale_task = conn.execute(
+    "SELECT 1 FROM tasks WHERE slug = ?",
+    (stale_task_slug,),
+).fetchone()
+if stale_task is not None:
+    raise SystemExit("stale task row was not pruned from the db")
+
+registry = json.loads((workspace / ".campfire" / "registry.json").read_text())
+if any(item.get("task_slug") == stale_task_slug for item in registry.get("tasks", [])):
+    raise SystemExit("stale task still appears in registry.json")
+
+stale_task_context = workspace / task_root / stale_task_slug / "task_context.json"
+if stale_task_context.exists():
+    raise SystemExit("stale task_context.json was not removed")
 
 print("SQL control-plane state verified.")
 PY

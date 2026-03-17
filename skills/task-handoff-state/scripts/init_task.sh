@@ -3,6 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(pwd -P)"
 TASK_SLUG=""
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SQL_HELPER="${SQL_HELPER:-$SCRIPT_DIR/campfire_sql.py}"
 
 usage() {
   cat <<'EOF'
@@ -47,13 +49,19 @@ fi
 OBJECTIVE="${POSITIONAL[1]}"
 TASK_SLUG="${TASK_SLUG:-$(slugify "$OBJECTIVE")}"
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
-TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
 TODAY="$(date +%Y-%m-%d)"
 NOW_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
 TOUCH_HEARTBEAT_SCRIPT="$SCRIPT_DIR/touch_heartbeat.sh"
 REFRESH_REGISTRY_SCRIPT="$SCRIPT_DIR/refresh_registry.sh"
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "python3 is required to initialize Campfire task state" >&2
+  exit 1
+fi
+
+TASK_ROOT="$(python3 "$SQL_HELPER" show-project --root "$ROOT_DIR" --field task_root)"
+TASK_DIR="$ROOT_DIR/$TASK_ROOT/$TASK_SLUG"
 
 mkdir -p "$TASK_DIR/logs" "$TASK_DIR/artifacts" "$TASK_DIR/findings"
 
@@ -112,9 +120,9 @@ if [ ! -f "$RUNBOOK_FILE" ]; then
 
 ## Observability
 
-- Logs: .autonomous/$TASK_SLUG/logs/
-- Artifacts: .autonomous/$TASK_SLUG/artifacts/
-- Findings: .autonomous/$TASK_SLUG/findings/
+- Logs: $TASK_ROOT/$TASK_SLUG/logs/
+- Artifacts: $TASK_ROOT/$TASK_SLUG/artifacts/
+- Findings: $TASK_ROOT/$TASK_SLUG/findings/
 
 ## Notes
 
@@ -147,7 +155,7 @@ if [ ! -f "$HANDOFF_FILE" ]; then
 
 ## Resume Prompt
 
-Use \$long-horizon-worker and \$task-handoff-state to continue this task from \`.autonomous/$TASK_SLUG/\` and keep working until the current milestone is validated or a real blocker appears.
+Use \$long-horizon-worker and \$task-handoff-state to continue this task from \`$TASK_ROOT/$TASK_SLUG/\` and keep working until the current milestone is validated or a real blocker appears.
 EOF
 fi
 
@@ -172,11 +180,6 @@ if [ ! -f "$ARTIFACTS_FILE" ]; then
   "notes": "Record files, logs, screenshots, reports, or outputs that matter for review or resumption."
 }
 EOF
-fi
-
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "python3 is required to normalize checkpoints.json" >&2
-  exit 1
 fi
 
 export CHECKPOINT_FILE TASK_SLUG TODAY NOW_UTC OBJECTIVE

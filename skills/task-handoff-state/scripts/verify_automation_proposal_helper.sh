@@ -40,7 +40,7 @@ TASK_SLUG="verify-automation-proposal-helper"
 cat >"$TEMP_WORKSPACE/campfire.toml" <<'EOF'
 version = 1
 project_name = "Automation Proposal Verifier"
-default_task_root = ".autonomous"
+default_task_root = ".tasks"
 EOF
 
 "$INIT_SCRIPT" --root "$TEMP_WORKSPACE" --slug "$TASK_SLUG" "verify automation proposal helper" >/dev/null

@@ -35,11 +35,12 @@ echo "== Generated skill drafting =="
 TEMP_WORKSPACE="$(mktemp -d)"
 trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_draft_skill_fail.out /tmp/campfire_draft_skill_fail.err /tmp/campfire_rollback_candidate.json' EXIT
 TASK_SLUG="verify-draft-generated-skill"
+TASK_ROOT=".tasks"
 
 cat >"$TEMP_WORKSPACE/campfire.toml" <<'EOF'
 version = 1
 project_name = "Draft Skill Verifier"
-default_task_root = ".autonomous"
+default_task_root = ".tasks"
 EOF
 
 "$INIT_SCRIPT" --root "$TEMP_WORKSPACE" --slug "$TASK_SLUG" "verify generated skill drafting" >/dev/null
@@ -74,17 +75,18 @@ EOF
 
 expect_file "$TEMP_WORKSPACE/.campfire/generated-skills/repo-skill-helper/SKILL.md"
 expect_file "$TEMP_WORKSPACE/.campfire/generated-skills/repo-skill-helper/skill_candidate.json"
-expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/generated-skills/task-skill-helper/SKILL.md"
-expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/generated-skills/task-skill-helper/skill_candidate.json"
+expect_file "$TEMP_WORKSPACE/$TASK_ROOT/$TASK_SLUG/generated-skills/task-skill-helper/SKILL.md"
+expect_file "$TEMP_WORKSPACE/$TASK_ROOT/$TASK_SLUG/generated-skills/task-skill-helper/skill_candidate.json"
 expect_file "$TEMP_WORKSPACE/.campfire/skill_inventory.json"
 
-python3 - "$TEMP_WORKSPACE" "$TASK_SLUG" <<'PY'
+python3 - "$TEMP_WORKSPACE" "$TASK_SLUG" "$TASK_ROOT" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 workspace = Path(sys.argv[1]).resolve()
 task_slug = sys.argv[2]
+task_root = sys.argv[3]
 
 inventory = json.loads((workspace / ".campfire" / "skill_inventory.json").read_text())
 skills = inventory.get("skills", [])
@@ -97,7 +99,7 @@ if task_entry["scope"] != "task_local_generated":
 if task_entry["task_slug"] != task_slug:
     raise SystemExit("task-local draft task slug mismatch")
 
-task_context = json.loads((workspace / ".autonomous" / task_slug / "task_context.json").read_text())
+task_context = json.loads((workspace / task_root / task_slug / "task_context.json").read_text())
 repo_local = task_context.get("skill_surfaces", {}).get("repo_local_generated", [])
 task_local = task_context.get("skill_surfaces", {}).get("task_local_generated", [])
 if not any(item.get("skill_name") == "repo-skill-helper" for item in repo_local):
@@ -111,7 +113,7 @@ if not any(item.get("skill_name") == "repo-skill-helper" for item in repo_skills
     raise SystemExit("project_context missing repo-local draft")
 
 repo_candidate = json.loads((workspace / ".campfire" / "generated-skills" / "repo-skill-helper" / "skill_candidate.json").read_text())
-task_candidate = json.loads((workspace / ".autonomous" / task_slug / "generated-skills" / "task-skill-helper" / "skill_candidate.json").read_text())
+task_candidate = json.loads((workspace / task_root / task_slug / "generated-skills" / "task-skill-helper" / "skill_candidate.json").read_text())
 if repo_candidate.get("promotion_state") != "drafted":
     raise SystemExit("repo-local candidate not marked drafted")
 if task_candidate.get("promotion_state") != "drafted":

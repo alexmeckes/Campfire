@@ -115,9 +115,10 @@ fi
 
 "$INIT_SCRIPT" --root "$ROOT_DIR" --slug "$PROMOTED_TASK_SLUG" "$TASK_OBJECTIVE" >/dev/null
 
-PLAN_FILE="$ROOT_DIR/.autonomous/$PROMOTED_TASK_SLUG/plan.md"
-PROGRESS_FILE="$ROOT_DIR/.autonomous/$PROMOTED_TASK_SLUG/progress.md"
-HANDOFF_FILE="$ROOT_DIR/.autonomous/$PROMOTED_TASK_SLUG/handoff.md"
+TASK_ROOT="$(python3 "$SQL_HELPER" show-project --root "$ROOT_DIR" --field task_root)"
+PLAN_FILE="$ROOT_DIR/$TASK_ROOT/$PROMOTED_TASK_SLUG/plan.md"
+PROGRESS_FILE="$ROOT_DIR/$TASK_ROOT/$PROMOTED_TASK_SLUG/progress.md"
+HANDOFF_FILE="$ROOT_DIR/$TASK_ROOT/$PROMOTED_TASK_SLUG/handoff.md"
 
 cat >> "$PLAN_FILE" <<EOF
 

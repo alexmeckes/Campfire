@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(pwd -P)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SQL_HELPER="${SQL_HELPER:-$SCRIPT_DIR/campfire_sql.py}"
 STATUS="validated"
 STOP_REASON=""
 SUMMARY_TEXT=""
@@ -78,12 +80,19 @@ fi
 
 TASK_SLUG="$1"
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
-TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
+TOUCH_HEARTBEAT_SCRIPT="$SCRIPT_DIR/touch_heartbeat.sh"
+REFRESH_REGISTRY_SCRIPT="$SCRIPT_DIR/refresh_registry.sh"
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "python3 is required to complete a slice" >&2
+  exit 1
+fi
+
+TASK_ROOT="$(python3 "$SQL_HELPER" show-project --root "$ROOT_DIR" --field task_root)"
+TASK_DIR="$ROOT_DIR/$TASK_ROOT/$TASK_SLUG"
 CHECKPOINT_FILE="$TASK_DIR/checkpoints.json"
 HANDOFF_FILE="$TASK_DIR/handoff.md"
 PROGRESS_FILE="$TASK_DIR/progress.md"
-TOUCH_HEARTBEAT_SCRIPT="$(cd "$(dirname "$0")" && pwd)/touch_heartbeat.sh"
-REFRESH_REGISTRY_SCRIPT="$(cd "$(dirname "$0")" && pwd)/refresh_registry.sh"
 
 if [ ! -d "$TASK_DIR" ]; then
   echo "Task not found: $TASK_DIR" >&2
@@ -96,11 +105,6 @@ for required in "$CHECKPOINT_FILE" "$HANDOFF_FILE" "$PROGRESS_FILE"; do
     exit 1
   fi
 done
-
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "python3 is required to complete a slice" >&2
-  exit 1
-fi
 
 EVENTS_JSON="$(printf '%s\n' "${EVENTS[@]}")"
 export CHECKPOINT_FILE HANDOFF_FILE PROGRESS_FILE TASK_SLUG STATUS STOP_REASON SUMMARY_TEXT NEXT_STEP NEXT_SLICE EVENTS_JSON

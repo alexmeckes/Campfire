@@ -2,6 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(pwd -P)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SQL_HELPER="${SQL_HELPER:-$SCRIPT_DIR/campfire_sql.py}"
 STATE=""
 MILESTONE_ID=""
 MILESTONE_TITLE=""
@@ -83,7 +85,8 @@ fi
 
 TASK_SLUG="$1"
 ROOT_DIR="$(cd "$ROOT_DIR" && pwd)"
-TASK_DIR="$ROOT_DIR/.autonomous/$TASK_SLUG"
+TASK_ROOT="$(python3 "$SQL_HELPER" show-project --root "$ROOT_DIR" --field task_root)"
+TASK_DIR="$ROOT_DIR/$TASK_ROOT/$TASK_SLUG"
 CHECKPOINT_FILE="$TASK_DIR/checkpoints.json"
 HEARTBEAT_FILE="$TASK_DIR/heartbeat.json"
 SESSION_LOG="$TASK_DIR/logs/session.log"
