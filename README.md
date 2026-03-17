@@ -38,7 +38,7 @@ This is intentionally still single-agent and local-first. The skills stay as the
 
 Campfire core should stay small.
 
-Core is only the surface needed for the basic single-agent loop:
+The minimum loop is still the baseline:
 
 - resume from disk
 - activate a slice
@@ -47,7 +47,16 @@ Core is only the surface needed for the basic single-agent loop:
 - write durable state
 - stop cleanly
 
-Features like automation helpers, generated-skill drafting, benchmark adapters, repo-specific wrappers, and app-specific integrations should default to extensions layered on top of the core control plane.
+Campfire's current shared core is a little larger than that minimum because the shipped scripts and verifiers already rely on a few supporting surfaces:
+
+- prompt-template rendering
+- operator guidance persistence
+- session lineage metadata
+- skill inventory and generated context projections
+
+The important rule from here forward is about growth: new capabilities should default to extensions unless they are required shared infrastructure for the single-agent control plane.
+
+Features like automation helpers, generated-skill drafting, benchmark adapters, repo-specific wrappers, and app-specific integrations should still start as extensions layered on top of the core control plane.
 
 For the explicit boundary, see [Campfire core vs extensions](/Users/alexmeckes/Downloads/Campfire/docs/campfire-core-vs-extensions.md).
 
@@ -133,63 +142,39 @@ For long unattended runs, switch the task into rolling mode:
 
 For a manual-stop rolling run, use `--until-stopped`.
 
-## Optional Extensions
+## Shared Workflow Utilities
 
-Print canonical operator prompts from state instead of rewriting them by hand:
+Campfire already ships a few shared control-plane utilities beyond the minimal quick start. These are part of the current core workflow even though a brand-new repo may not need them on day one.
+
+Examples:
 
 ```bash
 ./scripts/prompt_template_helper.sh --task-slug <task-slug> resume
 ./scripts/prompt_template_helper.sh --task-slug <task-slug> retrospective
 ./scripts/prompt_template_helper.sh benchmark
-```
-
-Persist operator guidance without hand-editing task state:
-
-```bash
 ./scripts/queue_guidance.sh --mode interrupt_now --summary "Stop and inspect the failing verifier." <task-slug>
 ./scripts/queue_guidance.sh --mode next_boundary --summary "Revisit this after the current milestone." <task-slug>
-```
-
-Record a structured improvement candidate from a retrospective:
-
-```bash
 ./scripts/record_improvement_candidate.sh --task-slug <task-slug> --category skill_candidate --scope repo_local --title "Title" --problem "Problem" --next-action "Next action"
-```
-
-Promote a reviewed candidate into a real follow-up task:
-
-```bash
 ./scripts/promote_improvement.sh <candidate-id>
 ```
 
-Inspect the generated skill discovery manifest when working with repo-local or task-local draft skills:
+These are still shared Campfire surfaces, not repo-local plugins.
 
-```bash
-./scripts/refresh_registry.sh
-cat .campfire/skill_inventory.json
-```
+## Extensions
 
-Draft a generated skill from a structured improvement candidate:
+Extensions are where new capability should land first.
+
+Current examples:
 
 ```bash
 ./scripts/draft_generated_skill.sh <candidate-id>
-```
-
-Validate the draft-generated-skill helper and wrapper flow:
-
-```bash
 ./skills/task-handoff-state/scripts/verify_draft_generated_skill.sh
+./scripts/automation_proposal_helper.sh <task-slug>
 ```
+
+For generated-skill and automation details, see the focused docs below.
 
 For the full template list, see [Prompt templates](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/prompt-templates.md).
-
-## Resume Prompt Pattern
-
-When a repo does not yet have a local `resume_task.sh` wrapper, the minimal core prompt still looks like this:
-
-```text
-Use $long-horizon-worker and $task-handoff-state to continue <task-root>/<task>/ and validate the next slice before stopping.
-```
 
 ## Recurring Automation Patterns
 
