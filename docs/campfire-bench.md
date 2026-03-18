@@ -24,6 +24,8 @@ Benchmarks like SWE-bench, Terminal-Bench, WebArena, GAIA, and AssistantBench ar
 
 CampfireBench is meant to evaluate those properties directly.
 
+For the first concrete scenario mix, run order, and long/extra-long task definitions, see [Benchmark Pack v1](/Users/alexmeckes/Downloads/Campfire/docs/campfire-benchmark-pack-v1.md).
+
 When you want the canonical operator prompt for reviewing benchmark state in this repo, print it from the shared template layer:
 
 ```bash

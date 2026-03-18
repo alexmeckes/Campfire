@@ -1,0 +1,33 @@
+{
+  "id": "self-hosted-long-run",
+  "name": "Self-Hosted Long Run",
+  "category": "long_horizon",
+  "description": "A real self-hosted Campfire task runs long enough to require queue replenishment, validation, and at least one deliberate stop or reassess point.",
+  "objective": "Measure whether Campfire can improve or harden itself over a long run without losing task coherence.",
+  "required_capabilities": [
+    "rolling_mode",
+    "queue_refresh",
+    "resume_from_state",
+    "validation_recording",
+    "decision_boundary_stop"
+  ],
+  "success_criteria": [
+    "The run spans multiple milestones with at least one queue replenish.",
+    "At least one explicit validation boundary is recorded and respected.",
+    "The final stop or reassess point is correct and visible in task state."
+  ],
+  "scoring_weights": {
+    "task_success": 0.2,
+    "state_fidelity": 0.2,
+    "resume_fidelity": 0.15,
+    "replan_quality": 0.2,
+    "validation_quality": 0.15,
+    "overhead": 0.1
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.18
+  },
+  "candidate_repo": "Campfire",
+  "candidate_task_slug": "improve-campfire",
+  "candidate_objective": "Run a real self-hosted Campfire hardening or extension-boundary backlog until a correct decision boundary or validated milestone boundary is reached."
+}

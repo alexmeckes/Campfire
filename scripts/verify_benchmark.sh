@@ -24,9 +24,12 @@ python3 -m py_compile "$RUNNER"
 
 echo "== Scenario validation =="
 python3 "$RUNNER" --root "$ROOT_DIR" --validate-only >/tmp/campfire_bench_validate.out
-expect_contains /tmp/campfire_bench_validate.out '"scenario_count": 5'
+expect_contains /tmp/campfire_bench_validate.out '"scenario_count": 10'
 expect_contains /tmp/campfire_bench_validate.out '"resume-after-interrupt"'
+expect_contains /tmp/campfire_bench_validate.out '"adapter-parity"'
+expect_contains /tmp/campfire_bench_validate.out '"consumer-repo-extra-long-run"'
 expect_contains /tmp/campfire_bench_validate.out '"long_horizon"'
+expect_contains /tmp/campfire_bench_validate.out '"extra_long_horizon"'
 
 echo "== Result scoring =="
 python3 "$RUNNER" --root "$ROOT_DIR" --results-dir "$BENCH_ROOT/fixtures/results" >/tmp/campfire_bench_score.out

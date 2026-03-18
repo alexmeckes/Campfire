@@ -1,0 +1,29 @@
+{
+  "id": "adapter-parity",
+  "name": "Adapter Parity",
+  "category": "repo_medium",
+  "description": "The same Campfire workflow is executed through the Codex and Claude adapters and compared for state semantics rather than model quality.",
+  "objective": "Measure whether adapter surfaces preserve the same Campfire lifecycle, stop conditions, and durable-state expectations.",
+  "required_capabilities": [
+    "adapter_resume_entrypoint",
+    "adapter_edit_guard",
+    "state_projection_refresh",
+    "resume_from_state"
+  ],
+  "success_criteria": [
+    "Both adapter paths preserve the same milestone and slice semantics.",
+    "Both adapter paths stop for the same class of reasons instead of drifting into adapter-specific behavior.",
+    "Any behavioral differences are recorded as adapter drift, not mistaken for task-quality differences."
+  ],
+  "scoring_weights": {
+    "task_success": 0.15,
+    "state_fidelity": 0.25,
+    "resume_fidelity": 0.2,
+    "replan_quality": 0.1,
+    "validation_quality": 0.15,
+    "overhead": 0.15
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.2
+  }
+}

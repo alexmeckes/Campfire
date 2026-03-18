@@ -1,9 +1,9 @@
 {
   "id": "queue-replenish",
   "name": "Queue Replenish",
-  "category": "long_horizon",
+  "category": "synthetic_lifecycle",
   "description": "A rolling task consumes its queued milestones and must replenish the queue once before continuing.",
-  "objective": "Measure whether rolling mode can reframe once, preserve continuity, and keep going without manual restart.",
+  "objective": "Measure whether rolling mode can reframe once, preserve continuity, and keep going without manual restart even in a short benchmark harness.",
   "required_capabilities": [
     "rolling_mode",
     "auto_advance",

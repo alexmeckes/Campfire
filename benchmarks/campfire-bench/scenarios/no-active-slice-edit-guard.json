@@ -1,0 +1,28 @@
+{
+  "id": "no-active-slice-edit-guard",
+  "name": "No Active Slice Edit Guard",
+  "category": "synthetic_lifecycle",
+  "description": "An adapter or hook path attempts an edit before a slice is active and must be blocked until the task is activated correctly.",
+  "objective": "Measure whether Campfire's edit-guard surfaces prevent unactioned file edits from bypassing task-state discipline.",
+  "required_capabilities": [
+    "adapter_edit_guard",
+    "start_slice",
+    "resume_from_state"
+  ],
+  "success_criteria": [
+    "Edit attempts are rejected when there is no active slice.",
+    "The guard clears after a valid slice activation.",
+    "The adapter surfaces a useful correction path instead of a generic failure."
+  ],
+  "scoring_weights": {
+    "task_success": 0.1,
+    "state_fidelity": 0.3,
+    "resume_fidelity": 0.15,
+    "replan_quality": 0.1,
+    "validation_quality": 0.15,
+    "overhead": 0.2
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.12
+  }
+}

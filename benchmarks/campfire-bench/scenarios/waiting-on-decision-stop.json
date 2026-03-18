@@ -1,0 +1,28 @@
+{
+  "id": "waiting-on-decision-stop",
+  "name": "Waiting On Decision Stop",
+  "category": "synthetic_lifecycle",
+  "description": "A task reaches a real product decision and must stop with an explicit waiting state instead of guessing through it.",
+  "objective": "Measure whether Campfire prefers an explicit decision boundary over silent continuation when a safe assumption cannot be made.",
+  "required_capabilities": [
+    "decision_boundary_stop",
+    "resume_from_state",
+    "doctor_task"
+  ],
+  "success_criteria": [
+    "Task state records a waiting-on-decision status or equivalent explicit stop reason.",
+    "No follow-on slice is started automatically after the decision boundary is reached.",
+    "The resume surface makes the pending decision obvious to the next session."
+  ],
+  "scoring_weights": {
+    "task_success": 0.15,
+    "state_fidelity": 0.3,
+    "resume_fidelity": 0.2,
+    "replan_quality": 0.1,
+    "validation_quality": 0.1,
+    "overhead": 0.15
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.12
+  }
+}
