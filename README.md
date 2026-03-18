@@ -1,8 +1,8 @@
 # Campfire
 
-Campfire is a lightweight long-horizon Codex harness.
+Campfire is a lightweight long-horizon agent harness.
 
-It keeps the workflow generic, keeps project rules local to each repo, and gives Codex durable task state outside chat history.
+It keeps the workflow generic, keeps project rules local to each repo, and gives agents durable task state outside chat history.
 
 The design constraint is simple: if a feature is not required for a single agent to resume, work, validate, and stop cleanly, it should start as an extension instead of becoming Campfire core.
 
@@ -32,7 +32,7 @@ Campfire now has a lightweight local control plane:
 - `.campfire/improvement_backlog.json` provides a repo-wide improvement queue
 - `.campfire/project_context.json` and `<task-root>/<task>/task_context.json` provide structured resume context
 
-This is intentionally still single-agent and local-first. The skills stay as the Codex behavior layer; the control plane makes the workflow more mechanical and less prompt-dependent.
+This is intentionally still single-agent and local-first. The skills and adapters stay as the agent behavior layer; the control plane makes the workflow more mechanical and less prompt-dependent.
 
 ## Core Boundary
 
@@ -62,13 +62,16 @@ For the explicit boundary, see [Campfire core vs extensions](/Users/alexmeckes/D
 
 ## Install
 
-Install the skills into `~/.codex/skills`:
+Install the core Campfire skills into `~/.codex/skills`:
 
 ```bash
 ./scripts/install_skills.sh
 ```
 
-Restart Codex App after installation so the skill list refreshes.
+Restart your agent client after installation so the skill list refreshes. Today Campfire ships:
+
+- Codex-oriented skills under `~/.codex/skills`
+- a Claude Code adapter template under `examples/basic-workspace/.claude/`
 
 ## Verify
 
@@ -118,7 +121,7 @@ Inspect the task state and use the emitted resume prompt:
 ./scripts/resume_task.sh <task-slug>
 ```
 
-Resume in Codex App with the prompt from that output. If you need to refer to the task directory directly, use the repo's configured `default_task_root` from `campfire.toml` rather than assuming `.autonomous/`.
+Resume in your agent client with the prompt or adapter output from that task. If you need to refer to the task directory directly, use the repo's configured `default_task_root` from `campfire.toml` rather than assuming `.autonomous/`.
 
 If `resume_task.sh` says the task is missing during a continue/resume request, stop and confirm the workspace plus task slug instead of bootstrapping a replacement task.
 

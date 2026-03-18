@@ -26,6 +26,7 @@ The Claude adapter is also intentionally small:
 - `.claude/commands/campfire-new-task.md`
 - `.claude/commands/campfire-start-slice.md`
 - `.claude/commands/campfire-complete-slice.md`
+- `.claude/hooks/campfire-hook-helper.py`
 - `.claude/hooks/campfire-session-start.sh`
 - `.claude/hooks/campfire-pre-tool.sh`
 - `.claude/hooks/campfire-post-tool.sh`
