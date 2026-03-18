@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-03-18T04:06:04.442375Z",
+  "root": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run",
+  "db_path": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run/.campfire/campfire.db",
+  "skill_inventory_path": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run/.campfire/skill_inventory.json",
+  "task_count": 1,
+  "tasks": [
+    {
+      "task_slug": "fixture-extra-long-run",
+      "task_dir": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run/.autonomous/fixture-extra-long-run",
+      "status": "ready",
+      "phase": "execution",
+      "current": {
+        "milestone_id": "m1_state_baseline",
+        "milestone_title": "Establish baseline state and benchmark reports",
+        "slice_id": "",
+        "slice_title": ""
+      },
+      "queued_count": 6,
+      "guidance": {
+        "active_count": 0,
+        "follow_up_count": 0,
+        "active_mode": "",
+        "active_summary": ""
+      },
+      "last_updated": "2026-03-18T04:06:04.441181Z",
+      "last_run": {
+        "run_id": "",
+        "stop_reason": "",
+        "started_at": "",
+        "ended_at": "",
+        "summary": "",
+        "lineage": {
+          "parent_run_id": "",
+          "kind": "",
+          "branch_label": ""
+        }
+      },
+      "heartbeat": {
+        "state": "idle",
+        "last_seen_at": "2026-03-18T03:59:19.239337Z",
+        "session_started_at": "",
+        "summary": "Task initialized.",
+        "touched_path": ""
+      }
+    }
+  ]
+}

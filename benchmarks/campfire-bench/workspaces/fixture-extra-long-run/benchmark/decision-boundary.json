@@ -1,0 +1,6 @@
+{
+  "id": "seeded-decision-stop",
+  "status": "pending",
+  "question": "Should the fixture archive prior recovery reports after a completed cycle, or preserve them across cycles for comparison?",
+  "rule": "Do not assume through this decision boundary without recording an explicit stop reason."
+}

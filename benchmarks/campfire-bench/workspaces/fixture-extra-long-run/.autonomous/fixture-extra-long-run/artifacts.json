@@ -1,0 +1,27 @@
+{
+  "task_slug": "fixture-extra-long-run",
+  "last_updated": "2026-03-18",
+  "artifacts": [
+    {
+      "path": "benchmark/brief.md",
+      "type": "source_doc",
+      "summary": "Neutral extra-long benchmark brief."
+    },
+    {
+      "path": "benchmark/inventory.json",
+      "type": "control_doc",
+      "summary": "Phase inventory for the extra-long fixture."
+    },
+    {
+      "path": "benchmark/blocker.json",
+      "type": "control_doc",
+      "summary": "Seeded blocker signal for the extra-long fixture."
+    },
+    {
+      "path": "benchmark/decision-boundary.json",
+      "type": "control_doc",
+      "summary": "Seeded decision-boundary signal for the extra-long fixture."
+    }
+  ],
+  "notes": "Record benchmark evidence, blocker handling, and evaluator outputs that matter for review or resumption."
+}

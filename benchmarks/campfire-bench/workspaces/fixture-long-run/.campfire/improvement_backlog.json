@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-03-18T04:06:03.346958Z",
+  "root": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-long-run",
+  "db_path": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-long-run/.campfire/campfire.db",
+  "candidate_count": 0,
+  "counts": {
+    "by_promotion_state": {},
+    "by_category": {}
+  },
+  "candidates": []
+}

@@ -1,0 +1,106 @@
+{
+  "task_slug": "fixture-extra-long-run",
+  "objective": "Run a neutral extra-long benchmark backlog with seeded resumes, blockers, and a decision boundary stop.",
+  "status": "ready",
+  "phase": "execution",
+  "current": {
+    "milestone_id": "m1_state_baseline",
+    "milestone_title": "Establish baseline state and benchmark reports",
+    "slice_id": "",
+    "slice_title": "",
+    "acceptance_criteria": [
+      "The source docs, blocker surface, and decision-boundary files agree on the extra-long benchmark shape.",
+      "The local verifier and resume surface can explain the seeded backlog without prior chat memory."
+    ],
+    "dependencies": [
+      "benchmark/brief.md",
+      "benchmark/validation-checklist.md",
+      "benchmark/inventory.json",
+      "benchmark/blocker.json",
+      "benchmark/decision-boundary.json",
+      "findings/m1-state-baseline.md"
+    ]
+  },
+  "execution": {
+    "mode": "rolling",
+    "run_style": "bounded",
+    "auto_advance": true,
+    "auto_reframe": true,
+    "planning_slice_minutes": 15,
+    "runtime_budget_minutes": 240,
+    "min_runtime_minutes": 180,
+    "min_milestones_per_run": 5,
+    "max_milestones_per_run": 8,
+    "reframe_queue_below": 1,
+    "target_queue_depth": 4,
+    "max_reframes_per_run": 3,
+    "continue_until": [
+      "blocked",
+      "waiting_on_decision",
+      "safe_work_exhaustion",
+      "budget_limit"
+    ],
+    "queued_milestones": [
+      {
+        "milestone_id": "m2_validation_report",
+        "milestone_title": "Expand verification notes and update the neutral report set"
+      },
+      {
+        "milestone_id": "m3_resume_reentry",
+        "milestone_title": "Exercise a deliberate resume and re-entry boundary"
+      },
+      {
+        "milestone_id": "m4_queue_refresh",
+        "milestone_title": "Replenish the queue from findings while keeping the work neutral"
+      },
+      {
+        "milestone_id": "m5_blocker_gate",
+        "milestone_title": "Handle the seeded blocker gate without silent drift"
+      },
+      {
+        "milestone_id": "m6_recovery_report",
+        "milestone_title": "Record recovery evidence after the blocker boundary"
+      },
+      {
+        "milestone_id": "m7_decision_stop",
+        "milestone_title": "Stop on the seeded benchmark decision boundary instead of choosing for the operator"
+      }
+    ],
+    "notes": "This fixture is an extra-long neutral benchmark workspace. It should exercise multiple resumes, a seeded blocker, queue replenish, and an explicit decision-boundary stop without inheriting product-repo history."
+  },
+  "blocker": {
+    "status": "none",
+    "type": "",
+    "summary": "",
+    "attempts": 0,
+    "next_action": ""
+  },
+  "workspace": {
+    "strategy": "in_place",
+    "root": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run",
+    "git_root": "",
+    "branch": ""
+  },
+  "last_run": {
+    "started_at": "",
+    "ended_at": "2026-03-18T03:59:19Z",
+    "stop_reason": "initialized",
+    "summary": "Fixture extra-long task seeded with a longer rolling backlog, a blocker gate, and a decision-boundary stop.",
+    "next_step": "Resume the workspace from disk, confirm state fidelity, and start the first bounded slice on m1_state_baseline.",
+    "events": [
+      "seeded_benchmark_fixture"
+    ]
+  },
+  "runbook": "runbook.md",
+  "artifacts_manifest": "artifacts.json",
+  "validation": [
+    {
+      "type": "fixture_workspace",
+      "result": "pass",
+      "command": "./scripts/verify_fixture_workspace.sh",
+      "artifact": "benchmark/inventory.json",
+      "summary": "The seeded extra-long benchmark workspace passes its baseline fixture verifier."
+    }
+  ],
+  "last_updated": "2026-03-18"
+}

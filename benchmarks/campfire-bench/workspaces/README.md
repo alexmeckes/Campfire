@@ -15,6 +15,14 @@ The intended Pack v1 fixture layout is:
 - `fixture-extra-long-run/`
   - a larger neutral backlog designed to run for hours and force multiple resumes, at least one blocker or failed validation, and a decision boundary
 
+Both seeded workspaces now exist in this folder and each contains:
+
+- a local `campfire.toml`
+- benchmark-specific `AGENTS.md` and `README.md`
+- thin wrapper scripts and a minimal Claude adapter
+- one canonical seeded benchmark task under `.autonomous/`
+- a local `scripts/verify_fixture_workspace.sh`
+
 These fixture workspaces should stay repo-independent.
 
 Good fixture work:

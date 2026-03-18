@@ -1,0 +1,22 @@
+{
+  "task_slug": "fixture-long-run",
+  "last_updated": "2026-03-18",
+  "artifacts": [
+    {
+      "path": "benchmark/brief.md",
+      "type": "source_doc",
+      "summary": "Neutral long-run benchmark brief."
+    },
+    {
+      "path": "benchmark/validation-checklist.md",
+      "type": "source_doc",
+      "summary": "Benchmark validation checklist."
+    },
+    {
+      "path": "benchmark/inventory.json",
+      "type": "control_doc",
+      "summary": "Phase inventory for the long-run fixture."
+    }
+  ],
+  "notes": "Record benchmark evidence, reports, and evaluator outputs that matter for review or resumption."
+}

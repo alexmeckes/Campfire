@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-03-18T04:06:04.443377Z",
+  "root": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run",
+  "project_name": "fixture-extra-long-run",
+  "task_root": ".autonomous",
+  "db_path": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run/.campfire/campfire.db",
+  "improvement_backlog_path": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run/.campfire/improvement_backlog.json",
+  "skill_inventory_path": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run/.campfire/skill_inventory.json",
+  "source_docs": [
+    "AGENTS.md",
+    "README.md",
+    "benchmark/brief.md",
+    "benchmark/validation-checklist.md",
+    "benchmark/inventory.json",
+    "benchmark/blocker.json",
+    "benchmark/decision-boundary.json"
+  ],
+  "default_skills": [
+    "task-framer",
+    "course-corrector",
+    "long-horizon-worker",
+    "task-evaluator",
+    "task-handoff-state",
+    "task-retrospector"
+  ],
+  "validators": [
+    {
+      "id": "fixture_workspace",
+      "kind": "fixture",
+      "label": "Fixture workspace verification"
+    }
+  ],
+  "task_counts": {
+    "total": 1,
+    "by_status": {
+      "ready": 1
+    }
+  },
+  "improvement_counts": {
+    "total": 0,
+    "by_promotion_state": {}
+  },
+  "skill_counts": {
+    "by_scope": {}
+  },
+  "discoverable_skills": {
+    "repo_local_generated": [],
+    "campfire_generated_core": []
+  },
+  "task_defaults": {}
+}

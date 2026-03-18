@@ -1,0 +1,42 @@
+{
+  "workspace_name": "fixture-extra-long-run",
+  "task_slug": "fixture-extra-long-run",
+  "benchmark_type": "extra_long_horizon_fixture",
+  "phases": [
+    {
+      "id": "m1_state_baseline",
+      "status": "queued",
+      "artifact": "benchmark/reports/m1-state-baseline.md"
+    },
+    {
+      "id": "m2_validation_report",
+      "status": "queued",
+      "artifact": "benchmark/reports/m2-validation-report.md"
+    },
+    {
+      "id": "m3_resume_reentry",
+      "status": "queued",
+      "artifact": "benchmark/reports/m3-resume-reentry.md"
+    },
+    {
+      "id": "m4_queue_refresh",
+      "status": "queued",
+      "artifact": "benchmark/reports/m4-queue-refresh.md"
+    },
+    {
+      "id": "m5_blocker_gate",
+      "status": "blocked_pending",
+      "artifact": "benchmark/reports/m5-blocker-gate.md"
+    },
+    {
+      "id": "m6_recovery_report",
+      "status": "queued",
+      "artifact": "benchmark/reports/m6-recovery-report.md"
+    },
+    {
+      "id": "m7_decision_stop",
+      "status": "decision_pending",
+      "artifact": "benchmark/reports/m7-decision-stop.md"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "task_slug": "fixture-long-run",
+  "objective": "Run a neutral long-horizon benchmark backlog until a correct validation or decision boundary stop occurs.",
+  "status": "ready",
+  "phase": "execution",
+  "current": {
+    "milestone_id": "m1_source_map",
+    "milestone_title": "Normalize source docs and benchmark inventory",
+    "slice_id": "",
+    "slice_title": "",
+    "acceptance_criteria": [
+      "The source docs and benchmark inventory agree on the first five benchmark phases.",
+      "The local verifier and resume surface can explain the current milestone without relying on prior chat memory."
+    ],
+    "dependencies": [
+      "benchmark/brief.md",
+      "benchmark/validation-checklist.md",
+      "benchmark/inventory.json",
+      "findings/m1-source-map.md"
+    ]
+  },
+  "execution": {
+    "mode": "rolling",
+    "run_style": "bounded",
+    "auto_advance": true,
+    "auto_reframe": true,
+    "planning_slice_minutes": 15,
+    "runtime_budget_minutes": 120,
+    "min_runtime_minutes": 90,
+    "min_milestones_per_run": 4,
+    "max_milestones_per_run": 6,
+    "reframe_queue_below": 1,
+    "target_queue_depth": 3,
+    "max_reframes_per_run": 2,
+    "continue_until": [
+      "blocked",
+      "waiting_on_decision",
+      "safe_work_exhaustion",
+      "budget_limit"
+    ],
+    "queued_milestones": [
+      {
+        "milestone_id": "m2_validation_report",
+        "milestone_title": "Tighten validation notes and produce a neutral report artifact"
+      },
+      {
+        "milestone_id": "m3_blocker_drill",
+        "milestone_title": "Handle the seeded blocker drill without corrupting benchmark state"
+      },
+      {
+        "milestone_id": "m4_backlog_refresh",
+        "milestone_title": "Replenish the queue from findings without inventing product work"
+      },
+      {
+        "milestone_id": "m5_decision_stop",
+        "milestone_title": "Stop on the seeded benchmark decision boundary instead of guessing through it"
+      }
+    ],
+    "notes": "This fixture is a neutral long-run benchmark workspace. The task should exercise queue replenishment, verification, and an explicit decision-boundary stop without inheriting product-repo history."
+  },
+  "blocker": {
+    "status": "none",
+    "type": "",
+    "summary": "",
+    "attempts": 0,
+    "next_action": ""
+  },
+  "workspace": {
+    "strategy": "in_place",
+    "root": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-long-run",
+    "git_root": "",
+    "branch": ""
+  },
+  "last_run": {
+    "started_at": "",
+    "ended_at": "2026-03-18T03:59:19Z",
+    "stop_reason": "initialized",
+    "summary": "Fixture long-run task seeded with a rolling backlog and neutral benchmark source files.",
+    "next_step": "Resume the workspace from disk, confirm state fidelity, and start the first bounded slice on m1_source_map.",
+    "events": [
+      "seeded_benchmark_fixture"
+    ]
+  },
+  "runbook": "runbook.md",
+  "artifacts_manifest": "artifacts.json",
+  "validation": [
+    {
+      "type": "fixture_workspace",
+      "result": "pass",
+      "command": "./scripts/verify_fixture_workspace.sh",
+      "artifact": "benchmark/inventory.json",
+      "summary": "The seeded benchmark workspace passes its baseline fixture verifier."
+    }
+  ],
+  "last_updated": "2026-03-18"
+}

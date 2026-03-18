@@ -1,0 +1,6 @@
+{
+  "id": "seeded-blocker-gate",
+  "status": "pending",
+  "summary": "At m5_blocker_gate, the run should treat this blocker as real unless the benchmark task has already recorded a recovery path.",
+  "recommended_action": "record blocker state explicitly and only continue when a recovery path is documented."
+}

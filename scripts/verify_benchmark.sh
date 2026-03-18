@@ -32,6 +32,9 @@ expect_contains /tmp/campfire_bench_validate.out '"fixture-long-run"'
 expect_contains /tmp/campfire_bench_validate.out '"long_horizon"'
 expect_contains /tmp/campfire_bench_validate.out '"extra_long_horizon"'
 
+echo "== Fixture workspaces =="
+zsh "$ROOT_DIR/scripts/verify_benchmark_workspaces.sh"
+
 echo "== Result scoring =="
 python3 "$RUNNER" --root "$ROOT_DIR" --results-dir "$BENCH_ROOT/fixtures/results" >/tmp/campfire_bench_score.out
 expect_contains /tmp/campfire_bench_score.out '"result_count": 1'

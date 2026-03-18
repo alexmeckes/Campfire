@@ -1,0 +1,31 @@
+version = 1
+project_name = "fixture-extra-long-run"
+default_task_root = ".autonomous"
+default_run_style = "bounded"
+
+[source_docs]
+priority = [
+  "AGENTS.md",
+  "README.md",
+  "benchmark/brief.md",
+  "benchmark/validation-checklist.md",
+  "benchmark/inventory.json",
+  "benchmark/blocker.json",
+  "benchmark/decision-boundary.json",
+]
+
+[skills]
+default = [
+  "task-framer",
+  "course-corrector",
+  "long-horizon-worker",
+  "task-evaluator",
+  "task-handoff-state",
+  "task-retrospector",
+]
+
+[[validators]]
+id = "fixture_workspace"
+label = "Fixture workspace verification"
+command = "./scripts/verify_fixture_workspace.sh"
+kind = "fixture"

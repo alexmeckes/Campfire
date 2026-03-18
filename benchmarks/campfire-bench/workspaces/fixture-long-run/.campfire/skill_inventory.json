@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-03-18T04:06:03.346557Z",
+  "root": ".",
+  "manifest_version": 1,
+  "task_root": ".autonomous",
+  "package_count": 0,
+  "counts": {
+    "by_scope": {}
+  },
+  "skills": []
+}
