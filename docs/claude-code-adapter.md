@@ -294,6 +294,7 @@ That is enough to make Campfire usable in Claude Code without expanding Campfire
 - no new database
 - no mandatory MCP server
 - no Claude-only automation semantics
+- no subagent orchestration in the base Claude adapter
 - no automatic skill generation inside Claude Code
 
 If deeper Claude integration is needed later, it should still start as an extension layered on top of this adapter.

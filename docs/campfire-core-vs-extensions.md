@@ -46,8 +46,10 @@ Examples:
 - automation proposal helpers
 - benchmark adapters or scenario packs
 - generated-skill drafting and promotion flows
+- subagent orchestration or delegation layers
 - repo-specific wrappers
 - Codex App-specific integrations
+- Claude Code-specific integrations
 - alternate board views
 
 These should be implemented so they can be ignored, removed, or replaced without breaking the basic Campfire loop.
@@ -77,6 +79,7 @@ That keeps Campfire from turning into a general orchestration framework.
 
 - Do not turn core into a plugin host for every experiment.
 - Do not add product-specific automation logic to core without a strong reason.
+- Do not add subagent orchestration to core without repeated evidence that the single-agent loop cannot stay sufficient.
 - Do not add new top-level primitives when an existing state surface can carry the behavior.
 - Do not make the single-agent loop depend on optional integrations.
 
