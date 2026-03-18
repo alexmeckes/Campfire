@@ -47,6 +47,7 @@ Examples:
 - benchmark adapters or scenario packs
 - generated-skill drafting and promotion flows
 - subagent orchestration or delegation layers
+- monitoring-sidecar subagents
 - repo-specific wrappers
 - Codex App-specific integrations
 - Claude Code-specific integrations
