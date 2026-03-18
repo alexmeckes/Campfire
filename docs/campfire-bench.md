@@ -106,9 +106,21 @@ Examples:
 
 Examples:
 
-- coding task with a forced resume and a forced blocker
-- rolling run that must replenish its queue at least once
-- long task that must stop on decision boundary instead of guessing
+- fixture task with a forced resume and a forced blocker
+- fixture run that must replenish its queue at least once
+- fixture run that must stop on decision boundary instead of guessing
+
+### Field Validation
+
+Real repo runs should be treated as field validation.
+
+They are useful for:
+
+- checking whether the harness survives real product pressure
+- comparing agent adapters in natural repo conditions
+- discovering failure modes that the fixture pack does not yet cover
+
+They should not define the benchmark contract by themselves.
 
 ## Result Model
 

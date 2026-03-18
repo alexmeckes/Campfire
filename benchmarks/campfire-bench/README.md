@@ -8,7 +8,7 @@ The benchmark is intentionally lightweight:
 - sample result files live in `fixtures/results/`
 - `scripts/run_campfire_bench.py` validates scenarios and scores result files
 
-For the concrete first benchmark mix, including the planned long and extra-long runs, see [Benchmark Pack v1](/Users/alexmeckes/Downloads/Campfire/docs/campfire-benchmark-pack-v1.md).
+For the concrete first benchmark mix, including the planned fixture-based long and extra-long runs, see [Benchmark Pack v1](/Users/alexmeckes/Downloads/Campfire/docs/campfire-benchmark-pack-v1.md).
 
 ## Commands
 
@@ -47,3 +47,5 @@ The current scaffold is not a full autonomous evaluator yet. It gives Campfire:
 - a way to measure orchestration overhead explicitly
 
 The scaffold now carries the full Pack v1 scenario contracts, but the expensive long and extra-long runs are still intended to be executed deliberately rather than on every repo verification pass.
+
+Canonical long-run benchmarks should use dedicated fixture workspaces under [workspaces/](/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces). Real repo runs should be treated as field validation, not as the benchmark contract itself.

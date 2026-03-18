@@ -27,7 +27,8 @@ python3 "$RUNNER" --root "$ROOT_DIR" --validate-only >/tmp/campfire_bench_valida
 expect_contains /tmp/campfire_bench_validate.out '"scenario_count": 10'
 expect_contains /tmp/campfire_bench_validate.out '"resume-after-interrupt"'
 expect_contains /tmp/campfire_bench_validate.out '"adapter-parity"'
-expect_contains /tmp/campfire_bench_validate.out '"consumer-repo-extra-long-run"'
+expect_contains /tmp/campfire_bench_validate.out '"fixture-extra-long-run"'
+expect_contains /tmp/campfire_bench_validate.out '"fixture-long-run"'
 expect_contains /tmp/campfire_bench_validate.out '"long_horizon"'
 expect_contains /tmp/campfire_bench_validate.out '"extra_long_horizon"'
 

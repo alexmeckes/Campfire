@@ -1,0 +1,33 @@
+{
+  "id": "fixture-extra-long-run",
+  "name": "Fixture Extra Long Run",
+  "category": "extra_long_horizon",
+  "description": "A dedicated benchmark fixture task runs for hours, crosses multiple resumes and validation boundaries, and must stay coherent until a correct stop condition appears.",
+  "objective": "Measure whether Campfire can stay mechanically correct across an afternoon-scale neutral benchmark task rather than a product task.",
+  "required_capabilities": [
+    "rolling_mode",
+    "queue_refresh",
+    "resume_from_state",
+    "validation_recording",
+    "decision_boundary_stop"
+  ],
+  "success_criteria": [
+    "The run remains coherent across at least five milestones and two resumes.",
+    "At least one failed validation or real blocker is handled without silent drift.",
+    "The final stop reason is correct and explicit instead of guessed through."
+  ],
+  "scoring_weights": {
+    "task_success": 0.2,
+    "state_fidelity": 0.2,
+    "resume_fidelity": 0.15,
+    "replan_quality": 0.2,
+    "validation_quality": 0.15,
+    "overhead": 0.1
+  },
+  "overhead_budget": {
+    "max_orchestration_token_ratio": 0.18
+  },
+  "candidate_workspace": "benchmarks/campfire-bench/workspaces/fixture-extra-long-run",
+  "candidate_task_slug": "fixture-extra-long-run",
+  "candidate_objective": "Run a neutral extra-long benchmark backlog that forces multiple resumes, at least one blocker or failed validation, and a correct decision-boundary stop."
+}

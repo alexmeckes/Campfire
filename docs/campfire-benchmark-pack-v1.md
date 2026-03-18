@@ -10,8 +10,8 @@ Pack v1 therefore mixes:
 
 - short synthetic scenarios
 - medium repo-integrated scenarios
-- one real long-running self-hosted task
-- one extra-long consumer-repo task
+- one dedicated long-running fixture task
+- one dedicated extra-long fixture task
 
 ## Why This Pack Exists
 
@@ -110,12 +110,12 @@ These use real repo work but keep the scope bounded.
 
 These are expensive and should only run after the earlier layers are stable.
 
-9. `self-hosted-long-run`
+9. `fixture-long-run`
    - Category: `long_horizon`
    - Target duration: `90 to 120 minutes`
-   - Candidate repo: `Campfire`
-   - Candidate task slug: `improve-campfire`
-   - Candidate task shape: real self-improvement or hardening backlog
+   - Candidate workspace: `benchmarks/campfire-bench/workspaces/fixture-long-run`
+   - Candidate task slug: `fixture-long-run`
+   - Candidate task shape: neutral long-horizon benchmark backlog
    - Required events:
      - multiple milestones
      - at least one queue replenish
@@ -127,12 +127,12 @@ These are expensive and should only run after the earlier layers are stable.
      - stop reason is correct
      - orchestration overhead remains bounded
 
-10. `consumer-repo-extra-long-run`
+10. `fixture-extra-long-run`
     - Category: `extra_long_horizon`
     - Target duration: `180 to 240 minutes`
-    - Candidate repo: `lootidle`
-    - Candidate task slug: `build-the-playable-vertical-slice`
-    - Candidate task shape: real product work, not harness-only work
+    - Candidate workspace: `benchmarks/campfire-bench/workspaces/fixture-extra-long-run`
+    - Candidate task slug: `fixture-extra-long-run`
+    - Candidate task shape: neutral extra-long benchmark backlog
     - Required events:
       - at least 5 milestones
       - at least 2 resumes
@@ -150,8 +150,8 @@ Run Pack v1 in order.
 
 1. Stabilize Layer 1.
 2. Run Layer 2 once the short mechanics stop finding obvious harness bugs.
-3. Run `self-hosted-long-run`.
-4. Only then run `consumer-repo-extra-long-run`.
+3. Run `fixture-long-run`.
+4. Only then run `fixture-extra-long-run`.
 
 This ordering matters. The extra-long run is for proof, not for discovering basic harness bugs that the short scenarios should have caught first.
 
@@ -192,6 +192,23 @@ Pack v1 is successful when:
 - the extra-long run remains coherent for hours without silent drift
 
 Pack v1 is not trying to prove maximum task completion rate yet. It is trying to prove that Campfire can stay mechanically correct over time.
+
+## Field Validation
+
+Real repo runs are still useful, but they should be recorded separately from Pack v1.
+
+Use field validation when you want to answer questions like:
+
+- does Campfire hold up on a real product backlog?
+- does a specific consumer repo expose adapter or workflow drift?
+- does a real team task reveal different failure modes than the fixture tasks?
+
+Good field validation examples:
+
+- a long Campfire self-hosting run in the Campfire repo
+- a long Lootidle run in the Loot Goblins project
+
+Field validation should inform future benchmark design, but it should not replace the fixture-based Pack v1 scenarios.
 
 ## What Pack v1 Should Decide
 
