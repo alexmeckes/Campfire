@@ -46,7 +46,7 @@ Examples:
 - automation proposal helpers
 - benchmark adapters or scenario packs
 - generated-skill drafting and promotion flows
-- subagent orchestration or delegation layers
+- subagent delegation layers
 - monitoring-sidecar subagents
 - repo-specific wrappers
 - Codex App-specific integrations
@@ -80,9 +80,34 @@ That keeps Campfire from turning into a general orchestration framework.
 
 - Do not turn core into a plugin host for every experiment.
 - Do not add product-specific automation logic to core without a strong reason.
-- Do not add subagent orchestration to core without repeated evidence that the single-agent loop cannot stay sufficient.
+- Do not add a general queueing or orchestration engine to core.
+- Do not let more than one agent own milestone or task-state writes.
+- Do not make the primary Campfire task loop depend on background worker scheduling semantics.
 - Do not add new top-level primitives when an existing state surface can carry the behavior.
 - Do not make the single-agent loop depend on optional integrations.
+
+## Subagent Boundary
+
+Subagents can fit Campfire, but only as extensions and only under a single-writer model.
+
+Allowed:
+
+- monitor sidecars
+- explorer sidecars
+- bounded workers with explicit parent ownership and disjoint write scope
+- adapter-level delegation helpers
+
+Not allowed in core:
+
+- scheduler-managed worker pools
+- durable multi-agent ownership of a task
+- automatic fan-out/fan-in orchestration as a first-class control-plane behavior
+- subagents directly mutating `checkpoints.json`, `handoff.md`, `progress.md`, or milestone status
+
+The litmus test is:
+
+- if the parent agent still owns the slice, validation, and stop reason, this can remain an extension
+- if Campfire would need to manage agent queues, retries, leases, or shared milestone ownership, it has become orchestration and should stay out of core
 
 ## Practical Test
 
