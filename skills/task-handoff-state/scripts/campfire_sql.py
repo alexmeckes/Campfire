@@ -27,6 +27,17 @@ def today_utc() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
+def normalize_string_list(raw_value: Any) -> list[str]:
+    if not isinstance(raw_value, list):
+        return []
+    normalized: list[str] = []
+    for item in raw_value:
+        text = str(item).strip()
+        if text:
+            normalized.append(text)
+    return normalized
+
+
 def load_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
@@ -76,13 +87,15 @@ def extract_plan_objective(plan_path: Path) -> str:
 
 
 def normalize_queue(raw_queue: Any) -> list[dict[str, str]]:
-    entries: list[dict[str, str]] = []
+    entries: list[dict[str, Any]] = []
     if not isinstance(raw_queue, list):
         return entries
     for item in raw_queue:
         if isinstance(item, dict):
             milestone_id = str(item.get("milestone_id", "")).strip()
             milestone_title = str(item.get("milestone_title", "")).strip()
+            acceptance = normalize_string_list(item.get("acceptance_criteria", []))
+            dependencies = normalize_string_list(item.get("dependencies", []))
         elif isinstance(item, str):
             text = item.strip()
             if ":" in text:
@@ -92,15 +105,20 @@ def normalize_queue(raw_queue: Any) -> list[dict[str, str]]:
             else:
                 milestone_id = text
                 milestone_title = text
+            acceptance = []
+            dependencies = []
         else:
             continue
         if milestone_id:
-            entries.append(
-                {
-                    "milestone_id": milestone_id,
-                    "milestone_title": milestone_title or milestone_id,
-                }
-            )
+            entry: dict[str, Any] = {
+                "milestone_id": milestone_id,
+                "milestone_title": milestone_title or milestone_id,
+            }
+            if acceptance:
+                entry["acceptance_criteria"] = acceptance
+            if dependencies:
+                entry["dependencies"] = dependencies
+            entries.append(entry)
     return entries
 
 
@@ -538,8 +556,8 @@ def sync_task(conn: sqlite3.Connection, root_dir: Path, task_slug: str) -> dict[
             entry["milestone_title"],
             "queued",
             index,
-            [],
-            [],
+            entry.get("acceptance_criteria", []) if isinstance(entry.get("acceptance_criteria"), list) else [],
+            entry.get("dependencies", []) if isinstance(entry.get("dependencies"), list) else [],
         )
         conn.execute(
             """
@@ -1434,6 +1452,8 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
           t.current_slice_key,
           t.updated_at,
           m.title AS current_milestone_title,
+          m.acceptance_json AS current_milestone_acceptance_json,
+          m.dependencies_json AS current_milestone_dependencies_json,
           s.title AS current_slice_title,
           hb.state AS heartbeat_state,
           hb.last_seen_at AS heartbeat_last_seen_at,
@@ -1471,10 +1491,17 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
 
     queue_rows = conn.execute(
         """
-        SELECT milestone_key, milestone_title, position
-        FROM queue_entries
-        WHERE task_id = ?
-        ORDER BY position ASC
+        SELECT
+          q.milestone_key,
+          q.milestone_title,
+          q.position,
+          m.acceptance_json,
+          m.dependencies_json
+        FROM queue_entries q
+        LEFT JOIN milestones m
+          ON m.task_id = q.task_id AND m.milestone_key = q.milestone_key
+        WHERE q.task_id = ?
+        ORDER BY q.position ASC
         """,
         (int(row["id"]),),
     ).fetchall()
@@ -1536,12 +1563,16 @@ def build_task_context(conn: sqlite3.Connection, root_dir: Path, task_slug: str)
             "milestone_title": row["current_milestone_title"] or "",
             "slice_id": row["current_slice_key"] or "",
             "slice_title": row["current_slice_title"] or "",
+            "acceptance_criteria": parse_json_array(row["current_milestone_acceptance_json"] or "[]"),
+            "dependencies": parse_json_array(row["current_milestone_dependencies_json"] or "[]"),
         },
         "queued_milestones": [
             {
                 "milestone_id": queue_row["milestone_key"],
                 "milestone_title": queue_row["milestone_title"],
                 "position": int(queue_row["position"]),
+                "acceptance_criteria": parse_json_array(queue_row["acceptance_json"] or "[]"),
+                "dependencies": parse_json_array(queue_row["dependencies_json"] or "[]"),
             }
             for queue_row in queue_rows
         ],

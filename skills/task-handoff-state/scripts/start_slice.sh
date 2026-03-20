@@ -152,6 +152,17 @@ def load_json(path: Path) -> dict:
     return data
 
 
+def normalize_string_list(raw_value):
+    if not isinstance(raw_value, list):
+        return []
+    normalized = []
+    for item in raw_value:
+        text = str(item).strip()
+        if text:
+            normalized.append(text)
+    return normalized
+
+
 def normalize_queue(raw_queue):
     normalized = []
     if not isinstance(raw_queue, list):
@@ -160,6 +171,8 @@ def normalize_queue(raw_queue):
         if isinstance(item, dict):
             milestone_id = str(item.get("milestone_id", "")).strip()
             milestone_title = str(item.get("milestone_title", "")).strip()
+            acceptance = normalize_string_list(item.get("acceptance_criteria", []))
+            dependencies = normalize_string_list(item.get("dependencies", []))
         elif isinstance(item, str):
             text = item.strip()
             if ":" in text:
@@ -169,12 +182,20 @@ def normalize_queue(raw_queue):
             else:
                 milestone_id = text
                 milestone_title = text
+            acceptance = []
+            dependencies = []
         else:
             continue
         if milestone_id:
-            normalized.append(
-                {"milestone_id": milestone_id, "milestone_title": milestone_title}
-            )
+            entry = {
+                "milestone_id": milestone_id,
+                "milestone_title": milestone_title or milestone_id,
+            }
+            if acceptance:
+                entry["acceptance_criteria"] = acceptance
+            if dependencies:
+                entry["dependencies"] = dependencies
+            normalized.append(entry)
     return normalized
 
 
@@ -251,12 +272,13 @@ queued = normalize_queue(execution.get("queued_milestones", []))
 
 selected_id = requested_milestone_id
 selected_title = requested_milestone_title
+selected_entry = None
 
 if from_next:
     if queued:
-      next_entry = queued.pop(0)
-      selected_id = selected_id or next_entry["milestone_id"]
-      selected_title = selected_title or next_entry["milestone_title"]
+      selected_entry = queued.pop(0)
+      selected_id = selected_id or selected_entry["milestone_id"]
+      selected_title = selected_title or selected_entry["milestone_title"]
     elif current.get("milestone_id"):
       selected_id = selected_id or str(current.get("milestone_id", "")).strip()
       selected_title = selected_title or str(current.get("milestone_title", "")).strip()
@@ -271,6 +293,7 @@ if not selected_title:
     else:
         for entry in queued:
             if entry["milestone_id"] == selected_id:
+                selected_entry = entry
                 selected_title = entry["milestone_title"]
                 break
 
@@ -283,6 +306,9 @@ if not selected_title:
 same_milestone = selected_id == str(current.get("milestone_id", "")).strip()
 acceptance = current.get("acceptance_criteria", []) if same_milestone else []
 dependencies = current.get("dependencies", []) if same_milestone else []
+if not same_milestone and selected_entry is not None:
+    acceptance = selected_entry.get("acceptance_criteria", [])
+    dependencies = selected_entry.get("dependencies", [])
 if not isinstance(acceptance, list):
     acceptance = []
 if not isinstance(dependencies, list):

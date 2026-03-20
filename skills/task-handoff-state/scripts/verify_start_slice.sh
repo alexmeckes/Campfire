@@ -36,6 +36,37 @@ FAILED_DIR="$TEMP_WORKSPACE/.autonomous/$FAILED_SLUG"
   --queue "milestone-002:Camp Loop" \
   --queue "milestone-003:Validate Loop" \
   "$TASK_SLUG" >/dev/null
+
+python3 - "$TASK_DIR/checkpoints.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+data = json.loads(path.read_text())
+execution = data.get("execution", {})
+queue = execution.get("queued_milestones", [])
+if not isinstance(queue, list) or len(queue) < 2:
+    raise SystemExit("expected two queued milestones")
+queue[0]["acceptance_criteria"] = [
+    "Camp Loop view renders from seeded state",
+    "Camp Loop interactions stay within the active slice",
+]
+queue[0]["dependencies"] = [
+    "findings/camp-loop-plan.md",
+    "artifacts.json",
+]
+queue[1]["acceptance_criteria"] = [
+    "Validate Loop captures evaluator evidence",
+]
+queue[1]["dependencies"] = [
+    "findings/validate-loop.md",
+]
+execution["queued_milestones"] = queue
+data["execution"] = execution
+path.write_text(json.dumps(data, indent=2) + "\n")
+PY
+
 "$START_SLICE_SCRIPT" --root "$TEMP_WORKSPACE" --from-next \
   --slice-id "camp-ui-shell" \
   --slice-title "Build the camp UI shell" \
@@ -47,7 +78,14 @@ expect_contains "$TASK_DIR/checkpoints.json" '"status": "in_progress"'
 expect_contains "$TASK_DIR/checkpoints.json" '"milestone_id": "milestone-002"'
 expect_contains "$TASK_DIR/checkpoints.json" '"slice_id": "camp-ui-shell"'
 expect_contains "$TASK_DIR/checkpoints.json" '"slice_started"'
+expect_contains "$TASK_DIR/checkpoints.json" '"acceptance_criteria":'
+expect_contains "$TASK_DIR/checkpoints.json" 'Camp Loop view renders from seeded state'
+expect_contains "$TASK_DIR/checkpoints.json" 'findings/camp-loop-plan.md'
 expect_contains "$TASK_DIR/checkpoints.json" '"milestone_id": "milestone-003"'
+expect_contains "$TASK_DIR/checkpoints.json" 'Validate Loop captures evaluator evidence'
+expect_contains "$TASK_DIR/task_context.json" '"milestone_id": "milestone-002"'
+expect_contains "$TASK_DIR/task_context.json" 'Camp Loop view renders from seeded state'
+expect_contains "$TASK_DIR/task_context.json" 'findings/camp-loop-plan.md'
 expect_contains "$TASK_DIR/handoff.md" 'Status: in progress'
 expect_contains "$TASK_DIR/handoff.md" 'Current milestone: `milestone-002` - Camp Loop'
 expect_contains "$TASK_DIR/handoff.md" 'Next slice: Implement and validate the camp UI shell.'
