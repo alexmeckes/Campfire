@@ -1,0 +1,92 @@
+{
+  "task_slug": "fixture-long-run",
+  "last_updated": "2026-03-18",
+  "artifacts": [
+    {
+      "path": "benchmark/brief.md",
+      "type": "source_doc",
+      "summary": "Neutral long-run benchmark brief."
+    },
+    {
+      "path": "benchmark/validation-checklist.md",
+      "type": "source_doc",
+      "summary": "Benchmark validation checklist."
+    },
+    {
+      "path": "benchmark/inventory.json",
+      "type": "control_doc",
+      "summary": "Phase inventory for the long-run fixture."
+    },
+    {
+      "path": "benchmark/reports/m1-source-map.md",
+      "type": "benchmark_report",
+      "milestone_id": "m1_source_map",
+      "summary": "Records source-doc and inventory alignment for the seeded benchmark phases."
+    },
+    {
+      "path": ".autonomous/fixture-long-run/findings/m1-source-map-evaluation.md",
+      "type": "milestone_evaluation",
+      "milestone_id": "m1_source_map",
+      "summary": "Evaluation evidence for the validated m1 source-map milestone."
+    },
+    {
+      "path": "benchmark/reports/m2-validation-report.md",
+      "type": "benchmark_report",
+      "milestone_id": "m2_validation_report",
+      "summary": "Neutral validation report describing the ordered fixture evidence ladder."
+    },
+    {
+      "path": ".autonomous/fixture-long-run/findings/m2-validation-report-evaluation.md",
+      "type": "milestone_evaluation",
+      "milestone_id": "m2_validation_report",
+      "summary": "Evaluation evidence for the validated m2 validation-report milestone."
+    },
+    {
+      "path": "benchmark/reports/m3-blocker-journal.md",
+      "type": "benchmark_report",
+      "milestone_id": "m3_blocker_drill",
+      "summary": "Journal of the seeded blocker drill and its justified no-blocker outcome."
+    },
+    {
+      "path": ".autonomous/fixture-long-run/findings/m3-blocker-drill-evaluation.md",
+      "type": "milestone_evaluation",
+      "milestone_id": "m3_blocker_drill",
+      "summary": "Evaluation evidence for the validated m3 blocker-drill milestone."
+    },
+    {
+      "path": "benchmark/reports/m4-reframe-summary.md",
+      "type": "benchmark_report",
+      "milestone_id": "m4_backlog_refresh",
+      "summary": "Records the bounded queue replenish and the neutral decision-dependent follow-ups."
+    },
+    {
+      "path": ".autonomous/fixture-long-run/findings/m4-backlog-refresh-evaluation.md",
+      "type": "milestone_evaluation",
+      "milestone_id": "m4_backlog_refresh",
+      "summary": "Evaluation evidence for the validated m4 backlog-refresh milestone."
+    },
+    {
+      "path": "benchmark/reports/m5-decision-note.md",
+      "type": "benchmark_report",
+      "milestone_id": "m5_decision_stop",
+      "summary": "Decision-boundary note explaining the explicit waiting-on-decision stop."
+    },
+    {
+      "path": ".autonomous/fixture-long-run/findings/m5-decision-stop-evaluation.md",
+      "type": "milestone_evaluation",
+      "milestone_id": "m5_decision_stop",
+      "summary": "Evaluation evidence for the seeded m5 waiting-on-decision stop."
+    },
+    {
+      "path": ".autonomous/fixture-long-run/findings/fixture-long-run-retrospective.md",
+      "type": "retrospective",
+      "summary": "Short retrospective for the benchmark run and the reusable control-plane follow-up."
+    },
+    {
+      "path": ".autonomous/fixture-long-run/findings/2026-03-18-carry-milestone-metadata-through-rolling-auto-advance.json",
+      "type": "improvement_candidate",
+      "summary": "Structured control-plane follow-up recorded from the blocker-drill and backlog-refresh evidence."
+    }
+  ],
+  "notes": "Record benchmark evidence, reports, and evaluator outputs that matter for review or resumption."
+}

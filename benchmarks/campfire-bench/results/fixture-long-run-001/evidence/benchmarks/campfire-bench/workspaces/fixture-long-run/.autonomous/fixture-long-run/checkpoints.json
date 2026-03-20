@@ -1,0 +1,93 @@
+{
+  "task_slug": "fixture-long-run",
+  "objective": "Run a neutral long-horizon benchmark backlog until a correct validation or decision boundary stop occurs.",
+  "status": "waiting_on_decision",
+  "phase": "waiting_on_decision",
+  "current": {
+    "milestone_id": "m5_decision_stop",
+    "milestone_title": "Stop on the seeded benchmark decision boundary instead of guessing through it",
+    "slice_id": "record-the-explicit-decision-boundary-stop",
+    "slice_title": "Record the explicit decision-boundary stop",
+    "acceptance_criteria": [
+      "The retention-window policy is treated as a real decision boundary when unresolved.",
+      "Task state records waiting_on_decision and does not auto-start follow-on work past the boundary."
+    ],
+    "dependencies": [
+      "benchmark/inventory.json",
+      "benchmark/reports/m5-decision-note.md",
+      "findings/m5-decision-stop-evaluation.md"
+    ]
+  },
+  "execution": {
+    "mode": "rolling",
+    "run_style": "bounded",
+    "auto_advance": true,
+    "auto_reframe": true,
+    "planning_slice_minutes": 15,
+    "runtime_budget_minutes": 120,
+    "min_runtime_minutes": 90,
+    "min_milestones_per_run": 4,
+    "max_milestones_per_run": 6,
+    "reframe_queue_below": 1,
+    "target_queue_depth": 3,
+    "max_reframes_per_run": 2,
+    "continue_until": [
+      "blocked",
+      "waiting_on_decision",
+      "safe_work_exhaustion",
+      "budget_limit"
+    ],
+    "queued_milestones": [
+      {
+        "milestone_id": "m6_retention_policy_apply",
+        "milestone_title": "Apply the chosen retention-window policy after the operator decision"
+      },
+      {
+        "milestone_id": "m7_post_decision_verification",
+        "milestone_title": "Re-run neutral verifier surfaces after the retention policy is applied"
+      }
+    ],
+    "notes": "This fixture is a neutral long-run benchmark workspace. The task should exercise queue replenishment, verification, and an explicit decision-boundary stop without inheriting product-repo history. The m4 reframe may add only decision-dependent benchmark follow-ups."
+  },
+  "blocker": {
+    "status": "waiting_on_decision",
+    "type": "policy_decision",
+    "summary": "The retention-window policy is unresolved, and the remaining queued milestones depend on that answer.",
+    "attempts": 1,
+    "next_action": "Decide whether the fixture retains every generated report or trims report history after each completed long-run cycle."
+  },
+  "workspace": {
+    "strategy": "in_place",
+    "root": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-long-run",
+    "git_root": "",
+    "branch": ""
+  },
+  "last_run": {
+    "started_at": "2026-03-18T12:33:01.383506Z",
+    "ended_at": "2026-03-18T12:33:33.225246Z",
+    "stop_reason": "waiting_on_decision",
+    "summary": "Stopped at the seeded retention-window decision boundary with only decision-dependent follow-ups remaining in the queue.",
+    "next_step": "Wait for an operator decision on whether the fixture retains every report or trims report history after each long-run cycle.",
+    "events": [
+      "seeded_benchmark_fixture",
+      "slice_started",
+      "slice_completed",
+      "auto_advanced",
+      "course_corrected",
+      "auto_reframed"
+    ],
+    "run_id": "run-20260318T123301383506Z"
+  },
+  "runbook": "runbook.md",
+  "artifacts_manifest": "artifacts.json",
+  "validation": [
+    {
+      "type": "fixture_workspace",
+      "result": "pass",
+      "command": "./scripts/verify_fixture_workspace.sh",
+      "artifact": "benchmark/inventory.json",
+      "summary": "The seeded benchmark workspace passes its baseline fixture verifier."
+    }
+  ],
+  "last_updated": "2026-03-18"
+}

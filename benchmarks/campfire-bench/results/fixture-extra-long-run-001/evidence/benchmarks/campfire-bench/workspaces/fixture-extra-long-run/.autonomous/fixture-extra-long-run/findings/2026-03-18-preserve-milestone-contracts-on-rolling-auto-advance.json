@@ -1,0 +1,31 @@
+{
+  "candidate_id": "2026-03-18-preserve-milestone-contracts-on-rolling-auto-advance",
+  "source": {
+    "type": "benchmark_run",
+    "task_slug": "fixture-extra-long-run",
+    "milestone_id": "m7_decision_stop",
+    "run_id": "run-20260318T132305644361Z"
+  },
+  "title": "Preserve milestone contracts on rolling auto-advance",
+  "category": "control_plane_candidate",
+  "scope": "repo_local",
+  "promotion_state": "proposed",
+  "problem": "start_slice.sh --from-next advances queued milestones but drops milestone-specific acceptance_criteria and dependencies, forcing manual checkpoint repair during rolling benchmark runs and increasing drift risk.",
+  "why_not_script": "",
+  "evidence": [
+    ".autonomous/fixture-extra-long-run/findings/fixture-extra-long-run-retrospective.md",
+    "benchmark/reports/m4-queue-refresh.md",
+    ".autonomous/fixture-extra-long-run/progress.md"
+  ],
+  "trigger_pattern": [],
+  "proposed_skill": {
+    "name": "",
+    "purpose": ""
+  },
+  "confidence": "high",
+  "next_action": "Teach rolling queue entries or start_slice.sh to preserve milestone contract metadata, then add verifier coverage for queue-to-current contract preservation.",
+  "promoted_task_slug": "",
+  "output_path": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run/.autonomous/fixture-extra-long-run/findings/2026-03-18-preserve-milestone-contracts-on-rolling-auto-advance.json",
+  "created_at": "2026-03-18T13:24:44.292982Z",
+  "updated_at": "2026-03-18T13:24:44.292982Z"
+}

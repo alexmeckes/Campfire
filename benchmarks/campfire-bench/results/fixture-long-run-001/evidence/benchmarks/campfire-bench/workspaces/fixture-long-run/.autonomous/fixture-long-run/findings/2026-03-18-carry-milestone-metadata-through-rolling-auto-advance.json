@@ -1,0 +1,31 @@
+{
+  "candidate_id": "2026-03-18-carry-milestone-metadata-through-rolling-auto-advance",
+  "source": {
+    "type": "benchmark",
+    "task_slug": "fixture-long-run",
+    "milestone_id": "m3_blocker_drill",
+    "run_id": "run-20260318T123301383506Z"
+  },
+  "title": "Carry milestone metadata through rolling auto-advance",
+  "category": "control_plane_candidate",
+  "scope": "repo_local",
+  "promotion_state": "proposed",
+  "problem": "Rolling auto-advance moves the task into the next queued milestone, but the current acceptance criteria and dependencies have to be restated manually before evaluation can stay independent from chat memory.",
+  "why_not_script": "",
+  "evidence": [
+    "benchmark/reports/m3-blocker-journal.md",
+    "benchmark/reports/m4-reframe-summary.md",
+    ".autonomous/fixture-long-run/findings/fixture-long-run-retrospective.md"
+  ],
+  "trigger_pattern": [],
+  "proposed_skill": {
+    "name": "",
+    "purpose": ""
+  },
+  "confidence": "high",
+  "next_action": "Extend the lifecycle helpers to hydrate current milestone criteria and dependencies from queued milestone metadata or a milestone catalog during --from-next transitions.",
+  "promoted_task_slug": "",
+  "output_path": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-long-run/.autonomous/fixture-long-run/findings/2026-03-18-carry-milestone-metadata-through-rolling-auto-advance.json",
+  "created_at": "2026-03-18T12:34:16.017705Z",
+  "updated_at": "2026-03-18T12:34:16.017705Z"
+}

@@ -1,0 +1,95 @@
+{
+  "task_slug": "fixture-extra-long-run",
+  "objective": "Run a neutral extra-long benchmark backlog with seeded resumes, blockers, and a decision boundary stop.",
+  "status": "waiting_on_decision",
+  "phase": "waiting_on_decision",
+  "current": {
+    "milestone_id": "m7_decision_stop",
+    "milestone_title": "Stop on the seeded benchmark decision boundary instead of choosing for the operator",
+    "slice_id": "record-the-pending-archive-versus-preserve-decision-stop",
+    "slice_title": "Record the pending archive-versus-preserve decision stop",
+    "acceptance_criteria": [
+      "The pending archive-versus-preserve question is recorded as an unresolved decision boundary.",
+      "The run stops with waiting_on_decision instead of choosing a path through m7."
+    ],
+    "dependencies": [
+      "benchmark/decision-boundary.json",
+      "benchmark/reports/m7-decision-stop.md",
+      ".autonomous/fixture-extra-long-run/artifacts/m7-resume-waiting.txt",
+      ".autonomous/fixture-extra-long-run/artifacts/m7-doctor.txt",
+      ".autonomous/fixture-extra-long-run/findings/m7-decision-stop.md",
+      ".autonomous/fixture-extra-long-run/findings/m7-decision-stop-evaluation.md"
+    ]
+  },
+  "execution": {
+    "mode": "rolling",
+    "run_style": "bounded",
+    "auto_advance": true,
+    "auto_reframe": true,
+    "planning_slice_minutes": 15,
+    "runtime_budget_minutes": 240,
+    "min_runtime_minutes": 180,
+    "min_milestones_per_run": 5,
+    "max_milestones_per_run": 8,
+    "reframe_queue_below": 1,
+    "target_queue_depth": 4,
+    "max_reframes_per_run": 3,
+    "continue_until": [
+      "blocked",
+      "waiting_on_decision",
+      "safe_work_exhaustion",
+      "budget_limit"
+    ],
+    "queued_milestones": [
+      {
+        "milestone_id": "m8_post_decision_follow_through",
+        "milestone_title": "Apply the archive-versus-preserve decision after explicit operator input"
+      }
+    ],
+    "notes": "This fixture is an extra-long neutral benchmark workspace. It should exercise multiple resumes, a seeded blocker, queue replenish, and an explicit decision-boundary stop without inheriting product-repo history. m4 adds one neutral post-decision follow-up so queue replenishment is real without assuming through m7."
+  },
+  "blocker": {
+    "status": "recovered",
+    "type": "seeded_blocker_gate",
+    "summary": "The seeded blocker was recovered through the dedicated m6 recovery milestone and is no longer the active stop condition.",
+    "attempts": 1,
+    "next_action": "The next active gate is the pending decision boundary at m7_decision_stop."
+  },
+  "workspace": {
+    "strategy": "in_place",
+    "root": "/Users/alexmeckes/Downloads/Campfire/benchmarks/campfire-bench/workspaces/fixture-extra-long-run",
+    "git_root": "",
+    "branch": ""
+  },
+  "last_run": {
+    "started_at": "2026-03-18T13:23:05.644361Z",
+    "ended_at": "2026-03-18T13:23:26.347451Z",
+    "stop_reason": "waiting_on_decision",
+    "summary": "Stopped at the seeded decision boundary because benchmark/decision-boundary.json still leaves the archive-versus-preserve question unresolved.",
+    "next_step": "Wait for explicit operator input on whether prior recovery reports should be archived or preserved across cycles before resuming m8_post_decision_follow_through.",
+    "events": [
+      "seeded_benchmark_fixture",
+      "slice_started",
+      "slice_completed",
+      "evaluation_passed",
+      "auto_advanced",
+      "auto_reframed",
+      "blocker_recorded",
+      "blocker_recovered",
+      "decision_boundary_recorded"
+    ],
+    "run_id": "run-20260318T132305644361Z"
+  },
+  "runbook": "runbook.md",
+  "artifacts_manifest": "artifacts.json",
+  "validation": [
+    {
+      "type": "fixture_workspace",
+      "result": "pass",
+      "command": "./scripts/verify_fixture_workspace.sh",
+      "artifact": "benchmark/inventory.json",
+      "summary": "The seeded extra-long benchmark workspace passes its baseline fixture verifier."
+    }
+  ],
+  "last_updated": "2026-03-18"
+}

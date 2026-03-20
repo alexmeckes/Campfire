@@ -1,0 +1,212 @@
+{
+  "task_slug": "fixture-extra-long-run",
+  "last_updated": "2026-03-18",
+  "artifacts": [
+    {
+      "path": "benchmark/brief.md",
+      "type": "source_doc",
+      "summary": "Neutral extra-long benchmark brief."
+    },
+    {
+      "path": "benchmark/inventory.json",
+      "type": "control_doc",
+      "summary": "Phase inventory for the extra-long fixture."
+    },
+    {
+      "path": "benchmark/blocker.json",
+      "type": "control_doc",
+      "summary": "Seeded blocker signal for the extra-long fixture."
+    },
+    {
+      "path": "benchmark/decision-boundary.json",
+      "type": "control_doc",
+      "summary": "Seeded decision-boundary signal for the extra-long fixture."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m1-verify-fixture.txt",
+      "type": "validation_output",
+      "summary": "Fixture verifier output for the baseline milestone."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m1-doctor.txt",
+      "type": "validation_output",
+      "summary": "Doctor output confirming control-plane coherence during m1."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m1-resume.txt",
+      "type": "resume_render",
+      "summary": "Resume render captured during the baseline milestone."
+    },
+    {
+      "path": "benchmark/reports/m1-state-baseline.md",
+      "type": "benchmark_report",
+      "summary": "Baseline coherence report for the extra-long fixture."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/m1-state-baseline-evaluation.md",
+      "type": "evaluation_note",
+      "summary": "Independent evaluation for m1_state_baseline."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m2-verify-fixture.txt",
+      "type": "validation_output",
+      "summary": "Fixture verifier output for m2_validation_report."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m2-doctor.txt",
+      "type": "validation_output",
+      "summary": "Doctor output confirming rolling-state coherence during m2."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m2-resume.txt",
+      "type": "resume_render",
+      "summary": "Resume render captured during m2_validation_report."
+    },
+    {
+      "path": "benchmark/reports/m2-validation-report.md",
+      "type": "benchmark_report",
+      "summary": "Validation-evidence report for the rolling extra-long fixture."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/m2-validation-report-evaluation.md",
+      "type": "evaluation_note",
+      "summary": "Independent evaluation for m2_validation_report."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m3-resume.txt",
+      "type": "resume_render",
+      "summary": "Deliberate re-entry resume render captured during m3."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m3-doctor.txt",
+      "type": "validation_output",
+      "summary": "Doctor output confirming resumed rolling-state coherence during m3."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m3-verify-fixture.txt",
+      "type": "validation_output",
+      "summary": "Fixture verifier output captured during m3_resume_reentry."
+    },
+    {
+      "path": "benchmark/reports/m3-resume-reentry.md",
+      "type": "benchmark_report",
+      "summary": "Resume and re-entry report for the extra-long fixture."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/m3-resume-reentry-evaluation.md",
+      "type": "evaluation_note",
+      "summary": "Independent evaluation for m3_resume_reentry."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m4-resume.txt",
+      "type": "resume_render",
+      "summary": "Resume render showing the replenished queue during m4."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m4-doctor.txt",
+      "type": "validation_output",
+      "summary": "Doctor output confirming queue-refresh coherence during m4."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m4-verify-fixture.txt",
+      "type": "validation_output",
+      "summary": "Fixture verifier output captured during m4_queue_refresh."
+    },
+    {
+      "path": "benchmark/reports/m4-queue-refresh.md",
+      "type": "benchmark_report",
+      "summary": "Queue-replenish report for the extra-long fixture."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/m4-queue-refresh-evaluation.md",
+      "type": "evaluation_note",
+      "summary": "Independent evaluation for m4_queue_refresh."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m5-doctor.txt",
+      "type": "validation_output",
+      "summary": "Doctor output confirming the durable blocked state at m5."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m5-resume-blocked.txt",
+      "type": "resume_render",
+      "summary": "Resume render captured after the blocked stop at m5."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m5-verify-fixture.txt",
+      "type": "validation_output",
+      "summary": "Fixture verifier output captured after the blocked stop at m5."
+    },
+    {
+      "path": "benchmark/reports/m5-blocker-gate.md",
+      "type": "benchmark_report",
+      "summary": "Blocked-stop report for the seeded blocker gate."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/m5-blocker-gate-evaluation.md",
+      "type": "evaluation_note",
+      "summary": "Independent evaluation for m5_blocker_gate."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m6-resume.txt",
+      "type": "resume_render",
+      "summary": "Resume render captured during blocker recovery in m6."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m6-doctor.txt",
+      "type": "validation_output",
+      "summary": "Doctor output confirming in-progress recovery coherence during m6."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m6-verify-fixture.txt",
+      "type": "validation_output",
+      "summary": "Fixture verifier output captured during m6_recovery_report."
+    },
+    {
+      "path": "benchmark/reports/m6-recovery-report.md",
+      "type": "benchmark_report",
+      "summary": "Recovery report for the extra-long fixture after the blocked stop."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/m6-recovery-report-evaluation.md",
+      "type": "evaluation_note",
+      "summary": "Independent evaluation for m6_recovery_report."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m7-doctor.txt",
+      "type": "validation_output",
+      "summary": "Doctor output confirming the waiting_on_decision terminal state at m7."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m7-resume-waiting.txt",
+      "type": "resume_render",
+      "summary": "Resume render captured after the waiting_on_decision stop at m7."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/artifacts/m7-verify-fixture.txt",
+      "type": "validation_output",
+      "summary": "Fixture verifier output captured after the m7 decision stop."
+    },
+    {
+      "path": "benchmark/reports/m7-decision-stop.md",
+      "type": "benchmark_report",
+      "summary": "Decision-stop report for the extra-long fixture."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/m7-decision-stop-evaluation.md",
+      "type": "evaluation_note",
+      "summary": "Independent evaluation for m7_decision_stop."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/fixture-extra-long-run-retrospective.md",
+      "type": "retrospective_note",
+      "summary": "Retrospective for the fixture-extra-long-run benchmark."
+    },
+    {
+      "path": ".autonomous/fixture-extra-long-run/findings/2026-03-18-preserve-milestone-contracts-on-rolling-auto-advance.json",
+      "type": "improvement_candidate",
+      "summary": "Structured follow-up candidate for preserving milestone contracts on rolling auto-advance."
+    }
+  ],
+  "notes": "Record benchmark evidence, blocker handling, and evaluator outputs that matter for review or resumption."
+}
