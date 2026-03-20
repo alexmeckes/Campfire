@@ -72,14 +72,15 @@
     "branch": ""
   },
   "last_run": {
-    "started_at": "",
+    "started_at": "2026-03-18T12:33:01.403257Z",
     "ended_at": "2026-03-18T03:59:19Z",
     "stop_reason": "initialized",
     "summary": "Fixture long-run task seeded with a rolling backlog and neutral benchmark source files.",
     "next_step": "Resume the workspace from disk, confirm state fidelity, and start the first bounded slice on m1_source_map.",
     "events": [
       "seeded_benchmark_fixture"
-    ]
+    ],
+    "run_id": "2026-03-18T12:33:01.403257Z"
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",

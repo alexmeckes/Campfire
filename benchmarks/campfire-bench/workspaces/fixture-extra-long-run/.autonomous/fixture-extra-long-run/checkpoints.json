@@ -82,14 +82,15 @@
     "branch": ""
   },
   "last_run": {
-    "started_at": "",
+    "started_at": "2026-03-18T13:23:05.665606Z",
     "ended_at": "2026-03-18T03:59:19Z",
     "stop_reason": "initialized",
     "summary": "Fixture extra-long task seeded with a longer rolling backlog, a blocker gate, and a decision-boundary stop.",
     "next_step": "Resume the workspace from disk, confirm state fidelity, and start the first bounded slice on m1_state_baseline.",
     "events": [
       "seeded_benchmark_fixture"
-    ]
+    ],
+    "run_id": "2026-03-18T13:23:05.665606Z"
   },
   "runbook": "runbook.md",
   "artifacts_manifest": "artifacts.json",
