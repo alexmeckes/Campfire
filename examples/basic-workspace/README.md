@@ -17,6 +17,7 @@ The wrapper scripts intentionally stay small:
 - `scripts/enable_rolling_mode.sh`
 - `scripts/automation_prompt_helper.sh`
 - `scripts/automation_proposal_helper.sh`
+- `scripts/automation_schedule_scaffold.sh`
 - `scripts/verify_harness.sh`
 
 The Claude adapter is also intentionally small:
@@ -36,6 +37,7 @@ By default they look for installed Campfire skills under `~/.codex/skills`.
 
 Use `scripts/automation_prompt_helper.sh` when you only need task-only prompt text.
 Use `scripts/automation_proposal_helper.sh` when you want schedule-agnostic automation metadata that also includes a suggested name and workspace roots.
+Use `scripts/automation_schedule_scaffold.sh` when you want generic cadence suggestions plus operator questions without choosing scheduler syntax yet.
 
 For deterministic verification inside the Campfire repo, set:
 

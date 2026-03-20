@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SQL_HELPER="${SQL_HELPER:-$SCRIPT_DIR/campfire_sql.py}"
 AUTOMATION_HELPER_SCRIPT="$SCRIPT_DIR/automation_prompt_helper.sh"
 AUTOMATION_PROPOSAL_HELPER_SCRIPT="$SCRIPT_DIR/automation_proposal_helper.sh"
+AUTOMATION_SCHEDULE_SCAFFOLD_SCRIPT="$SCRIPT_DIR/automation_schedule_scaffold.sh"
 PROMPT_TEMPLATE_SCRIPT="$SCRIPT_DIR/prompt_template_helper.sh"
 START_SLICE_SCRIPT="$SCRIPT_DIR/start_slice.sh"
 COMPLETE_SLICE_SCRIPT="$SCRIPT_DIR/complete_slice.sh"
@@ -314,6 +315,11 @@ PY
       echo
       echo "Automation proposal metadata:"
       "$AUTOMATION_PROPOSAL_HELPER_SCRIPT" --root "$ROOT_DIR" "$TASK_SLUG"
+    fi
+    if [ -x "$AUTOMATION_SCHEDULE_SCAFFOLD_SCRIPT" ]; then
+      echo
+      echo "Automation schedule scaffolds:"
+      "$AUTOMATION_SCHEDULE_SCAFFOLD_SCRIPT" --root "$ROOT_DIR" "$TASK_SLUG"
     fi
   fi
 fi

@@ -173,6 +173,7 @@ Current examples:
 ./scripts/draft_generated_skill.sh <candidate-id>
 ./skills/task-handoff-state/scripts/verify_draft_generated_skill.sh
 ./scripts/automation_proposal_helper.sh <task-slug>
+./scripts/automation_schedule_scaffold.sh <task-slug>
 ```
 
 For a Claude Code adapter that stays outside Campfire core, see [Claude Code adapter](/Users/alexmeckes/Downloads/Campfire/docs/claude-code-adapter.md).
@@ -199,6 +200,18 @@ Use the proposal helper when you want schedule-agnostic metadata with a suggeste
 ```bash
 ./scripts/automation_proposal_helper.sh <task-slug>
 ```
+
+Use the schedule scaffold helper when you want generic cadence suggestions and operator questions without committing to scheduler-specific syntax:
+
+```bash
+./scripts/automation_schedule_scaffold.sh <task-slug>
+```
+
+Use the helper layers intentionally:
+
+- `automation_prompt_helper.sh` for task-only prompt bodies
+- `automation_proposal_helper.sh` for names, prompts, and workspace roots
+- `automation_schedule_scaffold.sh` for natural-language cadence guidance that still leaves schedule selection to the operator or automation layer
 
 For the reusable patterns and prompt guidance, see [Automation patterns](/Users/alexmeckes/Downloads/Campfire/skills/task-handoff-state/references/automation-patterns.md).
 

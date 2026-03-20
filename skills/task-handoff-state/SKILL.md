@@ -14,6 +14,7 @@ Read [references/automation-patterns.md](references/automation-patterns.md) when
 Read [references/prompt-templates.md](references/prompt-templates.md) when you want the canonical operator prompts for resume, retrospection, benchmark review, or promoted-improvement follow-up.
 Use [scripts/automation_prompt_helper.sh](scripts/automation_prompt_helper.sh) when you want task-only automation prompt variants emitted from existing Campfire state.
 Use [scripts/automation_proposal_helper.sh](scripts/automation_proposal_helper.sh) when you want schedule-agnostic automation proposal metadata with stable names, prompt bodies, and workspace roots.
+Use [scripts/automation_schedule_scaffold.sh](scripts/automation_schedule_scaffold.sh) when you want generic cadence suggestions plus operator questions without choosing scheduler-specific syntax.
 Use [scripts/prompt_template_helper.sh](scripts/prompt_template_helper.sh) when you want the shared prompt-template layer instead of hand-writing common operator prompts.
 Use [scripts/queue_guidance.sh](scripts/queue_guidance.sh) when you need to persist active interrupt-now guidance or queued next-boundary follow-ups without hand-editing `checkpoints.json`.
 Use [scripts/draft_generated_skill.sh](scripts/draft_generated_skill.sh) when a structured `skill_candidate` should become a task-local or repo-local draft skill scaffold instead of staying only in the backlog.
@@ -95,6 +96,12 @@ Print schedule-agnostic automation proposal metadata for an existing task:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/automation_proposal_helper.sh build-the-next-milestone
+```
+
+Print generic automation cadence scaffolds for an existing task:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/automation_schedule_scaffold.sh build-the-next-milestone
 ```
 
 Print a canonical retrospective prompt for an existing task:

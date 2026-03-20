@@ -8,6 +8,7 @@ RESUME_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/resume_task.sh"
 ENABLE_ROLLING_SCRIPT="$EXAMPLE_ROOT/scripts/enable_rolling_mode.sh"
 AUTOMATION_PROMPTS_SCRIPT="$EXAMPLE_ROOT/scripts/automation_prompt_helper.sh"
 AUTOMATION_PROPOSAL_SCRIPT="$EXAMPLE_ROOT/scripts/automation_proposal_helper.sh"
+AUTOMATION_SCHEDULE_SCRIPT="$EXAMPLE_ROOT/scripts/automation_schedule_scaffold.sh"
 PROMPT_TEMPLATE_SCRIPT="$EXAMPLE_ROOT/scripts/prompt_template_helper.sh"
 QUEUE_GUIDANCE_SCRIPT="$EXAMPLE_ROOT/scripts/queue_guidance.sh"
 DOCTOR_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/doctor_task.sh"
@@ -46,7 +47,7 @@ expect_contains() {
 }
 
 echo "== Syntax checks =="
-zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$MONITOR_TASK_SCRIPT" "$CLAUDE_SESSION_START_HOOK" "$CLAUDE_PRE_TOOL_HOOK" "$CLAUDE_POST_TOOL_HOOK" "$CLAUDE_STATUSLINE_HOOK" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
+zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$AUTOMATION_SCHEDULE_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$MONITOR_TASK_SCRIPT" "$CLAUDE_SESSION_START_HOOK" "$CLAUDE_PRE_TOOL_HOOK" "$CLAUDE_POST_TOOL_HOOK" "$CLAUDE_STATUSLINE_HOOK" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
 python3 -m py_compile "$CLAUDE_HOOK_HELPER"
 
 echo "== Skill presence =="
@@ -58,9 +59,9 @@ expect_file "$SKILLS_ROOT/course-corrector/SKILL.md"
 
 echo "== Temp workspace wrapper flow =="
 TEMP_WORKSPACE="$(mktemp -d)"
-trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_example_roll.out /tmp/campfire_example_prompts.out /tmp/campfire_example_proposals.json /tmp/campfire_example_template.out /tmp/campfire_example_guidance.out /tmp/campfire_example_resume.out /tmp/campfire_example_monitor.json' EXIT
+trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_example_roll.out /tmp/campfire_example_prompts.out /tmp/campfire_example_proposals.json /tmp/campfire_example_schedule.json /tmp/campfire_example_template.out /tmp/campfire_example_guidance.out /tmp/campfire_example_resume.out' EXIT
 mkdir -p "$TEMP_WORKSPACE/scripts"
-cp "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
+cp "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$AUTOMATION_SCHEDULE_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$QUEUE_GUIDANCE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$DOCTOR_TASK_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$TEMP_WORKSPACE/scripts/"
@@ -74,6 +75,7 @@ CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/new_task.sh" --slug
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/enable_rolling_mode.sh" --until-stopped --queue "milestone-002:Next slice" --queue "milestone-003:Follow-up slice" "$TASK_SLUG" >/tmp/campfire_example_roll.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/automation_prompt_helper.sh" "$TASK_SLUG" >/tmp/campfire_example_prompts.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/automation_proposal_helper.sh" --json "$TASK_SLUG" >/tmp/campfire_example_proposals.json
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/automation_schedule_scaffold.sh" --json "$TASK_SLUG" >/tmp/campfire_example_schedule.json
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/prompt_template_helper.sh" --task-slug "$TASK_SLUG" resume >/tmp/campfire_example_template.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/queue_guidance.sh" --mode next_boundary --summary "Pause for review at the next boundary." "$TASK_SLUG" >/tmp/campfire_example_guidance.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/resume_task.sh" "$TASK_SLUG" >/tmp/campfire_example_resume.out
@@ -131,6 +133,29 @@ for item in proposals:
         raise SystemExit("proposal status mismatch")
     if not str(item.get("prompt", "")).startswith("Use $"):
         raise SystemExit("proposal prompt mismatch")
+
+schedule_payload = json.loads(Path("/tmp/campfire_example_schedule.json").read_text())
+scaffolds = schedule_payload.get("scaffolds", [])
+if [item.get("variant") for item in scaffolds] != ["rolling_resume", "verifier_sweep", "backlog_refresh"]:
+    raise SystemExit("schedule scaffold variant mismatch")
+labels = {item["variant"]: item["cadence_label"] for item in scaffolds}
+if labels["rolling_resume"] != "Nightly rolling resume":
+    raise SystemExit("rolling schedule label mismatch")
+if labels["verifier_sweep"] != "Nightly verifier sweep":
+    raise SystemExit("verifier schedule label mismatch")
+if labels["backlog_refresh"] != "Weekly backlog refresh":
+    raise SystemExit("backlog schedule label mismatch")
+for item in scaffolds:
+    if item.get("platform_scope") != "generic":
+        raise SystemExit("schedule platform scope mismatch")
+    if item.get("scheduler_binding") != "operator_owned":
+        raise SystemExit("schedule scheduler binding mismatch")
+    if item.get("local_first") is not True:
+        raise SystemExit("schedule local_first mismatch")
+    if len(item.get("schedule_examples", [])) < 2:
+        raise SystemExit("schedule examples mismatch")
+    if len(item.get("operator_questions", [])) < 2:
+        raise SystemExit("schedule questions mismatch")
 PY
 expect_contains /tmp/campfire_example_template.out '.autonomous/'
 expect_contains /tmp/campfire_example_guidance.out 'queued next_boundary guidance:'

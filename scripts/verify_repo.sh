@@ -27,6 +27,7 @@ zsh -n \
   "$ROOT_DIR/scripts/draft_generated_skill.sh" \
   "$ROOT_DIR/scripts/monitor_task.sh" \
   "$ROOT_DIR/scripts/automation_proposal_helper.sh" \
+  "$ROOT_DIR/scripts/automation_schedule_scaffold.sh" \
   "$ROOT_DIR/scripts/start_slice.sh" \
   "$ROOT_DIR/scripts/complete_slice.sh" \
   "$ROOT_DIR/scripts/refresh_registry.sh" \
@@ -36,6 +37,7 @@ zsh -n \
   "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/automation_prompt_helper.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/automation_proposal_helper.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/automation_schedule_scaffold.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/prompt_template_helper.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/queue_guidance.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/record_improvement_candidate.sh" \
@@ -69,6 +71,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_draft_generated_skill.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_schedule_scaffold.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_course_correction.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_task_evaluation.sh" \
@@ -83,6 +86,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_patterns.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_prompt_helper.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_proposal_guidance.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_schedule_guidance.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_guidance_queue.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_autonomous_floor.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_until_stopped_mode.sh" \
@@ -122,6 +126,7 @@ expect_file "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/enable_rolling_mode.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/automation_prompt_helper.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/automation_proposal_helper.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/automation_schedule_scaffold.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/prompt_template_helper.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/queue_guidance.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/record_improvement_candidate.sh"
@@ -198,6 +203,9 @@ echo "== Monitor task verifier =="
 echo "== Automation proposal helper verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh"
 
+echo "== Automation schedule scaffold verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_schedule_scaffold.sh"
+
 echo "== Benchmark verifier =="
 "$ROOT_DIR/scripts/verify_benchmark.sh"
 
@@ -254,6 +262,9 @@ echo "== Resume automation-guidance verifier =="
 
 echo "== Resume automation-proposal verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_proposal_guidance.sh"
+
+echo "== Resume automation-schedule verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_resume_automation_schedule_guidance.sh"
 
 rm -f /tmp/campfire_install.out
 
