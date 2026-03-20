@@ -1,6 +1,6 @@
 # Campfire
 
-Campfire is a lightweight long-horizon agent harness.
+Campfire is a lightweight control plane that sits on top of agent runtimes like Codex and Claude Code to support long-horizon, resumable engineering tasks.
 
 It keeps the workflow generic, keeps project rules local to each repo, and gives agents durable task state outside chat history.
 
