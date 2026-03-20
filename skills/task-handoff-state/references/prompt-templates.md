@@ -16,6 +16,7 @@ Task-scoped templates require `--task-slug <task-slug>`.
   - For a freshly created task that still needs framing before the first implementation slice.
 - `resume`
   - Resolves from task state and prints the right single-milestone, bounded rolling, or `until_stopped` resume prompt.
+  - For rolling Codex runs, the rendered prompt includes the monitor-sidecar instruction and the repo-local `./scripts/monitor_task_loop.sh <task-slug>` command.
 - `rolling_resume`
   - Alias for `resume` when the caller wants automation-oriented naming.
 - `verifier_sweep`

@@ -16,6 +16,7 @@ RECORD_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/record_improvement_candidate.sh
 PROMOTE_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/promote_improvement.sh"
 DRAFT_SKILL_SCRIPT="$EXAMPLE_ROOT/scripts/draft_generated_skill.sh"
 MONITOR_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/monitor_task.sh"
+MONITOR_TASK_LOOP_SCRIPT="$EXAMPLE_ROOT/scripts/monitor_task_loop.sh"
 CLAUDE_SETTINGS_FILE="$EXAMPLE_ROOT/.claude/settings.json"
 CLAUDE_RESUME_COMMAND="$EXAMPLE_ROOT/.claude/commands/campfire-resume.md"
 CLAUDE_NEW_TASK_COMMAND="$EXAMPLE_ROOT/.claude/commands/campfire-new-task.md"
@@ -27,6 +28,7 @@ CLAUDE_PRE_TOOL_HOOK="$EXAMPLE_ROOT/.claude/hooks/campfire-pre-tool.sh"
 CLAUDE_POST_TOOL_HOOK="$EXAMPLE_ROOT/.claude/hooks/campfire-post-tool.sh"
 CLAUDE_STATUSLINE_HOOK="$EXAMPLE_ROOT/.claude/hooks/campfire-statusline.sh"
 TASK_SLUG="verify-example-wrapper-flow"
+MONITOR_LOOP_PID=""
 
 fail() {
   echo "FAIL: $1" >&2
@@ -47,7 +49,7 @@ expect_contains() {
 }
 
 echo "== Syntax checks =="
-zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$AUTOMATION_SCHEDULE_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$MONITOR_TASK_SCRIPT" "$CLAUDE_SESSION_START_HOOK" "$CLAUDE_PRE_TOOL_HOOK" "$CLAUDE_POST_TOOL_HOOK" "$CLAUDE_STATUSLINE_HOOK" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
+zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$AUTOMATION_SCHEDULE_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$MONITOR_TASK_SCRIPT" "$MONITOR_TASK_LOOP_SCRIPT" "$CLAUDE_SESSION_START_HOOK" "$CLAUDE_PRE_TOOL_HOOK" "$CLAUDE_POST_TOOL_HOOK" "$CLAUDE_STATUSLINE_HOOK" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
 python3 -m py_compile "$CLAUDE_HOOK_HELPER"
 
 echo "== Skill presence =="
@@ -59,7 +61,7 @@ expect_file "$SKILLS_ROOT/course-corrector/SKILL.md"
 
 echo "== Temp workspace wrapper flow =="
 TEMP_WORKSPACE="$(mktemp -d)"
-trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_example_roll.out /tmp/campfire_example_prompts.out /tmp/campfire_example_proposals.json /tmp/campfire_example_schedule.json /tmp/campfire_example_template.out /tmp/campfire_example_guidance.out /tmp/campfire_example_resume.out' EXIT
+trap 'if [ -n "${MONITOR_LOOP_PID:-}" ]; then kill "$MONITOR_LOOP_PID" >/dev/null 2>&1 || true; wait "$MONITOR_LOOP_PID" >/dev/null 2>&1 || true; fi; rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_example_roll.out /tmp/campfire_example_prompts.out /tmp/campfire_example_proposals.json /tmp/campfire_example_schedule.json /tmp/campfire_example_template.out /tmp/campfire_example_guidance.out /tmp/campfire_example_resume.out /tmp/campfire_example_monitor_loop.out' EXIT
 mkdir -p "$TEMP_WORKSPACE/scripts"
 cp "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$AUTOMATION_SCHEDULE_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$QUEUE_GUIDANCE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
@@ -67,6 +69,7 @@ cp "$DOCTOR_TASK_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$DRAFT_SKILL_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$MONITOR_TASK_SCRIPT" "$TEMP_WORKSPACE/scripts/"
+cp "$MONITOR_TASK_LOOP_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp -R "$EXAMPLE_ROOT/.claude" "$TEMP_WORKSPACE/"
 chmod +x "$TEMP_WORKSPACE"/scripts/*.sh
 chmod +x "$TEMP_WORKSPACE/.claude/hooks/"*.sh
@@ -160,10 +163,13 @@ PY
 expect_contains /tmp/campfire_example_template.out '.autonomous/'
 expect_contains /tmp/campfire_example_guidance.out 'queued next_boundary guidance:'
 expect_contains /tmp/campfire_example_template.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state'
+expect_contains /tmp/campfire_example_template.out './scripts/monitor_task_loop.sh'
 expect_contains /tmp/campfire_example_resume.out 'Workspace-specific prompt:'
 expect_contains /tmp/campfire_example_resume.out 'Project context:'
 expect_contains /tmp/campfire_example_resume.out 'Task context:'
 expect_contains /tmp/campfire_example_resume.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state'
+expect_contains /tmp/campfire_example_resume.out 'Suggested monitor sidecar:'
+expect_contains /tmp/campfire_example_resume.out "./scripts/monitor_task_loop.sh $TASK_SLUG"
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-resume.md" './scripts/resume_task.sh'
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-new-task.md" './scripts/new_task.sh'
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-start-slice.md" './scripts/start_slice.sh'
@@ -182,6 +188,12 @@ expect_contains /tmp/campfire_example_claude_pre_block.out "./scripts/resume_tas
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$SKILLS_ROOT/task-handoff-state/scripts/start_slice.sh" --root "$TEMP_WORKSPACE" --from-next --slice-title "Claude adapter verifier slice" "$TASK_SLUG" >/tmp/campfire_example_claude_start_slice.out
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/monitor_task.sh" --json "$TASK_SLUG" >/tmp/campfire_example_monitor.json
+CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/monitor_task_loop.sh" --interval-seconds 1 "$TASK_SLUG" >/tmp/campfire_example_monitor_loop.out 2>&1 &
+MONITOR_LOOP_PID="$!"
+sleep 2
+kill "$MONITOR_LOOP_PID" >/dev/null 2>&1 || true
+wait "$MONITOR_LOOP_PID" >/dev/null 2>&1 || true
+MONITOR_LOOP_PID=""
 CLAUDE_PROJECT_DIR="$TEMP_WORKSPACE" "$TEMP_WORKSPACE/.claude/hooks/campfire-pre-tool.sh" <<'EOF' >/tmp/campfire_example_claude_pre_allow.out 2>&1
 {"tool":"Edit"}
 EOF
@@ -210,6 +222,9 @@ if payload.get("recommended_action") != "allow":
 if "healthy_active_slice" not in payload.get("reason_codes", []):
     raise SystemExit("example monitor helper reason code mismatch")
 PY
+expect_file "$TEMP_WORKSPACE/.campfire/monitoring/latest/$TASK_SLUG.json"
+expect_file "$TEMP_WORKSPACE/.campfire/monitoring/state/$TASK_SLUG.json"
+expect_contains /tmp/campfire_example_monitor_loop.out "monitor_loop: task=$TASK_SLUG"
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/doctor_task.sh" "$TASK_SLUG" >/tmp/campfire_example_doctor.out
 expect_contains /tmp/campfire_example_doctor.out 'Doctor passed:'

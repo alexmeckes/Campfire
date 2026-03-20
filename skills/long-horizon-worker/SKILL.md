@@ -58,14 +58,15 @@ When `checkpoints.json` has an `execution` object with:
 follow these extra rules:
 
 1. Keep planning bounded to `planning_slice_minutes`.
-2. Maintain a queued backlog of the next milestones in `execution.queued_milestones`.
-3. After a milestone validates, use `$task-evaluator` logic to confirm it and then advance to the next queued milestone instead of stopping.
-4. Update `checkpoints.json`, `handoff.md`, and `progress.md` at each milestone boundary.
-5. If `auto_reframe` is enabled and the queue depth falls to or below `reframe_queue_below` while run budget remains, spend one bounded planning slice to replenish the backlog toward `target_queue_depth`.
-6. Record `auto_advanced` and `auto_reframed` as run events in task state instead of using them as terminal stop reasons when the run continues.
-7. After a bounded reframe succeeds and budget remains, continue execution from the active or newly chosen safe milestone instead of stopping just because the queue had been low.
-8. If `min_runtime_minutes` or `min_milestones_per_run` are set, do not choose a voluntary `manual_pause` before those floors are met unless a blocker, decision boundary, or budget limit forces a real stop.
-9. Stop only when:
+2. In Codex App, spawn exactly one continuous monitor sidecar subagent for the active task before broad implementation work. Use the repo-local `./scripts/monitor_task_loop.sh <task-slug>` wrapper when available, otherwise the bundled Campfire helper path. Keep the sidecar alive between slices and keep it observer-only.
+3. Maintain a queued backlog of the next milestones in `execution.queued_milestones`.
+4. After a milestone validates, use `$task-evaluator` logic to confirm it and then advance to the next queued milestone instead of stopping.
+5. Update `checkpoints.json`, `handoff.md`, and `progress.md` at each milestone boundary.
+6. If `auto_reframe` is enabled and the queue depth falls to or below `reframe_queue_below` while run budget remains, spend one bounded planning slice to replenish the backlog toward `target_queue_depth`.
+7. Record `auto_advanced` and `auto_reframed` as run events in task state instead of using them as terminal stop reasons when the run continues.
+8. After a bounded reframe succeeds and budget remains, continue execution from the active or newly chosen safe milestone instead of stopping just because the queue had been low.
+9. If `min_runtime_minutes` or `min_milestones_per_run` are set, do not choose a voluntary `manual_pause` before those floors are met unless a blocker, decision boundary, or budget limit forces a real stop.
+10. Stop only when:
    - a configured `continue_until` condition is hit
    - the runtime budget expires for `run_style: bounded`
    - the queued backlog is empty and no safe next milestone can be chosen even after a permitted bounded reframe

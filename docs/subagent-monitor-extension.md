@@ -2,7 +2,7 @@
 
 ## Purpose
 
-If Campfire ever uses subagents, the safest first form is a monitoring extension, not a worker swarm.
+If Campfire uses subagents, the safest first form is a monitoring extension, not a worker swarm.
 
 This note defines a narrow subagent model that helps a primary Campfire run stay healthy without changing the core single-agent ownership model.
 
@@ -56,6 +56,27 @@ Its job is to read the same control plane and answer:
 - Is task state drifting from behavior?
 - Has the run likely hit a blocker, loop, or decision boundary?
 - Should the primary agent pause, re-evaluate, or stop?
+
+## Codex Default Pattern
+
+For rolling Codex App runs, the default Campfire pattern should be exactly one continuous monitor sidecar per active task.
+
+That means:
+
+- the primary agent starts or resumes the task
+- the primary agent spawns one monitor sidecar subagent for that task
+- the sidecar runs `./scripts/monitor_task_loop.sh <task-slug>` or the skill-path equivalent
+- the sidecar stays alive across slice boundaries until the parent run stops
+- the sidecar remains observer-only and writes only `.campfire/monitoring/` artifacts
+
+This is intentionally not a general orchestration layer:
+
+- no worker swarm
+- no milestone splitting
+- no durable state ownership transfer
+- no scheduler semantics in Campfire core
+
+If a monitor sidecar already exists for the same task in the current Codex run, reuse it instead of spawning duplicates.
 
 ## Allowed vs Forbidden
 
@@ -227,15 +248,20 @@ It should not add new Campfire core primitives.
 
 ## Initial Implementation Shape
 
-If this gets built, the smallest useful version is:
+The smallest useful version is:
 
 1. `monitor_task.sh <task-slug>`
    - reads task/project/registry context
    - emits a short advisory plus exit code
-2. one verifier
-   - proves stall detection and decision-boundary detection
-3. optional adapter integration
-   - Claude/Codex can call it during long runs
+2. `monitor_task_loop.sh <task-slug>`
+   - repeatedly calls `monitor_task.sh`
+   - writes latest and state snapshots under `.campfire/monitoring/`
+   - emits alert files only when the state changes into a non-allow action
+3. one verifier
+   - proves stall detection, decision-boundary detection, and alert emission
+4. optional adapter integration
+   - Codex rolling prompts should tell the parent agent to spawn exactly one continuous monitor sidecar
+   - Claude/Codex may still call the one-shot monitor helper during long runs
 
 That is enough to learn whether the idea is helpful before designing anything more ambitious.
 

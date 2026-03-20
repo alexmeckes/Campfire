@@ -238,3 +238,7 @@ echo "  $TASK_DIR"
 echo
 echo "Recommended Codex App prompt:"
 echo "  $ROLLING_PROMPT"
+echo
+echo "Suggested monitor sidecar:"
+echo "  ./scripts/monitor_task_loop.sh $TASK_SLUG"
+echo "  Keep it observer-only and let it write only .campfire/monitoring/ artifacts."

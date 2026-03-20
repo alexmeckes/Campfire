@@ -165,5 +165,7 @@ expect_contains /tmp/campfire_rolling_resume.out 'stop_reason: manual_pause'
 expect_contains /tmp/campfire_rolling_resume.out 'events:'
 expect_contains /tmp/campfire_rolling_resume.out 'auto_advanced'
 expect_contains /tmp/campfire_rolling_resume.out 'auto-advance through queued milestones'
+expect_contains /tmp/campfire_rolling_resume.out 'Suggested monitor sidecar:'
+expect_contains /tmp/campfire_rolling_resume.out "./scripts/monitor_task_loop.sh $TASK_SLUG"
 
 echo "PASS: Rolling execution verification completed."

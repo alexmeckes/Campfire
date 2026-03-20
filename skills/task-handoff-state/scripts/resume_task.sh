@@ -223,6 +223,28 @@ fi
 echo "Recommended Codex App prompt:"
 echo "  $("$PROMPT_TEMPLATE_SCRIPT" --root "$ROOT_DIR" --task-slug "$TASK_SLUG" resume)"
 
+TASK_MODE="$(python3 - "$TASK_DIR/checkpoints.json" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+data = json.loads(path.read_text())
+execution = data.get("execution", {})
+if isinstance(execution, dict):
+    print(execution.get("mode", "single_milestone"))
+else:
+    print("single_milestone")
+PY
+)"
+
+if [ "$TASK_MODE" = "rolling" ]; then
+  echo
+  echo "Suggested monitor sidecar:"
+  echo "  ./scripts/monitor_task_loop.sh $TASK_SLUG"
+  echo "  Keep it observer-only and let it write only .campfire/monitoring/ artifacts."
+fi
+
 echo
 echo "Pre-edit slice activation:"
 python3 - "$TASK_DIR/checkpoints.json" "$TASK_SLUG" "$ROOT_DIR" "$START_SLICE_SCRIPT" <<'PY'
@@ -293,20 +315,6 @@ echo "Post-slice completion:"
 echo "  $COMPLETE_SLICE_SCRIPT --root $ROOT_DIR --summary \"Describe what validated.\" --next-step \"Describe the next step.\" $TASK_SLUG"
 
 if [ -f "$TASK_DIR/checkpoints.json" ] && [ -x "$AUTOMATION_HELPER_SCRIPT" ]; then
-  TASK_MODE="$(python3 - "$TASK_DIR/checkpoints.json" <<'PY'
-import json
-import sys
-from pathlib import Path
-
-path = Path(sys.argv[1])
-data = json.loads(path.read_text())
-execution = data.get("execution", {})
-if isinstance(execution, dict):
-    print(execution.get("mode", "single_milestone"))
-else:
-    print("single_milestone")
-PY
-)"
   if [ "$TASK_MODE" = "rolling" ]; then
     echo
     echo "Automation prompt variants:"

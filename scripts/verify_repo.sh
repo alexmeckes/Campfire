@@ -26,6 +26,7 @@ zsh -n \
   "$ROOT_DIR/scripts/queue_guidance.sh" \
   "$ROOT_DIR/scripts/draft_generated_skill.sh" \
   "$ROOT_DIR/scripts/monitor_task.sh" \
+  "$ROOT_DIR/scripts/monitor_task_loop.sh" \
   "$ROOT_DIR/scripts/automation_proposal_helper.sh" \
   "$ROOT_DIR/scripts/automation_schedule_scaffold.sh" \
   "$ROOT_DIR/scripts/start_slice.sh" \
@@ -44,6 +45,7 @@ zsh -n \
   "$ROOT_DIR/examples/basic-workspace/scripts/promote_improvement.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/draft_generated_skill.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task.sh" \
+  "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task_loop.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/bootstrap_task.sh" \
@@ -56,6 +58,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/queue_guidance.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/draft_generated_skill.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/monitor_task.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/monitor_task_loop.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/start_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/complete_slice.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/touch_heartbeat.sh" \
@@ -70,6 +73,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_session_lineage.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_draft_generated_skill.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task_loop.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_schedule_scaffold.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
@@ -133,6 +137,7 @@ expect_file "$ROOT_DIR/examples/basic-workspace/scripts/record_improvement_candi
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/promote_improvement.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/draft_generated_skill.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task_loop.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/plan.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/runbook.md"
@@ -199,6 +204,9 @@ echo "== Draft generated skill verifier =="
 
 echo "== Monitor task verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task.sh"
+
+echo "== Monitor loop verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task_loop.sh"
 
 echo "== Automation proposal helper verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh"

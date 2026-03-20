@@ -143,6 +143,14 @@ For long unattended runs, switch the task into rolling mode:
 
 For a manual-stop rolling run, use `--until-stopped`.
 
+For rolling Codex App runs, start the observer-only monitor loop and keep it alive in a sidecar subagent while the parent agent advances slices:
+
+```bash
+./scripts/monitor_task_loop.sh <task-slug>
+```
+
+The monitor loop should write only `.campfire/monitoring/` artifacts and never mutate durable task state.
+
 ## Shared Workflow Utilities
 
 Campfire already ships a few shared control-plane utilities beyond the minimal quick start. These are part of the current core workflow even though a brand-new repo may not need them on day one.
@@ -176,7 +184,7 @@ Current examples:
 
 For a Claude Code adapter that stays outside Campfire core, see [Claude Code adapter](/Users/alexmeckes/Downloads/Campfire/docs/claude-code-adapter.md).
 
-For a first-pass subagent model that stays outside core, see [Subagent monitor extension](/Users/alexmeckes/Downloads/Campfire/docs/subagent-monitor-extension.md).
+For a first-pass subagent model that stays outside core, see [Subagent monitor extension](/Users/alexmeckes/Downloads/Campfire/docs/subagent-monitor-extension.md). For Codex rolling runs, the default extension pattern is one continuous monitor sidecar backed by `./scripts/monitor_task_loop.sh`, not a worker swarm.
 
 For generated-skill and automation details, see the focused docs below.
 

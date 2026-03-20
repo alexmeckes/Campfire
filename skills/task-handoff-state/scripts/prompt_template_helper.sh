@@ -110,6 +110,8 @@ def require_task() -> Path:
 
 context = {
     "task_ref": f"{task_root}/{task_slug}/" if task_slug else "",
+    "task_slug": task_slug,
+    "monitor_loop_command": f"./scripts/monitor_task_loop.sh {task_slug}" if task_slug else "./scripts/monitor_task_loop.sh <task-slug>",
     "benchmark_root": "benchmarks/campfire-bench/",
     "candidate_ref": f"`{candidate_id}`" if candidate_id else "the promoted improvement candidate",
 }

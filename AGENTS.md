@@ -9,6 +9,7 @@
 - Use `$task-retrospector` after meaningful completed, failed, or benchmarked runs to turn lessons into benchmark, verifier, skill, or control-plane improvements.
 - Treat generated skills conservatively: create candidates first, keep drafts task-local or repo-local by default, and only promote to Campfire core with benchmark-backed evidence.
 - For Codex App runs that should keep going while the user is away, use rolling execution in `checkpoints.json` with queued milestones and bounded planning slices.
+- For rolling Codex App runs, spawn exactly one continuous monitor sidecar with `./scripts/monitor_task_loop.sh <task-slug>` and keep it observer-only between slices.
 - Keep durable task state under `.autonomous/<task>/`.
 - Create a task with `./scripts/new_task.sh "<objective>"`.
 - Resume a task with `./scripts/resume_task.sh <task-slug>`.

@@ -72,6 +72,7 @@ if /usr/bin/grep -Fq -- '"manual_pause"' "$TASK_DIR/checkpoints.json"; then
 fi
 expect_contains "$TASK_DIR/handoff.md" 'replenish the queue when policy allows and budget remains'
 expect_contains "$TASK_DIR/handoff.md" 'do not self-pause before the configured minimum runtime and milestone floor'
+expect_contains "$TASK_DIR/handoff.md" './scripts/monitor_task_loop.sh'
 expect_contains /tmp/campfire_enable_resume.out 'mode: rolling'
 expect_contains /tmp/campfire_enable_resume.out 'run_style: bounded'
 expect_contains /tmp/campfire_enable_resume.out 'auto_advance: True'
@@ -80,5 +81,7 @@ expect_contains /tmp/campfire_enable_resume.out 'min_runtime_minutes: 30'
 expect_contains /tmp/campfire_enable_resume.out 'min_milestones_per_run: 2'
 expect_contains /tmp/campfire_enable_resume.out 'milestone-002: Implement the next rolling slice'
 expect_contains /tmp/campfire_enable_resume.out 'do not self-pause before the configured minimum runtime and milestone floor'
+expect_contains /tmp/campfire_enable_resume.out 'Suggested monitor sidecar:'
+expect_contains /tmp/campfire_enable_resume.out "./scripts/monitor_task_loop.sh $TASK_SLUG"
 
 echo "PASS: Rolling mode helper verification completed."

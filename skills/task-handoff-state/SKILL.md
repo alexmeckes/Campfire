@@ -21,6 +21,8 @@ Use [scripts/draft_generated_skill.sh](scripts/draft_generated_skill.sh) when a 
 Use [scripts/start_slice.sh](scripts/start_slice.sh) to move a task into an active implementation slice before touching project files.
 Use [scripts/complete_slice.sh](scripts/complete_slice.sh) to close a slice mechanically and update handoff state, heartbeat, and registry.
 Use [scripts/touch_heartbeat.sh](scripts/touch_heartbeat.sh) when you need to refresh task liveness without re-writing the whole handoff.
+Use [scripts/monitor_task.sh](scripts/monitor_task.sh) when you want a one-shot health advisory for an active task.
+Use [scripts/monitor_task_loop.sh](scripts/monitor_task_loop.sh) when a rolling Codex run should keep one continuous observer-only sidecar alive between slices.
 Use [scripts/refresh_registry.sh](scripts/refresh_registry.sh) to rebuild the repo-local task registry under `.campfire/registry.json` and refresh generated discovery surfaces such as `.campfire/skill_inventory.json`.
 Use [scripts/doctor_task.sh](scripts/doctor_task.sh) to compare task files against the SQL control plane and catch drift.
 Use [scripts/record_improvement_candidate.sh](scripts/record_improvement_candidate.sh) to turn a retrospective finding into a structured improvement candidate and append it to the SQL-backed improvement backlog.
@@ -110,6 +112,18 @@ Print a canonical retrospective prompt for an existing task:
 ~/.codex/skills/task-handoff-state/scripts/prompt_template_helper.sh --task-slug build-the-next-milestone retrospective
 ```
 
+Check one-shot monitor health for an existing task:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/monitor_task.sh build-the-next-milestone
+```
+
+Run the continuous monitor loop for a rolling task:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/monitor_task_loop.sh build-the-next-milestone
+```
+
 Print the benchmark review prompt:
 
 ```bash
@@ -168,6 +182,12 @@ Verify blocked and retry handling:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/verify_blocked_retry.sh
+```
+
+Verify the continuous monitor loop:
+
+```bash
+~/.codex/skills/task-handoff-state/scripts/verify_monitor_task_loop.sh
 ```
 
 Verify course correction handling:
