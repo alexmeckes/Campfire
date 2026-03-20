@@ -4,8 +4,6 @@ Campfire is a lightweight control plane that sits on top of agent runtimes like 
 
 It keeps the workflow generic, keeps project rules local to each repo, and gives agents durable task state outside chat history.
 
-The design constraint is simple: if a feature is not required for a single agent to resume, work, validate, and stop cleanly, it should start as an extension instead of becoming Campfire core.
-
 ## Model
 
 Campfire uses a small stack:
