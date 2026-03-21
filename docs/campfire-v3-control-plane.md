@@ -125,7 +125,7 @@ default = [
   "task-evaluator",
   "task-handoff-state",
 ]
-optional = ["godot-interactive"]
+optional = ["godot-interactive", "thread-monitor-sidecar"]
 
 [constraints]
 stack = "godot4"
@@ -628,6 +628,15 @@ Responsibilities:
 - expose canonical resume output
 
 This skill becomes mostly a projection and operator-facing surface, not the storage engine.
+
+### `$thread-monitor-sidecar`
+
+Responsibilities:
+
+- start or reuse exactly one visible observer-only monitor subagent for the current thread
+- point that sidecar at `monitor_task_loop.sh <task-slug>` for the current task
+- retarget the same sidecar when the active task changes
+- emit monitoring advisories without taking ownership of task-state writes
 
 ## Keeping the Skills Lightweight
 

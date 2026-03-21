@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $long-horizon-worker to keep advancing this task until the current milestone is validated."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -82,8 +82,10 @@ BOUNDED_SLUG="verify-prompt-template-bounded"
 "$HELPER_SCRIPT" --root "$TEMP_WORKSPACE" --task-slug "$BOUNDED_SLUG" resume >/tmp/campfire_prompt_bounded.out
 expect_contains /tmp/campfire_prompt_bounded.out 'budget remains'
 expect_contains /tmp/campfire_prompt_bounded.out 'configured run budget'
+expect_contains /tmp/campfire_prompt_bounded.out '$thread-monitor-sidecar'
 expect_contains /tmp/campfire_prompt_bounded.out './scripts/monitor_task_loop.sh'
 expect_contains /tmp/campfire_prompt_bounded.out "task slug \`$BOUNDED_SLUG\`"
+expect_contains /tmp/campfire_prompt_bounded.out 'retarget that same sidecar'
 
 UNTIL_SLUG="verify-prompt-template-until"
 "$INIT_SCRIPT" --root "$TEMP_WORKSPACE" --slug "$UNTIL_SLUG" "verify until-stopped prompt template coverage" >/tmp/campfire_prompt_until.out
@@ -96,8 +98,10 @@ UNTIL_SLUG="verify-prompt-template-until"
 "$HELPER_SCRIPT" --root "$TEMP_WORKSPACE" --task-slug "$UNTIL_SLUG" rolling_resume >/tmp/campfire_prompt_until.out
 expect_contains /tmp/campfire_prompt_until.out 'safe-work exhaustion'
 expect_contains /tmp/campfire_prompt_until.out 'Do not impose an internal runtime budget or milestone cap.'
+expect_contains /tmp/campfire_prompt_until.out '$thread-monitor-sidecar'
 expect_contains /tmp/campfire_prompt_until.out './scripts/monitor_task_loop.sh'
 expect_contains /tmp/campfire_prompt_until.out "task slug \`$UNTIL_SLUG\`"
+expect_contains /tmp/campfire_prompt_until.out 'retarget that same sidecar'
 expect_not_contains /tmp/campfire_prompt_until.out 'configured run budget'
 
 echo "PASS: Prompt template helper verification completed."

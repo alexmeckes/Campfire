@@ -72,7 +72,7 @@ cat > "$TASK_DIR/handoff.md" <<'EOF'
 
 ## Resume Prompt
 
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue this rolling task from `.autonomous/verify-rolling-execution/` and keep going until a configured run limit or real blocker appears.
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar to continue this rolling task from `.autonomous/verify-rolling-execution/` and keep going until a configured run limit or real blocker appears.
 EOF
 
 export TASK_DIR
@@ -165,7 +165,8 @@ expect_contains /tmp/campfire_rolling_resume.out 'stop_reason: manual_pause'
 expect_contains /tmp/campfire_rolling_resume.out 'events:'
 expect_contains /tmp/campfire_rolling_resume.out 'auto_advanced'
 expect_contains /tmp/campfire_rolling_resume.out 'auto-advance through queued milestones'
-expect_contains /tmp/campfire_rolling_resume.out 'Suggested monitor sidecar:'
-expect_contains /tmp/campfire_rolling_resume.out "./scripts/monitor_task_loop.sh $TASK_SLUG"
+expect_contains /tmp/campfire_rolling_resume.out '$thread-monitor-sidecar'
+expect_contains /tmp/campfire_rolling_resume.out 'Suggested thread monitor sidecar:'
+expect_contains /tmp/campfire_rolling_resume.out "Initial task monitor command: ./scripts/monitor_task_loop.sh $TASK_SLUG"
 
 echo "PASS: Rolling execution verification completed."

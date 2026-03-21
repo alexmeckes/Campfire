@@ -239,6 +239,7 @@ echo
 echo "Recommended Codex App prompt:"
 echo "  $ROLLING_PROMPT"
 echo
-echo "Suggested monitor sidecar:"
-echo "  ./scripts/monitor_task_loop.sh $TASK_SLUG"
-echo "  Keep it observer-only and let it write only .campfire/monitoring/ artifacts."
+echo "Suggested thread monitor sidecar:"
+echo "  Use \$thread-monitor-sidecar to start or reuse one visible observer-only subagent for this thread."
+echo "  Initial task monitor command: ./scripts/monitor_task_loop.sh $TASK_SLUG"
+echo "  Reuse that same sidecar if the active task changes; retarget it instead of spawning another."

@@ -70,7 +70,7 @@ cat > "$TASK_DIR/handoff.md" <<'EOF'
 
 ## Resume Prompt
 
-Use $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue this rolling task from `.autonomous/verify-waiting-on-decision/` after the decision boundary is resolved.
+Use $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar to continue this rolling task from `.autonomous/verify-waiting-on-decision/` after the decision boundary is resolved.
 EOF
 
 export TASK_DIR

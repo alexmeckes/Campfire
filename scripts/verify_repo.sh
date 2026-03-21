@@ -109,6 +109,8 @@ expect_file "$ROOT_DIR/skills/task-handoff-state/references/task-state-contract.
 expect_file "$ROOT_DIR/skills/task-handoff-state/references/automation-patterns.md"
 expect_file "$ROOT_DIR/skills/task-handoff-state/references/prompt-templates.md"
 expect_file "$ROOT_DIR/skills/task-handoff-state/templates/prompt_templates.json"
+expect_file "$ROOT_DIR/skills/thread-monitor-sidecar/SKILL.md"
+expect_file "$ROOT_DIR/skills/thread-monitor-sidecar/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/course-corrector/SKILL.md"
 expect_file "$ROOT_DIR/skills/course-corrector/agents/openai.yaml"
 expect_file "$ROOT_DIR/skills/course-corrector/references/course-correction-triggers.md"
@@ -173,6 +175,7 @@ trap 'rm -rf "$TEMP_CODEX_HOME"' EXIT
 CODEX_HOME="$TEMP_CODEX_HOME" "$ROOT_DIR/scripts/install_skills.sh" >/tmp/campfire_install.out
 expect_file "$TEMP_CODEX_HOME/skills/long-horizon-worker"
 expect_file "$TEMP_CODEX_HOME/skills/task-handoff-state"
+expect_file "$TEMP_CODEX_HOME/skills/thread-monitor-sidecar"
 expect_file "$TEMP_CODEX_HOME/skills/task-evaluator"
 
 echo "== Lifecycle verifier =="

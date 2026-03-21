@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use $task-framer and $task-handoff-state to turn this objective into a concrete Campfire task."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

@@ -70,7 +70,7 @@ cat > "$TASK_DIR/handoff.md" <<'EOF'
 
 ## Resume Prompt
 
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue this rolling task from `.autonomous/verify-budget-limit/` and keep going until another configured stop condition appears.
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar to continue this rolling task from `.autonomous/verify-budget-limit/` and keep going until another configured stop condition appears.
 EOF
 
 export TASK_DIR

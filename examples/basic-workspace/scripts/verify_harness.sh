@@ -162,14 +162,14 @@ for item in scaffolds:
 PY
 expect_contains /tmp/campfire_example_template.out '.autonomous/'
 expect_contains /tmp/campfire_example_guidance.out 'queued next_boundary guidance:'
-expect_contains /tmp/campfire_example_template.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state'
+expect_contains /tmp/campfire_example_template.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar'
 expect_contains /tmp/campfire_example_template.out './scripts/monitor_task_loop.sh'
 expect_contains /tmp/campfire_example_resume.out 'Workspace-specific prompt:'
 expect_contains /tmp/campfire_example_resume.out 'Project context:'
 expect_contains /tmp/campfire_example_resume.out 'Task context:'
-expect_contains /tmp/campfire_example_resume.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state'
-expect_contains /tmp/campfire_example_resume.out 'Suggested monitor sidecar:'
-expect_contains /tmp/campfire_example_resume.out "./scripts/monitor_task_loop.sh $TASK_SLUG"
+expect_contains /tmp/campfire_example_resume.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar'
+expect_contains /tmp/campfire_example_resume.out 'Suggested thread monitor sidecar:'
+expect_contains /tmp/campfire_example_resume.out "Initial task monitor command: ./scripts/monitor_task_loop.sh $TASK_SLUG"
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-resume.md" './scripts/resume_task.sh'
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-new-task.md" './scripts/new_task.sh'
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-start-slice.md" './scripts/start_slice.sh'

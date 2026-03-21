@@ -92,7 +92,7 @@ Subagents can fit Campfire, but only as extensions and only under a single-write
 
 Allowed:
 
-- monitor sidecars
+- thread-scoped monitor sidecars
 - explorer sidecars
 - bounded workers with explicit parent ownership and disjoint write scope
 - adapter-level delegation helpers

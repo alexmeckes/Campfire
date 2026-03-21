@@ -22,7 +22,8 @@ Use [scripts/start_slice.sh](scripts/start_slice.sh) to move a task into an acti
 Use [scripts/complete_slice.sh](scripts/complete_slice.sh) to close a slice mechanically and update handoff state, heartbeat, and registry.
 Use [scripts/touch_heartbeat.sh](scripts/touch_heartbeat.sh) when you need to refresh task liveness without re-writing the whole handoff.
 Use [scripts/monitor_task.sh](scripts/monitor_task.sh) when you want a one-shot health advisory for an active task.
-Use [scripts/monitor_task_loop.sh](scripts/monitor_task_loop.sh) when a rolling Codex run should keep one continuous observer-only sidecar alive between slices.
+Use [../thread-monitor-sidecar/SKILL.md](../thread-monitor-sidecar/SKILL.md) when a rolling Codex run should keep one visible observer-only subagent alive for the current thread and reuse it across task changes.
+Use [scripts/monitor_task_loop.sh](scripts/monitor_task_loop.sh) as the task-local monitor loop that the thread-scoped sidecar should run for the current task.
 Use [scripts/refresh_registry.sh](scripts/refresh_registry.sh) to rebuild the repo-local task registry under `.campfire/registry.json` and refresh generated discovery surfaces such as `.campfire/skill_inventory.json`.
 Use [scripts/doctor_task.sh](scripts/doctor_task.sh) to compare task files against the SQL control plane and catch drift.
 Use [scripts/record_improvement_candidate.sh](scripts/record_improvement_candidate.sh) to turn a retrospective finding into a structured improvement candidate and append it to the SQL-backed improvement backlog.
@@ -118,7 +119,7 @@ Check one-shot monitor health for an existing task:
 ~/.codex/skills/task-handoff-state/scripts/monitor_task.sh build-the-next-milestone
 ```
 
-Run the continuous monitor loop for a rolling task:
+Run the task-local monitor loop that the thread-scoped sidecar should target for a rolling task:
 
 ```bash
 ~/.codex/skills/task-handoff-state/scripts/monitor_task_loop.sh build-the-next-milestone

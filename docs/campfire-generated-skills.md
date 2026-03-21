@@ -283,6 +283,7 @@ Use them as adjuncts to:
 - `long-horizon-worker`
 - `task-evaluator`
 - `task-handoff-state`
+- `thread-monitor-sidecar`
 - `task-retrospector`
 
 The normal pattern should be:

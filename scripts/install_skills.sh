@@ -36,6 +36,7 @@ install_skill() {
 install_skill "long-horizon-worker"
 install_skill "task-framer"
 install_skill "task-handoff-state"
+install_skill "thread-monitor-sidecar"
 install_skill "course-corrector"
 install_skill "task-evaluator"
 install_skill "task-retrospector"

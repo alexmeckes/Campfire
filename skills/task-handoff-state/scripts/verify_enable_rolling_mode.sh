@@ -81,7 +81,9 @@ expect_contains /tmp/campfire_enable_resume.out 'min_runtime_minutes: 30'
 expect_contains /tmp/campfire_enable_resume.out 'min_milestones_per_run: 2'
 expect_contains /tmp/campfire_enable_resume.out 'milestone-002: Implement the next rolling slice'
 expect_contains /tmp/campfire_enable_resume.out 'do not self-pause before the configured minimum runtime and milestone floor'
-expect_contains /tmp/campfire_enable_resume.out 'Suggested monitor sidecar:'
-expect_contains /tmp/campfire_enable_resume.out "./scripts/monitor_task_loop.sh $TASK_SLUG"
+expect_contains /tmp/campfire_enable_resume.out '$thread-monitor-sidecar'
+expect_contains /tmp/campfire_enable_resume.out 'Suggested thread monitor sidecar:'
+expect_contains /tmp/campfire_enable_resume.out "Initial task monitor command: ./scripts/monitor_task_loop.sh $TASK_SLUG"
+expect_contains /tmp/campfire_enable_resume.out 'Reuse that same sidecar if the active task changes'
 
 echo "PASS: Rolling mode helper verification completed."

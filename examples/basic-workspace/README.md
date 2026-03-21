@@ -40,7 +40,7 @@ By default they look for installed Campfire skills under `~/.codex/skills`.
 Use `scripts/automation_prompt_helper.sh` when you only need task-only prompt text.
 Use `scripts/automation_proposal_helper.sh` when you want schedule-agnostic automation metadata that also includes a suggested name and workspace roots.
 Use `scripts/automation_schedule_scaffold.sh` when you want generic cadence suggestions plus operator questions without choosing scheduler syntax yet.
-Use `scripts/monitor_task.sh` for a one-shot advisory and `scripts/monitor_task_loop.sh` when a rolling Codex run should keep a monitor sidecar alive between slices.
+Use `scripts/monitor_task.sh` for a one-shot advisory and `scripts/monitor_task_loop.sh` as the task-local loop underneath a thread-scoped `$thread-monitor-sidecar` during rolling Codex runs.
 
 For deterministic verification inside the Campfire repo, set:
 

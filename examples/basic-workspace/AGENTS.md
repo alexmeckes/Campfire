@@ -5,7 +5,8 @@
 - Create a task with `./scripts/new_task.sh "<objective>"`.
 - Resume a task with `./scripts/resume_task.sh <task-slug>`.
 - For rolling Codex App runs, switch a task with `./scripts/enable_rolling_mode.sh <task-slug> ...`.
-- For rolling Codex App runs, spawn exactly one continuous monitor sidecar with `./scripts/monitor_task_loop.sh <task-slug>` and keep it observer-only between slices.
+- For rolling Codex App runs, use `$thread-monitor-sidecar` to start or reuse exactly one visible observer-only monitor sidecar for the current thread.
+- Point that sidecar at `./scripts/monitor_task_loop.sh <task-slug>` for the current task and retarget the same sidecar if the active task changes.
 - Run `./scripts/doctor_task.sh <task-slug>` when you want to confirm the task files and SQL control plane still agree.
 - Print rolling automation prompt variants with `./scripts/automation_prompt_helper.sh <task-slug>`.
 - Print schedule-agnostic automation proposal metadata with `./scripts/automation_proposal_helper.sh <task-slug>`.

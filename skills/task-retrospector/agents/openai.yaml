@@ -5,4 +5,4 @@ interface:
   default_prompt: "Use $task-retrospector and $task-handoff-state to analyze this completed or failed Campfire run and turn the reusable lessons into benchmark, verifier, skill, or control-plane follow-up candidates."
 
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

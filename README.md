@@ -13,12 +13,14 @@ Campfire uses a small stack:
 - `long-horizon-worker`
 - `task-evaluator`
 - `task-handoff-state`
+- `thread-monitor-sidecar`
 - `task-retrospector`
 
 Each repo supplies its own `AGENTS.md`, docs, validators, and local wrappers.  
 Each repo also chooses a task root in `campfire.toml` via `default_task_root` (default: `.autonomous`).
 
 `task-retrospector` is the improvement loop. It turns completed runs, failures, and benchmark regressions into benchmark, verifier, control-plane, or generated-skill follow-up candidates instead of relying on vague memory.
+`thread-monitor-sidecar` is the rolling-run sidecar layer. It keeps one visible observer-only monitor subagent alive for the current thread and retargets it when the active Campfire task changes.
 
 ## Control Plane
 
@@ -143,13 +145,13 @@ For long unattended runs, switch the task into rolling mode:
 
 For a manual-stop rolling run, use `--until-stopped`.
 
-For rolling Codex App runs, start the observer-only monitor loop and keep it alive in a sidecar subagent while the parent agent advances slices:
+For rolling Codex App runs, use `$thread-monitor-sidecar` to start or reuse one visible observer-only sidecar subagent for the current thread. Point it at the task-local monitor loop while the parent agent advances slices:
 
 ```bash
 ./scripts/monitor_task_loop.sh <task-slug>
 ```
 
-The monitor loop should write only `.campfire/monitoring/` artifacts and never mutate durable task state.
+Reuse that same sidecar if the active task changes later in the thread. The task-local monitor loop should write only `.campfire/monitoring/` artifacts and never mutate durable task state.
 
 ## Shared Workflow Utilities
 
@@ -184,7 +186,7 @@ Current examples:
 
 For a Claude Code adapter that stays outside Campfire core, see [Claude Code adapter](/Users/alexmeckes/Downloads/Campfire/docs/claude-code-adapter.md).
 
-For a first-pass subagent model that stays outside core, see [Subagent monitor extension](/Users/alexmeckes/Downloads/Campfire/docs/subagent-monitor-extension.md). For Codex rolling runs, the default extension pattern is one continuous monitor sidecar backed by `./scripts/monitor_task_loop.sh`, not a worker swarm.
+For a first-pass subagent model that stays outside core, see [Subagent monitor extension](/Users/alexmeckes/Downloads/Campfire/docs/subagent-monitor-extension.md). For Codex rolling runs, the default extension pattern is one continuous visible monitor sidecar per thread, backed by `./scripts/monitor_task_loop.sh`, not a worker swarm.
 
 For generated-skill and automation details, see the focused docs below.
 

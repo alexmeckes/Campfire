@@ -1,0 +1,8 @@
+---
+interface:
+  display_name: "Thread Monitor Sidecar"
+  short_description: "Keeps one visible observer-only monitor subagent alive for the current thread"
+  default_prompt: "Use $thread-monitor-sidecar with $task-handoff-state to start or reuse one visible observer-only monitoring sidecar subagent for this thread and retarget it as the active Campfire task changes."
+
+policy:
+  allow_implicit_invocation: true

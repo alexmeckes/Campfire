@@ -46,7 +46,7 @@ Keep the automation prompt focused on the task itself.
 Use when a known task should keep advancing while preserving its current backlog.
 
 ```text
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue .autonomous/<task>/. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, update task state after each meaningful slice, and stop only on a real blocker, decision boundary, budget limit, or manual pause.
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar to continue .autonomous/<task>/. Start or reuse one visible observer-only monitor sidecar for the current thread, point it at the task-local monitor loop, keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, update task state after each meaningful slice, and stop only on a real blocker, decision boundary, budget limit, or manual pause.
 ```
 
 ### Verifier Sweep

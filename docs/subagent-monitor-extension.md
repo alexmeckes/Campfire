@@ -59,14 +59,15 @@ Its job is to read the same control plane and answer:
 
 ## Codex Default Pattern
 
-For rolling Codex App runs, the default Campfire pattern should be exactly one continuous monitor sidecar per active task.
+For rolling Codex App runs, the default Campfire pattern should be exactly one continuous visible monitor sidecar per thread.
 
 That means:
 
 - the primary agent starts or resumes the task
-- the primary agent spawns one monitor sidecar subagent for that task
-- the sidecar runs `./scripts/monitor_task_loop.sh <task-slug>` or the skill-path equivalent
-- the sidecar stays alive across slice boundaries until the parent run stops
+- the primary agent starts or reuses one monitor sidecar subagent for the current thread
+- the sidecar runs `./scripts/monitor_task_loop.sh <task-slug>` or the skill-path equivalent for the current task
+- if the active task changes in the same thread, the parent reuses the same sidecar and retargets it to the new task slug
+- the sidecar stays alive across slice boundaries and task changes until the parent run stops
 - the sidecar remains observer-only and writes only `.campfire/monitoring/` artifacts
 
 This is intentionally not a general orchestration layer:
@@ -76,7 +77,7 @@ This is intentionally not a general orchestration layer:
 - no durable state ownership transfer
 - no scheduler semantics in Campfire core
 
-If a monitor sidecar already exists for the same task in the current Codex run, reuse it instead of spawning duplicates.
+If a monitor sidecar already exists in the current Codex run, reuse it instead of spawning duplicates.
 
 ## Allowed vs Forbidden
 
@@ -239,6 +240,7 @@ This should remain an extension.
 
 Possible homes:
 
+- a Campfire skill boundary such as `$thread-monitor-sidecar`
 - a repo-local script wrapper
 - a Codex-side adapter helper
 - a Claude Code adapter hook/sidecar
@@ -260,7 +262,8 @@ The smallest useful version is:
 3. one verifier
    - proves stall detection, decision-boundary detection, and alert emission
 4. optional adapter integration
-   - Codex rolling prompts should tell the parent agent to spawn exactly one continuous monitor sidecar
+   - Codex rolling prompts should tell the parent agent to use `$thread-monitor-sidecar` to start or reuse exactly one visible monitor sidecar for the thread
+   - when the active task changes, the parent should retarget that same sidecar instead of spawning another
    - Claude/Codex may still call the one-shot monitor helper during long runs
 
 That is enough to learn whether the idea is helpful before designing anything more ambitious.

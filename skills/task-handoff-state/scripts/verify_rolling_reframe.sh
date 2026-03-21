@@ -72,7 +72,7 @@ cat > "$TASK_DIR/handoff.md" <<'EOF'
 
 ## Resume Prompt
 
-Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, and $task-handoff-state to continue this rolling task from `.autonomous/verify-rolling-reframe/`. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, and stop only on a configured run limit or a real blocker.
+Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar to continue this rolling task from `.autonomous/verify-rolling-reframe/`. Keep planning bounded, auto-advance through queued milestones, replenish the queue when policy allows and budget remains, and stop only on a configured run limit or a real blocker.
 EOF
 
 export TASK_DIR

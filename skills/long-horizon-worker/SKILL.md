@@ -58,7 +58,7 @@ When `checkpoints.json` has an `execution` object with:
 follow these extra rules:
 
 1. Keep planning bounded to `planning_slice_minutes`.
-2. In Codex App, spawn exactly one continuous monitor sidecar subagent for the active task before broad implementation work. Use the repo-local `./scripts/monitor_task_loop.sh <task-slug>` wrapper when available, otherwise the bundled Campfire helper path. Keep the sidecar alive between slices and keep it observer-only.
+2. In Codex App, use `$thread-monitor-sidecar` before broad implementation work so the thread has exactly one visible observer-only monitor sidecar subagent. Point it at the repo-local `./scripts/monitor_task_loop.sh <task-slug>` wrapper when available, otherwise the bundled Campfire helper path, and retarget the same sidecar if the active task changes.
 3. Maintain a queued backlog of the next milestones in `execution.queued_milestones`.
 4. After a milestone validates, use `$task-evaluator` logic to confirm it and then advance to the next queued milestone instead of stopping.
 5. Update `checkpoints.json`, `handoff.md`, and `progress.md` at each milestone boundary.
