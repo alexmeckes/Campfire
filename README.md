@@ -72,9 +72,25 @@ Restart your agent client after installation so the skill list refreshes. Today 
 
 - Codex-oriented skills under `~/.codex/skills`
 - a repo-local Codex plugin bundle exposed through [/.agents/plugins/marketplace.json](/Users/alexmeckes/Downloads/Campfire/.agents/plugins/marketplace.json)
+- repo-local Codex hooks under [/.codex/hooks.json](/Users/alexmeckes/Downloads/Campfire/.codex/hooks.json)
 - a Claude Code adapter template under `examples/basic-workspace/.claude/`
 
 If you want to test Campfire through the Codex plugin directory instead of direct skill installs, the repo now exposes a local `campfire-codex` plugin under [plugins/campfire-codex](/Users/alexmeckes/Downloads/Campfire/plugins/campfire-codex). It ships a thin Campfire workflow skill and relies on the target repo's local Campfire wrappers instead of copying the full control plane into the plugin cache.
+
+For Codex specifically, there are now three supported entry points:
+
+- direct skill installs via `./scripts/install_skills.sh`
+- a repo-local plugin via [/.agents/plugins/marketplace.json](/Users/alexmeckes/Downloads/Campfire/.agents/plugins/marketplace.json)
+- repo-local hooks via [/.codex/hooks.json](/Users/alexmeckes/Downloads/Campfire/.codex/hooks.json)
+
+The current Codex hook set covers:
+
+- `SessionStart` to inject Campfire task context
+- `PostToolUse` for Bash-driven heartbeat and projection refresh
+- `UserPromptSubmit` guardrails for `waiting_on_decision` and `blocked` states
+- `Stop` continuation checks for healthy rolling tasks
+
+The `Stop` hook also writes evaluation records under `.campfire/monitoring/stop-hooks/` so rolling continuations leave a small audit trail outside chat history.
 
 ## Verify
 
