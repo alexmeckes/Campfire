@@ -17,6 +17,9 @@ PROMOTE_IMPROVEMENT_SCRIPT="$EXAMPLE_ROOT/scripts/promote_improvement.sh"
 DRAFT_SKILL_SCRIPT="$EXAMPLE_ROOT/scripts/draft_generated_skill.sh"
 MONITOR_TASK_SCRIPT="$EXAMPLE_ROOT/scripts/monitor_task.sh"
 MONITOR_TASK_LOOP_SCRIPT="$EXAMPLE_ROOT/scripts/monitor_task_loop.sh"
+CODEX_CONFIG_FILE="$EXAMPLE_ROOT/.codex/config.toml"
+CODEX_HOOKS_FILE="$EXAMPLE_ROOT/.codex/hooks.json"
+CODEX_STOP_HOOK="$EXAMPLE_ROOT/.codex/hooks/campfire-stop.sh"
 CLAUDE_SETTINGS_FILE="$EXAMPLE_ROOT/.claude/settings.json"
 CLAUDE_RESUME_COMMAND="$EXAMPLE_ROOT/.claude/commands/campfire-resume.md"
 CLAUDE_NEW_TASK_COMMAND="$EXAMPLE_ROOT/.claude/commands/campfire-new-task.md"
@@ -49,7 +52,7 @@ expect_contains() {
 }
 
 echo "== Syntax checks =="
-zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$AUTOMATION_SCHEDULE_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$MONITOR_TASK_SCRIPT" "$MONITOR_TASK_LOOP_SCRIPT" "$CLAUDE_SESSION_START_HOOK" "$CLAUDE_PRE_TOOL_HOOK" "$CLAUDE_POST_TOOL_HOOK" "$CLAUDE_STATUSLINE_HOOK" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
+zsh -n "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$AUTOMATION_SCHEDULE_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$QUEUE_GUIDANCE_SCRIPT" "$DOCTOR_TASK_SCRIPT" "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$DRAFT_SKILL_SCRIPT" "$MONITOR_TASK_SCRIPT" "$MONITOR_TASK_LOOP_SCRIPT" "$CODEX_STOP_HOOK" "$CLAUDE_SESSION_START_HOOK" "$CLAUDE_PRE_TOOL_HOOK" "$CLAUDE_POST_TOOL_HOOK" "$CLAUDE_STATUSLINE_HOOK" "$EXAMPLE_ROOT/scripts/verify_harness.sh"
 python3 -m py_compile "$CLAUDE_HOOK_HELPER"
 
 echo "== Skill presence =="
@@ -70,8 +73,10 @@ cp "$RECORD_IMPROVEMENT_SCRIPT" "$PROMOTE_IMPROVEMENT_SCRIPT" "$TEMP_WORKSPACE/s
 cp "$DRAFT_SKILL_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$MONITOR_TASK_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$MONITOR_TASK_LOOP_SCRIPT" "$TEMP_WORKSPACE/scripts/"
+cp -R "$EXAMPLE_ROOT/.codex" "$TEMP_WORKSPACE/"
 cp -R "$EXAMPLE_ROOT/.claude" "$TEMP_WORKSPACE/"
 chmod +x "$TEMP_WORKSPACE"/scripts/*.sh
+chmod +x "$TEMP_WORKSPACE/.codex/hooks/"*.sh
 chmod +x "$TEMP_WORKSPACE/.claude/hooks/"*.sh
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/scripts/new_task.sh" --slug "$TASK_SLUG" "verify example wrapper flow" >/tmp/campfire_example_new.out
@@ -94,6 +99,9 @@ expect_file "$TEMP_WORKSPACE/.campfire/registry.json"
 expect_file "$TEMP_WORKSPACE/.campfire/project_context.json"
 expect_file "$TEMP_WORKSPACE/.campfire/improvement_backlog.json"
 expect_file "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/task_context.json"
+expect_file "$TEMP_WORKSPACE/.codex/config.toml"
+expect_file "$TEMP_WORKSPACE/.codex/hooks.json"
+expect_file "$TEMP_WORKSPACE/.codex/hooks/campfire-stop.sh"
 expect_file "$TEMP_WORKSPACE/.claude/settings.json"
 expect_file "$TEMP_WORKSPACE/.claude/commands/campfire-resume.md"
 expect_file "$TEMP_WORKSPACE/.claude/commands/campfire-new-task.md"
@@ -130,7 +138,8 @@ if names["verifier_sweep"] != "Sweep verify-example-wrapper-flow verifier":
 if names["backlog_refresh"] != "Refresh verify-example-wrapper-flow backlog":
     raise SystemExit("backlog proposal name mismatch")
 for item in proposals:
-    if item.get("cwds") != [str(workspace)]:
+    normalized_cwds = [str(Path(value).resolve()) for value in item.get("cwds", [])]
+    if normalized_cwds != [str(workspace)]:
         raise SystemExit("proposal cwd mismatch")
     if item.get("status") != "ACTIVE":
         raise SystemExit("proposal status mismatch")
@@ -170,6 +179,8 @@ expect_contains /tmp/campfire_example_resume.out 'Task context:'
 expect_contains /tmp/campfire_example_resume.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar'
 expect_contains /tmp/campfire_example_resume.out 'Suggested thread monitor sidecar:'
 expect_contains /tmp/campfire_example_resume.out "Initial task monitor command: ./scripts/monitor_task_loop.sh $TASK_SLUG"
+expect_contains "$TEMP_WORKSPACE/.codex/config.toml" 'codex_hooks = true'
+expect_contains "$TEMP_WORKSPACE/.codex/hooks.json" '"Stop"'
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-resume.md" './scripts/resume_task.sh'
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-new-task.md" './scripts/new_task.sh'
 expect_contains "$TEMP_WORKSPACE/.claude/commands/campfire-start-slice.md" './scripts/start_slice.sh'
@@ -207,10 +218,13 @@ EOF
 CLAUDE_PROJECT_DIR="$TEMP_WORKSPACE" "$TEMP_WORKSPACE/.claude/hooks/campfire-statusline.sh" <<'EOF' >/tmp/campfire_example_claude_statusline.out
 {"session_id":"demo"}
 EOF
+printf '%s\n' "{\"hook_event_name\":\"Stop\",\"cwd\":\"$TEMP_WORKSPACE\",\"stop_hook_active\":false,\"turn_id\":\"demo-turn\",\"session_id\":\"demo-session\"}" | CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/.codex/hooks/campfire-stop.sh" >/tmp/campfire_example_codex_stop.out
 expect_contains /tmp/campfire_example_claude_session.out 'Campfire project detected.'
 expect_contains /tmp/campfire_example_claude_session.out "task: $TASK_SLUG"
 expect_contains /tmp/campfire_example_claude_session.out "./scripts/resume_task.sh $TASK_SLUG"
 expect_contains /tmp/campfire_example_claude_statusline.out "campfire $TASK_SLUG"
+expect_contains /tmp/campfire_example_codex_stop.out '"decision": "block"'
+expect_contains /tmp/campfire_example_codex_stop.out "$TASK_SLUG"
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/heartbeat.json" '"source": "claude-post-tool.sh"'
 python3 - <<'PY'
 import json

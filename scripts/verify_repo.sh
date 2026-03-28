@@ -15,6 +15,7 @@ expect_file() {
 
 echo "== Syntax checks =="
 zsh -n \
+  "$ROOT_DIR/.codex/hooks/campfire-stop.sh" \
   "$ROOT_DIR/scripts/new_task.sh" \
   "$ROOT_DIR/scripts/resume_task.sh" \
   "$ROOT_DIR/scripts/enable_rolling_mode.sh" \
@@ -46,6 +47,7 @@ zsh -n \
   "$ROOT_DIR/examples/basic-workspace/scripts/draft_generated_skill.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task_loop.sh" \
+  "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-stop.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/bootstrap_task.sh" \
@@ -74,6 +76,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_draft_generated_skill.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task_loop.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_codex_stop_hook.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_schedule_scaffold.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_blocked_retry.sh" \
@@ -126,6 +129,9 @@ expect_file "$ROOT_DIR/campfire.toml"
 expect_file "$ROOT_DIR/examples/basic-workspace/AGENTS.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/campfire.toml"
 expect_file "$ROOT_DIR/examples/basic-workspace/README.md"
+expect_file "$ROOT_DIR/.codex/config.toml"
+expect_file "$ROOT_DIR/.codex/hooks.json"
+expect_file "$ROOT_DIR/.codex/hooks/campfire-stop.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/doctor_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh"
@@ -141,6 +147,9 @@ expect_file "$ROOT_DIR/examples/basic-workspace/scripts/draft_generated_skill.sh
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task_loop.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/.codex/config.toml"
+expect_file "$ROOT_DIR/examples/basic-workspace/.codex/hooks.json"
+expect_file "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-stop.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/plan.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/runbook.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/progress.md"
@@ -210,6 +219,9 @@ echo "== Monitor task verifier =="
 
 echo "== Monitor loop verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task_loop.sh"
+
+echo "== Codex Stop hook verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_codex_stop_hook.sh"
 
 echo "== Automation proposal helper verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh"
