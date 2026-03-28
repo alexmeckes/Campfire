@@ -102,10 +102,24 @@ def selected_task(root_dir: Path) -> dict:
         "phase": str(selected.get("phase", "")).strip(),
         "task_dir": str(task_dir),
         "run_mode": str(task_context.get("run_mode", "")).strip(),
+        "project_name": str(load_json(root_dir / ".campfire" / "project_context.json").get("project_name", root_dir.name)).strip() or root_dir.name,
+        "task_root": str(load_json(root_dir / ".campfire" / "project_context.json").get("task_root", ".autonomous")).strip() or ".autonomous",
+        "milestone_id": str(current.get("milestone_id", "")).strip(),
+        "milestone_title": str(current.get("milestone_title", "")).strip(),
         "current_slice_id": str(current.get("slice_id", "")).strip(),
+        "current_slice_title": str(current.get("slice_title", "")).strip(),
         "queued_count": len(queued),
         "stop_reason": str(last_run.get("stop_reason", "")).strip(),
     }
+
+
+def active_task_slug(root_dir: Path) -> str:
+    task = selected_task(root_dir)
+    if not task:
+        return ""
+    if task["status"] == "in_progress" and task["current_slice_id"] and task["task_slug"]:
+        return task["task_slug"]
+    return ""
 
 
 def load_monitor_payload(root_dir: Path, task_slug: str) -> dict:
@@ -157,27 +171,127 @@ def render_resume_prompt(root_dir: Path, task_slug: str) -> str:
     return proc.stdout.strip()
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Campfire Codex Stop hook")
-    parser.add_argument("--root", default="", help="Workspace root override")
-    args = parser.parse_args()
+def emit_additional_context(event_name: str, text: str) -> int:
+    print(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": event_name,
+                    "additionalContext": text,
+                }
+            }
+        )
+    )
+    return 0
 
-    try:
-        hook_input = json.load(sys.stdin)
-    except Exception:
+
+def refresh_active_task(root_dir: Path, source_name: str) -> int:
+    task_slug = active_task_slug(root_dir)
+    if not task_slug:
         return 0
 
-    if not isinstance(hook_input, dict):
+    touch_script = resolve_script(
+        root_dir,
+        "scripts/touch_heartbeat.sh",
+        "task-handoff-state/scripts/touch_heartbeat.sh",
+    )
+    refresh_script = resolve_script(
+        root_dir,
+        "scripts/refresh_registry.sh",
+        "task-handoff-state/scripts/refresh_registry.sh",
+    )
+    if touch_script is None or refresh_script is None:
         return 0
-    if str(hook_input.get("hook_event_name", "")).strip() != "Stop":
+
+    subprocess.run(
+        [
+            str(touch_script),
+            "--root",
+            str(root_dir),
+            "--state",
+            "active",
+            "--source",
+            source_name,
+            "--summary",
+            "Codex tool activity.",
+            task_slug,
+        ],
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        [str(refresh_script), "--root", str(root_dir)],
+        capture_output=True,
+        text=True,
+    )
+    return 0
+
+
+def handle_session_start(root_dir: Path) -> int:
+    task = selected_task(root_dir)
+    if not task:
+        return emit_additional_context(
+            "SessionStart",
+            "Campfire project detected.\n"
+            f"project: {root_dir.name}\n"
+            "task: none\n"
+            'next_helper: ./scripts/new_task.sh "objective"',
+        )
+
+    milestone_text = task["milestone_id"]
+    if task["milestone_id"] and task["milestone_title"]:
+        milestone_text = f'{task["milestone_id"]} - {task["milestone_title"]}'
+
+    lines = [
+        "Campfire project detected.",
+        f'project: {task["project_name"]}',
+        f'task_root: {task["task_root"]}',
+        f'task: {task["task_slug"]}',
+        f'status: {task["status"]}',
+    ]
+    if task["phase"]:
+        lines.append(f'phase: {task["phase"]}')
+    if milestone_text:
+        lines.append(f'milestone: {milestone_text}')
+    if task["current_slice_title"]:
+        lines.append(f'slice: {task["current_slice_title"]}')
+    if task["stop_reason"]:
+        lines.append(f'stop_reason: {task["stop_reason"]}')
+    lines.append(f'next_helper: ./scripts/resume_task.sh {task["task_slug"]}')
+    if task["status"] == "waiting_on_decision":
+        lines.append("decision_boundary: stop and ask for the missing decision before implementing more work.")
+
+    return emit_additional_context("SessionStart", "\n".join(lines))
+
+
+def handle_user_prompt_submit(root_dir: Path) -> int:
+    task = selected_task(root_dir)
+    if not task:
         return 0
+    if task["status"] not in {"waiting_on_decision", "blocked"}:
+        return 0
+
+    lines = [
+        f'Campfire task {task["task_slug"]} is currently {task["status"]}.',
+    ]
+    if task["stop_reason"]:
+        lines.append(f'stop_reason: {task["stop_reason"]}')
+    if task["status"] == "waiting_on_decision":
+        lines.append("Do not guess past the unresolved decision boundary; ask for the missing decision or keep the turn to inspection only.")
+    else:
+        lines.append("Do not assume the blocker is cleared; verify the blocker state before continuing implementation.")
+
+    return emit_additional_context("UserPromptSubmit", "\n".join(lines))
+
+
+def handle_post_tool_use(root_dir: Path, hook_input: dict) -> int:
+    if str(hook_input.get("tool_name", "")).strip() != "Bash":
+        return 0
+    return refresh_active_task(root_dir, "codex-post-tool.sh")
+
+
+def handle_stop(root_dir: Path, hook_input: dict) -> int:
     if bool(hook_input.get("stop_hook_active")):
-        return 0
-
-    root_dir = resolve_repo_root(args.root, hook_input)
-    if root_dir is None:
-        return 0
-    if not ((root_dir / "campfire.toml").exists() or (root_dir / ".campfire").exists()):
         return 0
 
     task = selected_task(root_dir)
@@ -201,6 +315,37 @@ def main() -> int:
         return 0
 
     print(json.dumps({"decision": "block", "reason": prompt}))
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Campfire Codex hook adapter")
+    parser.add_argument("--root", default="", help="Workspace root override")
+    args = parser.parse_args()
+
+    try:
+        hook_input = json.load(sys.stdin)
+    except Exception:
+        return 0
+
+    if not isinstance(hook_input, dict):
+        return 0
+
+    root_dir = resolve_repo_root(args.root, hook_input)
+    if root_dir is None:
+        return 0
+    if not ((root_dir / "campfire.toml").exists() or (root_dir / ".campfire").exists()):
+        return 0
+
+    event_name = str(hook_input.get("hook_event_name", "")).strip()
+    if event_name == "SessionStart":
+        return handle_session_start(root_dir)
+    if event_name == "PostToolUse":
+        return handle_post_tool_use(root_dir, hook_input)
+    if event_name == "UserPromptSubmit":
+        return handle_user_prompt_submit(root_dir)
+    if event_name == "Stop":
+        return handle_stop(root_dir, hook_input)
     return 0
 
 

@@ -15,6 +15,9 @@ expect_file() {
 
 echo "== Syntax checks =="
 zsh -n \
+  "$ROOT_DIR/.codex/hooks/campfire-session-start.sh" \
+  "$ROOT_DIR/.codex/hooks/campfire-post-tool.sh" \
+  "$ROOT_DIR/.codex/hooks/campfire-user-prompt-submit.sh" \
   "$ROOT_DIR/.codex/hooks/campfire-stop.sh" \
   "$ROOT_DIR/scripts/new_task.sh" \
   "$ROOT_DIR/scripts/resume_task.sh" \
@@ -47,6 +50,9 @@ zsh -n \
   "$ROOT_DIR/examples/basic-workspace/scripts/draft_generated_skill.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task_loop.sh" \
+  "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-session-start.sh" \
+  "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-post-tool.sh" \
+  "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-user-prompt-submit.sh" \
   "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-stop.sh" \
   "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/init_task.sh" \
@@ -131,6 +137,9 @@ expect_file "$ROOT_DIR/examples/basic-workspace/campfire.toml"
 expect_file "$ROOT_DIR/examples/basic-workspace/README.md"
 expect_file "$ROOT_DIR/.codex/config.toml"
 expect_file "$ROOT_DIR/.codex/hooks.json"
+expect_file "$ROOT_DIR/.codex/hooks/campfire-session-start.sh"
+expect_file "$ROOT_DIR/.codex/hooks/campfire-post-tool.sh"
+expect_file "$ROOT_DIR/.codex/hooks/campfire-user-prompt-submit.sh"
 expect_file "$ROOT_DIR/.codex/hooks/campfire-stop.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/doctor_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh"
@@ -149,6 +158,9 @@ expect_file "$ROOT_DIR/examples/basic-workspace/scripts/monitor_task_loop.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/verify_harness.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/.codex/config.toml"
 expect_file "$ROOT_DIR/examples/basic-workspace/.codex/hooks.json"
+expect_file "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-session-start.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-post-tool.sh"
+expect_file "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-user-prompt-submit.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/.codex/hooks/campfire-stop.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/plan.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/.autonomous/example-task/runbook.md"

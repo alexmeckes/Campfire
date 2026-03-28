@@ -1,5 +1,43 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/campfire-session-start.sh\"",
+            "timeout": 30,
+            "statusMessage": "Loading Campfire context"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/campfire-post-tool.sh\"",
+            "timeout": 30,
+            "statusMessage": "Refreshing Campfire state"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$(git rev-parse --show-toplevel)/.codex/hooks/campfire-user-prompt-submit.sh\"",
+            "timeout": 30,
+            "statusMessage": "Checking Campfire prompt context"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
