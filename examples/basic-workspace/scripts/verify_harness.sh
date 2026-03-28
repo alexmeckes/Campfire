@@ -67,7 +67,7 @@ expect_file "$SKILLS_ROOT/course-corrector/SKILL.md"
 
 echo "== Temp workspace wrapper flow =="
 TEMP_WORKSPACE="$(mktemp -d)"
-trap 'if [ -n "${MONITOR_LOOP_PID:-}" ]; then kill "$MONITOR_LOOP_PID" >/dev/null 2>&1 || true; wait "$MONITOR_LOOP_PID" >/dev/null 2>&1 || true; fi; rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_example_roll.out /tmp/campfire_example_prompts.out /tmp/campfire_example_proposals.json /tmp/campfire_example_schedule.json /tmp/campfire_example_template.out /tmp/campfire_example_guidance.out /tmp/campfire_example_resume.out /tmp/campfire_example_monitor_loop.out /tmp/campfire_example_codex_session.out /tmp/campfire_example_codex_post.out /tmp/campfire_example_codex_prompt.out /tmp/campfire_example_codex_stop.out /tmp/campfire_example_claude_post_again.out' EXIT
+trap 'if [ -n "${MONITOR_LOOP_PID:-}" ]; then kill "$MONITOR_LOOP_PID" >/dev/null 2>&1 || true; wait "$MONITOR_LOOP_PID" >/dev/null 2>&1 || true; fi; rm -rf "$TEMP_WORKSPACE" /tmp/campfire_example_new.out /tmp/campfire_example_roll.out /tmp/campfire_example_prompts.out /tmp/campfire_example_proposals.json /tmp/campfire_example_schedule.json /tmp/campfire_example_template.out /tmp/campfire_example_guidance.out /tmp/campfire_example_resume.out /tmp/campfire_example_monitor_loop.out /tmp/campfire_example_codex_session.out /tmp/campfire_example_codex_post.out /tmp/campfire_example_codex_prompt.out /tmp/campfire_example_codex_stop.out /tmp/campfire_example_codex_stop_waiting.out /tmp/campfire_example_claude_post_again.out' EXIT
 mkdir -p "$TEMP_WORKSPACE/scripts"
 cp "$NEW_TASK_SCRIPT" "$RESUME_TASK_SCRIPT" "$ENABLE_ROLLING_SCRIPT" "$AUTOMATION_PROMPTS_SCRIPT" "$AUTOMATION_PROPOSAL_SCRIPT" "$AUTOMATION_SCHEDULE_SCRIPT" "$PROMPT_TEMPLATE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
 cp "$QUEUE_GUIDANCE_SCRIPT" "$TEMP_WORKSPACE/scripts/"
@@ -239,16 +239,32 @@ expect_contains /tmp/campfire_example_codex_session.out "$TASK_SLUG"
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/heartbeat.json" '"source": "codex-post-tool.sh"'
 expect_contains /tmp/campfire_example_codex_stop.out '"decision": "block"'
 expect_contains /tmp/campfire_example_codex_stop.out "$TASK_SLUG"
+expect_contains /tmp/campfire_example_codex_stop.out '"systemMessage": "Campfire continuing rolling task'
 CLAUDE_PROJECT_DIR="$TEMP_WORKSPACE" CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/.claude/hooks/campfire-post-tool.sh" <<'EOF' >/tmp/campfire_example_claude_post_again.out 2>&1
 {"tool":"Edit"}
 EOF
 expect_contains "$TEMP_WORKSPACE/.autonomous/$TASK_SLUG/heartbeat.json" '"source": "claude-post-tool.sh"'
+expect_file "$TEMP_WORKSPACE/.campfire/monitoring/stop-hooks/latest/$TASK_SLUG.json"
 
 CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$SKILLS_ROOT/task-handoff-state/scripts/complete_slice.sh" --root "$TEMP_WORKSPACE" --status waiting_on_decision --summary "A real decision boundary is pending." --next-step "Wait for explicit operator input." "$TASK_SLUG" >/dev/null
 printf '%s\n' "{\"hook_event_name\":\"UserPromptSubmit\",\"cwd\":\"$TEMP_WORKSPACE\",\"turn_id\":\"demo-turn-2\",\"session_id\":\"demo-session\",\"prompt\":\"continue the task\"}" | CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/.codex/hooks/campfire-user-prompt-submit.sh" >/tmp/campfire_example_codex_prompt.out
 expect_contains /tmp/campfire_example_codex_prompt.out '"hookEventName": "UserPromptSubmit"'
 expect_contains /tmp/campfire_example_codex_prompt.out 'waiting_on_decision'
 expect_contains /tmp/campfire_example_codex_prompt.out 'Do not guess past the unresolved decision boundary'
+printf '%s\n' "{\"hook_event_name\":\"Stop\",\"cwd\":\"$TEMP_WORKSPACE\",\"stop_hook_active\":false,\"turn_id\":\"demo-turn-3\",\"session_id\":\"demo-session\"}" | CAMPFIRE_SKILLS_ROOT="$SKILLS_ROOT" "$TEMP_WORKSPACE/.codex/hooks/campfire-stop.sh" >/tmp/campfire_example_codex_stop_waiting.out
+python3 - "$TEMP_WORKSPACE" "$TASK_SLUG" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+workspace = Path(sys.argv[1]).resolve()
+task_slug = sys.argv[2]
+payload = json.loads((workspace / ".campfire" / "monitoring" / "stop-hooks" / "latest" / f"{task_slug}.json").read_text())
+if payload.get("decision") != "noop_non_continuable_status":
+    raise SystemExit("codex stop latest payload decision mismatch")
+if payload.get("status") != "waiting_on_decision":
+    raise SystemExit("codex stop latest payload status mismatch")
+PY
 python3 - <<'PY'
 import json
 from pathlib import Path

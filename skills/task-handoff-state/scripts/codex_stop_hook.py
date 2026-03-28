@@ -4,6 +4,7 @@ import json
 import os
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -185,6 +186,59 @@ def emit_additional_context(event_name: str, text: str) -> int:
     return 0
 
 
+def stop_hook_dirs(root_dir: Path) -> tuple[Path, Path]:
+    base = root_dir / ".campfire" / "monitoring" / "stop-hooks"
+    return base / "events", base / "latest"
+
+
+def record_stop_hook_event(
+    root_dir: Path,
+    task: dict,
+    decision: str,
+    summary: str,
+    hook_input: dict,
+    monitor_payload: dict | None = None,
+    prompt: str = "",
+) -> None:
+    if not task or not task.get("task_slug"):
+        return
+
+    events_dir, latest_dir = stop_hook_dirs(root_dir)
+    events_dir.mkdir(parents=True, exist_ok=True)
+    latest_dir.mkdir(parents=True, exist_ok=True)
+
+    now = datetime.now(timezone.utc)
+    task_slug = str(task.get("task_slug", "")).strip()
+    payload = {
+        "recorded_at": now.isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "task_slug": task_slug,
+        "status": str(task.get("status", "")).strip(),
+        "phase": str(task.get("phase", "")).strip(),
+        "run_mode": str(task.get("run_mode", "")).strip(),
+        "milestone_id": str(task.get("milestone_id", "")).strip(),
+        "milestone_title": str(task.get("milestone_title", "")).strip(),
+        "current_slice_id": str(task.get("current_slice_id", "")).strip(),
+        "current_slice_title": str(task.get("current_slice_title", "")).strip(),
+        "queued_count": int(task.get("queued_count", 0) or 0),
+        "last_stop_reason": str(task.get("stop_reason", "")).strip(),
+        "decision": decision,
+        "summary": summary,
+        "hook_event_name": str(hook_input.get("hook_event_name", "")).strip(),
+        "stop_hook_active": bool(hook_input.get("stop_hook_active")),
+        "session_id": str(hook_input.get("session_id", "")).strip(),
+        "turn_id": str(hook_input.get("turn_id", "")).strip(),
+        "monitor_payload": monitor_payload or {},
+        "prompt_preview": prompt[:280],
+    }
+
+    timestamp = now.strftime("%Y%m%dT%H%M%SZ")
+    event_path = events_dir / f"{timestamp}-{task_slug}.json"
+    latest_path = latest_dir / f"{task_slug}.json"
+    serialized = json.dumps(payload, indent=2) + "\n"
+    event_path.write_text(serialized)
+    latest_path.write_text(serialized)
+
+
 def refresh_active_task(root_dir: Path, source_name: str) -> int:
     task_slug = active_task_slug(root_dir)
     if not task_slug:
@@ -291,30 +345,97 @@ def handle_post_tool_use(root_dir: Path, hook_input: dict) -> int:
 
 
 def handle_stop(root_dir: Path, hook_input: dict) -> int:
-    if bool(hook_input.get("stop_hook_active")):
-        return 0
-
     task = selected_task(root_dir)
     if not task:
         return 0
+
+    if bool(hook_input.get("stop_hook_active")):
+        record_stop_hook_event(
+            root_dir,
+            task,
+            "noop_reentrant",
+            "Stop hook was already active for this turn; Campfire did not continue.",
+            hook_input,
+        )
+        return 0
     if task["run_mode"] != "rolling":
+        record_stop_hook_event(
+            root_dir,
+            task,
+            "noop_non_rolling",
+            "Campfire did not continue because the selected task is not in rolling mode.",
+            hook_input,
+        )
         return 0
     if task["status"] not in CONTINUABLE_STATUSES:
+        record_stop_hook_event(
+            root_dir,
+            task,
+            "noop_non_continuable_status",
+            f'Campfire did not continue because task status is {task["status"]}.',
+            hook_input,
+        )
         return 0
     if task["stop_reason"] in NON_CONTINUABLE_STOP_REASONS:
+        record_stop_hook_event(
+            root_dir,
+            task,
+            "noop_manual_pause",
+            "Campfire did not continue because the task was manually paused.",
+            hook_input,
+        )
         return 0
     if not task["current_slice_id"] and task["queued_count"] <= 0:
+        record_stop_hook_event(
+            root_dir,
+            task,
+            "noop_no_safe_work",
+            "Campfire did not continue because there is no active slice and no queued work.",
+            hook_input,
+        )
         return 0
 
     monitor_payload = load_monitor_payload(root_dir, task["task_slug"])
     if monitor_payload.get("recommended_action") != "allow":
+        record_stop_hook_event(
+            root_dir,
+            task,
+            f'noop_monitor_{monitor_payload.get("recommended_action", "unknown")}',
+            str(monitor_payload.get("summary", "Campfire monitor did not allow continuation.")).strip(),
+            hook_input,
+            monitor_payload=monitor_payload,
+        )
         return 0
 
     prompt = render_resume_prompt(root_dir, task["task_slug"])
     if not prompt:
+        record_stop_hook_event(
+            root_dir,
+            task,
+            "noop_missing_prompt",
+            "Campfire did not continue because it could not render a rolling resume prompt.",
+            hook_input,
+            monitor_payload=monitor_payload,
+        )
         return 0
 
-    print(json.dumps({"decision": "block", "reason": prompt}))
+    milestone_label = task["milestone_id"] or "current milestone"
+    if task["milestone_id"] and task["milestone_title"]:
+        milestone_label = f'{task["milestone_id"]} - {task["milestone_title"]}'
+    summary = (
+        f'Campfire continuing rolling task {task["task_slug"]} at {milestone_label}; '
+        f'monitor verdict: {", ".join(monitor_payload.get("reason_codes", [])) or "allow"}.'
+    )
+    record_stop_hook_event(
+        root_dir,
+        task,
+        "continue_rolling",
+        summary,
+        hook_input,
+        monitor_payload=monitor_payload,
+        prompt=prompt,
+    )
+    print(json.dumps({"decision": "block", "reason": prompt, "systemMessage": summary}))
     return 0
 
 

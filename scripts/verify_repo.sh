@@ -82,6 +82,7 @@ zsh -n \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_draft_generated_skill.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_monitor_task_loop.sh" \
+  "$ROOT_DIR/skills/task-handoff-state/scripts/verify_codex_plugin.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_codex_stop_hook.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh" \
   "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_schedule_scaffold.sh" \
@@ -141,6 +142,9 @@ expect_file "$ROOT_DIR/.codex/hooks/campfire-session-start.sh"
 expect_file "$ROOT_DIR/.codex/hooks/campfire-post-tool.sh"
 expect_file "$ROOT_DIR/.codex/hooks/campfire-user-prompt-submit.sh"
 expect_file "$ROOT_DIR/.codex/hooks/campfire-stop.sh"
+expect_file "$ROOT_DIR/.agents/plugins/marketplace.json"
+expect_file "$ROOT_DIR/plugins/campfire-codex/.codex-plugin/plugin.json"
+expect_file "$ROOT_DIR/plugins/campfire-codex/skills/campfire/SKILL.md"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/doctor_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/new_task.sh"
 expect_file "$ROOT_DIR/examples/basic-workspace/scripts/resume_task.sh"
@@ -234,6 +238,9 @@ echo "== Monitor loop verifier =="
 
 echo "== Codex Stop hook verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_codex_stop_hook.sh"
+
+echo "== Codex plugin verifier =="
+"$ROOT_DIR/skills/task-handoff-state/scripts/verify_codex_plugin.sh"
 
 echo "== Automation proposal helper verifier =="
 "$ROOT_DIR/skills/task-handoff-state/scripts/verify_automation_proposal_helper.sh"

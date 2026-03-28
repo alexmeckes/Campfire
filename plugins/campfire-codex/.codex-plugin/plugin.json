@@ -1,0 +1,31 @@
+{
+  "name": "campfire-codex",
+  "version": "0.1.0",
+  "description": "Campfire skills and Codex hook adapters for long-horizon engineering tasks.",
+  "homepage": "https://github.com/alexmeckes/Campfire",
+  "repository": "https://github.com/alexmeckes/Campfire",
+  "keywords": [
+    "campfire",
+    "agent-workflow",
+    "long-horizon"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Campfire",
+    "shortDescription": "Long-horizon task control plane for Codex.",
+    "longDescription": "Install a thin Campfire Codex skill that routes into repo-local Campfire wrappers for resumable long-horizon engineering workflows.",
+    "developerName": "Campfire",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/alexmeckes/Campfire",
+    "defaultPrompt": [
+      "Use Campfire to resume the current long-horizon task.",
+      "Use Campfire to frame a new engineering objective.",
+      "Use Campfire to continue a rolling task safely."
+    ],
+    "brandColor": "#F97316"
+  }
+}

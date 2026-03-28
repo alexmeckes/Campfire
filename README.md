@@ -71,7 +71,10 @@ Install the core Campfire skills into `~/.codex/skills`:
 Restart your agent client after installation so the skill list refreshes. Today Campfire ships:
 
 - Codex-oriented skills under `~/.codex/skills`
+- a repo-local Codex plugin bundle exposed through [/.agents/plugins/marketplace.json](/Users/alexmeckes/Downloads/Campfire/.agents/plugins/marketplace.json)
 - a Claude Code adapter template under `examples/basic-workspace/.claude/`
+
+If you want to test Campfire through the Codex plugin directory instead of direct skill installs, the repo now exposes a local `campfire-codex` plugin under [plugins/campfire-codex](/Users/alexmeckes/Downloads/Campfire/plugins/campfire-codex). It ships a thin Campfire workflow skill and relies on the target repo's local Campfire wrappers instead of copying the full control plane into the plugin cache.
 
 ## Verify
 

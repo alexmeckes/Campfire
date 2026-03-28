@@ -31,7 +31,7 @@ expect_empty() {
 }
 
 TEMP_WORKSPACE="$(mktemp -d)"
-trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_codex_hook_continue.out /tmp/campfire_codex_hook_waiting.out /tmp/campfire_codex_hook_reentrant.out /tmp/campfire_codex_hook_session.out /tmp/campfire_codex_hook_prompt.out /tmp/campfire_codex_hook_post.out' EXIT
+trap 'rm -rf "$TEMP_WORKSPACE" /tmp/campfire_codex_hook_continue.out /tmp/campfire_codex_hook_waiting.out /tmp/campfire_codex_hook_reentrant.out /tmp/campfire_codex_hook_session.out /tmp/campfire_codex_hook_prompt.out /tmp/campfire_codex_hook_post.out /tmp/campfire_codex_hook_latest.json' EXIT
 
 mkdir -p "$TEMP_WORKSPACE/scripts" "$TEMP_WORKSPACE/.codex/hooks"
 cp "$ROOT_DIR/scripts/monitor_task.sh" "$ROOT_DIR/scripts/prompt_template_helper.sh" "$TEMP_WORKSPACE/scripts/"
@@ -61,7 +61,11 @@ printf '%s\n' "{\"hook_event_name\":\"Stop\",\"cwd\":\"$TEMP_WORKSPACE\",\"stop_
 
 expect_contains /tmp/campfire_codex_hook_continue.out '"decision": "block"'
 expect_contains /tmp/campfire_codex_hook_continue.out "$TASK_SLUG"
+expect_contains /tmp/campfire_codex_hook_continue.out '"systemMessage": "Campfire continuing rolling task'
 expect_contains /tmp/campfire_codex_hook_continue.out 'Use $task-framer, $course-corrector, $long-horizon-worker, $task-evaluator, $task-handoff-state, and $thread-monitor-sidecar'
+cp "$TEMP_WORKSPACE/.campfire/monitoring/stop-hooks/latest/$TASK_SLUG.json" /tmp/campfire_codex_hook_latest.json
+expect_contains /tmp/campfire_codex_hook_latest.json '"decision": "continue_rolling"'
+expect_contains /tmp/campfire_codex_hook_latest.json '"task_slug": "verify-codex-stop-hook"'
 
 "$COMPLETE_SLICE_SCRIPT" --root "$TEMP_WORKSPACE" --status waiting_on_decision --summary "Pause on an explicit decision boundary." --next-step "Wait for the operator decision." "$TASK_SLUG" >/dev/null
 
@@ -76,11 +80,16 @@ printf '%s\n' "{\"hook_event_name\":\"Stop\",\"cwd\":\"$TEMP_WORKSPACE\",\"stop_
   CAMPFIRE_SKILLS_ROOT="$ROOT_DIR/skills" "$TEMP_WORKSPACE/.codex/hooks/campfire-stop.sh" >/tmp/campfire_codex_hook_waiting.out
 
 expect_empty /tmp/campfire_codex_hook_waiting.out
+cp "$TEMP_WORKSPACE/.campfire/monitoring/stop-hooks/latest/$TASK_SLUG.json" /tmp/campfire_codex_hook_latest.json
+expect_contains /tmp/campfire_codex_hook_latest.json '"decision": "noop_non_continuable_status"'
+expect_contains /tmp/campfire_codex_hook_latest.json '"status": "waiting_on_decision"'
 
 printf '%s\n' "{\"hook_event_name\":\"Stop\",\"cwd\":\"$TEMP_WORKSPACE\",\"stop_hook_active\":true,\"turn_id\":\"turn-3\",\"session_id\":\"session-3\"}" | \
   CAMPFIRE_SKILLS_ROOT="$ROOT_DIR/skills" "$TEMP_WORKSPACE/.codex/hooks/campfire-stop.sh" >/tmp/campfire_codex_hook_reentrant.out
 
 expect_empty /tmp/campfire_codex_hook_reentrant.out
+cp "$TEMP_WORKSPACE/.campfire/monitoring/stop-hooks/latest/$TASK_SLUG.json" /tmp/campfire_codex_hook_latest.json
+expect_contains /tmp/campfire_codex_hook_latest.json '"decision": "noop_reentrant"'
 expect_contains "$TEMP_WORKSPACE/.codex/hooks.json" '"SessionStart"'
 expect_contains "$TEMP_WORKSPACE/.codex/hooks.json" '"PostToolUse"'
 expect_contains "$TEMP_WORKSPACE/.codex/hooks.json" '"UserPromptSubmit"'
